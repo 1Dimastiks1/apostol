@@ -12,4 +12,4 @@ function App() {
   return <><Header /><main><Hero /><LiveStreams /><FacebookFeed /><Rector /><Contacts /></main><footer className="border-t border-slate-200 bg-white px-6 py-7 text-center text-sm text-slate-500"><p>© {new Date().getFullYear()} Храм св. апостолів Петра і Павла · Кам'янець-Подільський</p><p className="mt-1">Православна Церква України</p></footer></>
 }
 
-createRoot(document.getElementById('app')).render(<React.StrictMode><App /></React.StrictMode>)
+createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>)
