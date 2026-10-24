@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="./src/style.css">
+  <link rel="stylesheet" href="./calendar-module/styles.css">
   <style>
     /* ← Inline-блок залишено для Tailwind CDN-конфігурації.
        Усі кастомні стилі тепер у src/style.css              */
@@ -64,12 +65,12 @@
   <header class="border-b border-[#c5a059]/40 bg-[#190101]">
     <div class="shell flex min-h-[82px] items-center justify-between gap-5 py-3">
       <a href="#home" class="flex items-center gap-3 no-underline" aria-label="На головну"><span class="grid size-12 place-items-center border border-[#c5a059] text-[#c5a059]" aria-hidden="true"><svg width="22" height="28" viewBox="0 0 23 29" fill="none"><path d="M11.5 1v26M5 8h13M7 14h9M3 27h17" stroke="currentColor" stroke-width="1.5"/><path d="M11.5 1 9 4m2.5-3L14 4" stroke="currentColor" stroke-width="1.2"/></svg></span><span><span class="display block text-sm tracking-[.12em]">Петропавлівський храм</span><span class="block text-[10px] tracking-[.12em] text-[#c5a059]">ПРАВОСЛАВНА ЦЕРКВА УКРАЇНИ</span></span></a>
-      <nav class="hidden items-center gap-5 text-xs text-[#e6d9bf] md:flex" aria-label="Основна навігація"><a href="#home">Головна</a><a href="#schedule">Розклад</a><a href="#rector">Настоятель</a><a href="#news">Події</a><a href="#prayer">Поминання</a><a href="#community">Питання</a><a href="#contacts">Контакти</a></nav>
+      <nav class="hidden items-center gap-5 text-xs text-[#e6d9bf] md:flex" aria-label="Основна навігація"><a href="#home">Головна</a><a href="#schedule">Розклад</a><a href="#calendar">Календар</a><a href="#rector">Настоятель</a><a href="#news">Події</a><a href="#prayer">Поминання</a><a href="#community">Питання</a><a href="#contacts">Контакти</a></nav>
       <a href="https://www.facebook.com/profile.php?id=100059029128700&locale=uk_UA" target="_blank" rel="noopener noreferrer" class="metal text-xs"><span class="desktop-facebook-label">Facebook парафії</span><span class="mobile-facebook-label">Facebook</span> ↗</a>
     </div>
   </header>
 
-  <nav class="mobile-dock" aria-label="Швидкі переходи"><a href="#schedule"><span class="dock-mark" aria-hidden="true">☷</span><span>Розклад</span></a><a href="#prayer"><span class="dock-mark" aria-hidden="true">✣</span><span>Поминання</span></a><button id="mobile-donate" type="button"><span class="dock-mark" aria-hidden="true">₴</span><span>Пожертва</span></button></nav>
+  <nav class="mobile-dock" aria-label="Швидкі переходи"><a href="#schedule"><span class="dock-mark" aria-hidden="true">☷</span><span>Розклад</span></a><a href="#calendar"><span class="dock-mark" aria-hidden="true">✝</span><span>Календар</span></a><a href="#prayer"><span class="dock-mark" aria-hidden="true">✣</span><span>Поминання</span></a><button id="mobile-donate" type="button"><span class="dock-mark" aria-hidden="true">₴</span><span>Пожертва</span></button></nav>
 
   <main>
     <section id="home" class="hero">
@@ -80,6 +81,12 @@
           <article class="hero-slide" data-slide="2" aria-hidden="true"><div class="slide-copy"><p class="eyebrow">ДОБРА СПРАВА · ПІДТРИМКА ГРОМАДИ</p><h2 class="display mt-4 text-4xl sm:text-5xl">Підтримка храму та парафії</h2><p class="mt-5 text-base leading-7 text-[#eadfca]">Оберіть напрям і суму. Після переходу до оплати перевірте одержувача, суму та призначення переказу.</p><form id="donation-form" class="mt-5 max-w-xl" novalidate><fieldset><legend class="mb-2 text-xs uppercase tracking-[.14em] text-[#c5a059]">Напрям підтримки</legend><div class="flex flex-wrap gap-2"><button type="button" class="cause-button" data-cause="потреби храму" aria-pressed="true">На храм</button><button type="button" class="cause-button" data-cause="потреби парафії" aria-pressed="false">На потреби парафії</button></div></fieldset><fieldset class="mt-4"><legend class="mb-2 text-xs uppercase tracking-[.14em] text-[#c5a059]">Сума · грн</legend><div class="flex flex-wrap gap-2"><button type="button" class="amount-button" data-amount="100" aria-pressed="false">100 ₴</button><button type="button" class="amount-button" data-amount="250" aria-pressed="true">250 ₴</button><button type="button" class="amount-button" data-amount="500" aria-pressed="false">500 ₴</button><button type="button" class="amount-button" data-amount="1000" aria-pressed="false">1000 ₴</button></div></fieldset><label class="mt-4 flex items-start gap-2 text-xs leading-5 text-[#d8c9aa]"><input id="donation-consent" type="checkbox" class="mt-1 accent-[#b38f43]"><span>Я розумію, що обраний тут напрям і сума можуть не передатися автоматично. Перед оплатою перевірю одержувача, суму та призначення.</span></label><button type="submit" class="metal metal-bright mt-4">Перейти до оплати ↗</button><p id="donation-status" class="mt-2 min-h-5 text-xs text-[#e7cf98]" aria-live="polite"></p></form></div><div class="slide-visual flex items-center justify-center p-8"><div class="text-center"><svg class="mx-auto text-[#c5a059]" width="116" height="150" viewBox="0 0 116 150" fill="none" aria-hidden="true"><path d="M58 6v138M30 35h56M39 61h38M18 143h80" stroke="currentColor" stroke-width="2"/><path d="m58 6-10 12m10-12 10 12" stroke="currentColor" stroke-width="2"/></svg><p class="display mt-4 text-2xl text-[#dec180]">Спільна підтримка</p><p class="mt-2 text-xs text-[#c5a059]">Безпечний перехід до оплати</p></div></div></article>
           <div class="carousel-tools"><span id="slide-counter" class="mr-1 text-xs tracking-[.15em] text-[#d8c9aa]">01 / 03</span><button id="prev-slide" class="carousel-arrow" type="button" aria-label="Попередній слайд">‹</button><button id="next-slide" class="carousel-arrow" type="button" aria-label="Наступний слайд">›</button></div>
         </div><div class="slide-dots" role="group" aria-label="Вибрати слайд"><button class="slide-dot" data-slide-to="0" aria-label="Розклад богослужінь" aria-current="true"></button><button class="slide-dot" data-slide-to="1" aria-label="Святині храму" aria-current="false"></button><button class="slide-dot" data-slide-to="2" aria-label="Підтримка храму та парафії" aria-current="false"></button></div>
+      </div>
+    </section>
+
+    <section id="calendar" class="section textured" aria-label="Новоюліанський церковний календар ПЦУ">
+      <div class="shell">
+        <div id="church-calendar-widget"></div>
       </div>
     </section>
 
@@ -244,5 +251,7 @@
 
 
   </script>
+  <script src="./calendar-module/app.js"></script>
+  <script>mountChurchCalendar('#church-calendar-widget');</script>
 </body>
 </html>

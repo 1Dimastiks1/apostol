@@ -1,0 +1,1159 @@
+.cc-calendar-host {
+  --cc-ink: #292820;
+  --cc-muted: #777268;
+  --cc-paper: #fffdf8;
+  --cc-warm: #f6f1e7;
+  --cc-line: #e5ddcd;
+  --cc-gold: #9d7b37;
+  --cc-gold-pale: #f4ead1;
+  --cc-wine: #713d38;
+  --cc-wine-pale: #f8ece8;
+  --cc-blue: #38576b;
+  --cc-blue-pale: #eaf0f3;
+  display: block;
+  color: var(--cc-ink);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  width: 100%;
+}
+
+.cc-calendar-host *,
+.cc-calendar-host *::before,
+.cc-calendar-host *::after {
+  box-sizing: border-box;
+}
+
+.cc-calendar-host button,
+.cc-calendar-host input,
+.cc-calendar-host select {
+  font: inherit;
+}
+
+.cc-calendar {
+  width: min(1160px, 100%);
+  margin-inline: auto;
+  padding: clamp(18px, 3.5vw, 38px);
+  background: var(--cc-paper);
+  border: 1px solid var(--cc-line);
+  border-radius: 18px;
+  box-shadow: 0 18px 55px rgb(62 45 20 / 8%);
+}
+
+.cc-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--cc-line);
+}
+
+.cc-kicker,
+.cc-detail-kicker {
+  margin: 0;
+  color: var(--cc-gold);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.cc-kicker span {
+  display: inline-block;
+  margin-right: 7px;
+  font-size: 15px;
+}
+
+.cc-title {
+  margin: 6px 0 5px;
+  color: #302a20;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 600;
+  letter-spacing: .015em;
+  line-height: 1.05;
+}
+
+.cc-intro {
+  max-width: 570px;
+  margin: 0;
+  color: var(--cc-muted);
+  font-size: 14px;
+}
+
+.cc-controls {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.cc-month-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cc-icon-button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--cc-line);
+  border-radius: 50%;
+  background: transparent;
+  color: #514a3e;
+  cursor: pointer;
+  font-family: Georgia, serif !important;
+  font-size: 29px !important;
+  line-height: 1;
+  transition: border-color .18s ease, color .18s ease, background .18s ease;
+}
+
+.cc-icon-button:hover,
+.cc-icon-button:focus-visible {
+  border-color: var(--cc-gold);
+  background: var(--cc-gold-pale);
+  color: #5c4316;
+}
+
+.cc-month-year {
+  min-width: 123px;
+  text-align: center;
+}
+
+.cc-month-label {
+  margin: 0;
+  color: #322d24;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 23px;
+  font-weight: 650;
+  line-height: 1.1;
+}
+
+.cc-year-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  color: var(--cc-muted);
+  font-size: 11px;
+}
+
+.cc-year-input {
+  width: 54px;
+  padding: 1px 2px;
+  border: 0;
+  border-bottom: 1px solid #d6c7a6;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  color: var(--cc-ink);
+  font-size: 12px !important;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.cc-year-input:focus-visible {
+  border-color: var(--cc-gold);
+  box-shadow: 0 1px 0 var(--cc-gold);
+}
+
+.cc-today-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid #d9c89f;
+  border-radius: 999px;
+  background: #fbf7ed;
+  color: #6d5728;
+  cursor: pointer;
+  font-size: 13px !important;
+  font-weight: 650;
+  white-space: nowrap;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.cc-today-button:hover,
+.cc-today-button:focus-visible {
+  border-color: var(--cc-gold);
+  background: var(--cc-gold-pale);
+}
+
+.cc-tools {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 0 18px;
+}
+
+.cc-search-wrap {
+  position: relative;
+  width: min(470px, 100%);
+}
+
+.cc-search-label,
+.cc-filter-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #5f594e;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.cc-search-box {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid var(--cc-line);
+  border-radius: 9px;
+  background: #fff;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.cc-search-box:focus-within {
+  border-color: #b89a5a;
+  box-shadow: 0 0 0 3px rgb(184 154 90 / 12%);
+}
+
+.cc-search-icon {
+  flex: 0 0 auto;
+  color: #927b4c;
+  font-family: Georgia, serif;
+  font-size: 22px;
+  line-height: 1;
+  transform: rotate(-20deg);
+}
+
+.cc-search {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--cc-ink);
+  font-size: 14px !important;
+}
+
+.cc-search::placeholder {
+  color: #9a958b;
+}
+
+.cc-clear-search {
+  width: 25px;
+  height: 25px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 50%;
+  background: #f2eee6;
+  color: #635d52;
+  cursor: pointer;
+  font-size: 18px !important;
+  line-height: 1;
+}
+
+.cc-clear-search[hidden] {
+  display: none;
+}
+
+.cc-filter-label {
+  min-width: 180px;
+  margin-bottom: 0;
+}
+
+.cc-filter {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
+  padding: 0 34px 0 12px;
+  border: 1px solid var(--cc-line);
+  border-radius: 9px;
+  outline: 0;
+  appearance: auto;
+  background: #fff;
+  color: #48443c;
+  cursor: pointer;
+  font-size: 13px !important;
+}
+
+.cc-filter:focus-visible {
+  border-color: #b89a5a;
+  box-shadow: 0 0 0 3px rgb(184 154 90 / 12%);
+}
+
+.cc-search-results {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 5px);
+  right: 0;
+  left: 0;
+  max-height: 300px;
+  overflow: auto;
+  border: 1px solid var(--cc-line);
+  border-radius: 10px;
+  background: #fffefa;
+  box-shadow: 0 12px 30px rgb(41 35 23 / 14%);
+}
+
+.cc-search-results[hidden] {
+  display: none;
+}
+
+.cc-search-result {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 13px;
+  border: 0;
+  border-bottom: 1px solid #eee8dd;
+  background: transparent;
+  color: #383329;
+  cursor: pointer;
+  text-align: left;
+}
+
+.cc-search-result:last-child {
+  border-bottom: 0;
+}
+
+.cc-search-result:hover,
+.cc-search-result:focus-visible {
+  outline: 0;
+  background: #f7f0df;
+}
+
+.cc-search-result span {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.cc-search-result small,
+.cc-search-empty {
+  color: var(--cc-muted);
+  font-size: 11px;
+}
+
+.cc-search-empty {
+  margin: 0;
+  padding: 12px;
+}
+
+.cc-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, .75fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.cc-calendar-panel {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid #eee8dc;
+  border-radius: 12px;
+  background: #fffefa;
+}
+
+.cc-weekdays,
+.cc-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.cc-weekdays {
+  margin-bottom: 7px;
+}
+
+.cc-weekdays span {
+  padding: 5px 0 8px;
+  color: #8b8478;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.cc-days {
+  grid-auto-rows: minmax(56px, 1fr);
+}
+
+.cc-day-empty {
+  min-width: 0;
+}
+
+.cc-day {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 56px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 3px;
+  padding: 8px 3px 5px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #49443c;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, opacity .15s ease, transform .15s ease;
+}
+
+.cc-day:hover {
+  border-color: #e2d3ad;
+  background: #faf5e9;
+}
+
+.cc-day:focus-visible {
+  z-index: 1;
+  outline: 2px solid #987739;
+  outline-offset: 1px;
+}
+
+.cc-day-number {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.cc-day.has-major .cc-day-number {
+  background: var(--cc-gold-pale);
+  color: #71571e;
+  font-weight: 750;
+}
+
+.cc-day.has-great .cc-day-number,
+.cc-day.is-pascha .cc-day-number {
+  background: #e9dfc5;
+  color: #5b4315;
+  box-shadow: inset 0 0 0 1px #c9b47b;
+}
+
+.cc-day.has-fast .cc-day-number {
+  color: var(--cc-blue);
+}
+
+.cc-day.is-today .cc-day-number {
+  box-shadow: inset 0 0 0 1px #536f7e;
+  color: #234052;
+  font-weight: 800;
+}
+
+.cc-day.is-selected {
+  border-color: #a88646;
+  background: #f8f2e5;
+}
+
+.cc-day.is-selected .cc-day-number {
+  background: #725c33;
+  color: #fffdf7;
+  box-shadow: none;
+}
+
+.cc-day.is-muted {
+  opacity: .28;
+}
+
+.cc-day-marks {
+  display: flex;
+  min-height: 9px;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 9px;
+  line-height: 1;
+}
+
+.cc-mark {
+  font-style: normal;
+  line-height: 1;
+}
+
+.cc-mark-great {
+  color: #9c782f;
+}
+
+.cc-mark-fast {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #496878;
+  color: transparent;
+}
+
+.cc-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  margin-top: 17px;
+  padding-top: 13px;
+  border-top: 1px solid #eee8dc;
+  color: #777166;
+  font-size: 11px;
+}
+
+.cc-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cc-legend-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.cc-legend-great {
+  background: #c5ad73;
+}
+
+.cc-legend-fast {
+  background: #526f7e;
+}
+
+.cc-legend-today {
+  border: 1px solid #536f7e;
+  background: transparent;
+}
+
+.cc-detail {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 22px;
+  border: 1px solid #e7dfd0;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #f9f5eb, #fffefa 75%);
+}
+
+.cc-detail--great {
+  border-color: #d4c49e;
+  background: linear-gradient(145deg, #f5edda, #fffefa 78%);
+}
+
+.cc-detail--pascha {
+  border-color: #cdb77d;
+  background: linear-gradient(145deg, #f4ead1, #fffefa 78%);
+}
+
+.cc-detail-date {
+  margin: 7px 0 0;
+  color: #746c5e;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.cc-detail-title {
+  margin: 13px 0 0;
+  color: #332c22;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(23px, 2.1vw, 30px);
+  font-weight: 650;
+  line-height: 1.12;
+}
+
+.cc-detail-saints {
+  margin: 12px 0 0;
+  color: #665d4d;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.55;
+}
+
+.cc-detail-description {
+  margin: 12px 0 0;
+  color: #5d584f;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.cc-fast-status {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: auto;
+  padding: 13px 12px;
+  border: 1px solid #e6e1d6;
+  border-radius: 9px;
+  background: #fffefa;
+}
+
+.cc-fast-status.is-fast {
+  border-color: #d4dfe4;
+  background: var(--cc-blue-pale);
+  color: #304e61;
+}
+
+.cc-fast-status.is-clear {
+  color: #5a624e;
+}
+
+.cc-fast-symbol {
+  flex: 0 0 auto;
+  font-size: 17px;
+  line-height: 1.1;
+}
+
+.cc-fast-status strong,
+.cc-fast-status small {
+  display: block;
+}
+
+.cc-fast-status strong {
+  font-size: 12px;
+}
+
+.cc-fast-status small {
+  margin-top: 3px;
+  color: #687279;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.cc-source-link {
+  margin-top: 14px;
+  color: #77602e;
+  font-size: 11px;
+  text-decoration-color: #c7b27b;
+  text-underline-offset: 3px;
+}
+
+.cc-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 17px;
+  color: #898377;
+  font-size: 10px;
+}
+
+.cc-footer a {
+  flex: 0 0 auto;
+  color: #77602e;
+  text-decoration-color: #c7b27b;
+  text-underline-offset: 3px;
+}
+
+.cc-calendar-host :is(button, input, select, a):focus-visible {
+  outline-offset: 3px;
+}
+
+@media (max-width: 820px) {
+  .cc-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .cc-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .cc-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cc-detail {
+    min-height: 290px;
+  }
+}
+
+@media (max-width: 520px) {
+  .cc-calendar {
+    padding: 17px 12px;
+    border-radius: 13px;
+  }
+
+  .cc-title {
+    font-size: 34px;
+  }
+
+  .cc-intro {
+    font-size: 13px;
+  }
+
+  .cc-controls {
+    align-items: flex-end;
+    gap: 7px;
+  }
+
+  .cc-month-controls {
+    gap: 6px;
+  }
+
+  .cc-icon-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .cc-month-year {
+    min-width: 105px;
+  }
+
+  .cc-month-label {
+    font-size: 21px;
+  }
+
+  .cc-today-button {
+    min-height: 36px;
+    padding-inline: 11px;
+    font-size: 12px !important;
+  }
+
+  .cc-tools {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .cc-search-wrap,
+  .cc-filter-label {
+    width: 100%;
+  }
+
+  .cc-calendar-panel {
+    padding: 10px 7px 12px;
+  }
+
+  .cc-weekdays,
+  .cc-days {
+    gap: 2px;
+  }
+
+  .cc-weekdays span {
+    font-size: 9px;
+  }
+
+  .cc-days {
+    grid-auto-rows: minmax(45px, 1fr);
+  }
+
+  .cc-day {
+    min-height: 45px;
+    gap: 2px;
+    padding: 5px 1px 3px;
+    border-radius: 7px;
+  }
+
+  .cc-day-number {
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+  }
+
+  .cc-day-marks {
+    min-height: 7px;
+  }
+
+  .cc-legend {
+    gap: 9px 12px;
+    padding-inline: 3px;
+    font-size: 10px;
+  }
+
+  .cc-detail {
+    min-height: 0;
+    padding: 18px 15px;
+  }
+
+  .cc-footer {
+    flex-direction: column;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .cc-controls {
+    align-items: center;
+  }
+
+  .cc-month-controls {
+    gap: 3px;
+  }
+
+  .cc-icon-button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .cc-month-year {
+    min-width: 93px;
+  }
+
+  .cc-month-label {
+    font-size: 19px;
+  }
+
+  .cc-today-button {
+    padding-inline: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-calendar-host *,
+  .cc-calendar-host *::before,
+  .cc-calendar-host *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Лаконічна пергаментна тема в палітрі Петропавлівського храму. */
+.cc-calendar-host {
+  --cc-ink: #342b25;
+  --cc-muted: #746b60;
+  --cc-paper: #faf6ee;
+  --cc-warm: #f5efe4;
+  --cc-line: #e8dfd1;
+  --cc-gold: #927340;
+  --cc-gold-pale: #f2ead8;
+  --cc-wine: #651b17;
+  --cc-wine-pale: #f6ece9;
+  --cc-blue: #34546a;
+  --cc-blue-pale: #edf2f4;
+  color: var(--cc-ink);
+  font-family: 'Lora', Georgia, 'Times New Roman', serif;
+}
+
+.cc-calendar {
+  position: relative;
+  overflow: visible;
+  border: 1px solid rgb(197 160 89 / 38%);
+  border-radius: 18px;
+  background: var(--cc-paper);
+  box-shadow: 0 12px 34px rgb(31 0 0 / 9%);
+}
+
+.cc-calendar::before {
+  content: none;
+}
+
+.cc-header {
+  align-items: center;
+  padding-bottom: 22px;
+  border-bottom-color: var(--cc-line);
+}
+
+.cc-kicker,
+.cc-detail-kicker {
+  color: var(--cc-gold);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.cc-kicker span {
+  font-size: 12px;
+}
+
+.cc-title {
+  margin-top: 7px;
+  color: #3a1714;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(34px, 4vw, 46px);
+  font-weight: 600;
+  letter-spacing: .01em;
+  text-shadow: none;
+  text-transform: none;
+}
+
+.cc-intro {
+  color: var(--cc-muted);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 14px;
+}
+
+.cc-icon-button {
+  width: 38px;
+  height: 38px;
+  border-color: var(--cc-line);
+  border-radius: 50%;
+  background: #fffdf9;
+  color: var(--cc-wine);
+  box-shadow: none;
+  font-size: 25px !important;
+}
+
+.cc-icon-button:hover,
+.cc-icon-button:focus-visible {
+  border-color: #c8ad79;
+  background: var(--cc-gold-pale);
+  color: #4e241b;
+}
+
+.cc-month-label {
+  color: #3a3028;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.cc-year-label {
+  color: var(--cc-muted);
+  font-family: 'Lora', Georgia, serif;
+}
+
+.cc-year-input {
+  border-bottom-color: #d6c6a4;
+  color: var(--cc-ink);
+  font-family: 'Lora', Georgia, serif;
+}
+
+.cc-today-button {
+  min-height: 38px;
+  border: 1px solid var(--cc-wine);
+  border-radius: 999px;
+  background: var(--cc-wine);
+  color: #fffaf2;
+  box-shadow: none;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 12px !important;
+}
+
+.cc-today-button:hover,
+.cc-today-button:focus-visible {
+  border-color: #7b2d25;
+  background: #7b2d25;
+  color: #fffaf2;
+}
+
+.cc-search-label,
+.cc-filter-label {
+  color: #62584d;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 12px;
+}
+
+.cc-search-box,
+.cc-filter {
+  border-color: #e2d8c9;
+  border-radius: 9px;
+  background: #fffdf9;
+  color: var(--cc-ink);
+  font-family: 'Lora', Georgia, serif;
+  box-shadow: none;
+}
+
+.cc-search-box:focus-within,
+.cc-filter:focus-visible {
+  border-color: #bda36f;
+  box-shadow: 0 0 0 3px rgb(146 115 64 / 9%);
+}
+
+.cc-search-results {
+  border-color: var(--cc-line);
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: 0 12px 26px rgb(45 33 18 / 12%);
+}
+
+.cc-search-result:hover,
+.cc-search-result:focus-visible {
+  background: #f7f1e7;
+}
+
+.cc-calendar-panel {
+  padding: 16px;
+  border-color: #eee7dc;
+  border-radius: 14px;
+  background: #fffdf9;
+  box-shadow: none;
+}
+
+.cc-weekdays span {
+  color: #8a8175;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 10px;
+  letter-spacing: .03em;
+}
+
+.cc-day {
+  border-radius: 10px;
+  color: #443b33;
+  font-family: 'Lora', Georgia, serif;
+}
+
+.cc-day:hover {
+  border-color: transparent;
+  background: #f6f0e7;
+}
+
+.cc-day-number {
+  width: 31px;
+  height: 31px;
+  font-size: 14px;
+}
+
+.cc-day.has-major .cc-day-number {
+  background: var(--cc-gold-pale);
+  color: #755a2d;
+}
+
+.cc-day.has-great .cc-day-number,
+.cc-day.is-pascha .cc-day-number {
+  background: var(--cc-wine);
+  color: #fffaf2;
+  box-shadow: none;
+}
+
+.cc-day.is-today .cc-day-number {
+  box-shadow: inset 0 0 0 1px var(--cc-blue);
+  color: var(--cc-blue);
+}
+
+.cc-day.is-selected {
+  border-color: transparent;
+  background: #f2eadc;
+  box-shadow: none;
+}
+
+.cc-day.is-selected .cc-day-number {
+  background: var(--cc-wine);
+  color: #fffaf2;
+}
+
+.cc-mark-great {
+  color: var(--cc-gold);
+}
+
+.cc-mark-fast {
+  background: var(--cc-blue);
+}
+
+.cc-legend {
+  border-top-color: #eee7dc;
+  color: #72695e;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 11px;
+}
+
+.cc-legend-great {
+  background: #c3a76e;
+}
+
+.cc-legend-fast {
+  background: var(--cc-blue);
+}
+
+.cc-legend-today {
+  border-color: var(--cc-blue);
+}
+
+.cc-detail,
+.cc-detail--great,
+.cc-detail--pascha {
+  padding: 22px;
+  border: 0;
+  border-left: 2px solid #c1a268;
+  border-radius: 0 14px 14px 0;
+  background: #f5efe4;
+  box-shadow: none;
+}
+
+.cc-detail--great {
+  border-left-color: var(--cc-wine);
+  background: #f7efea;
+}
+
+.cc-detail--pascha {
+  border-left-color: #a7894e;
+  background: #f4eddf;
+}
+
+.cc-detail-date,
+.cc-detail-saints,
+.cc-detail-description {
+  font-family: 'Lora', Georgia, serif;
+}
+
+.cc-detail-title {
+  margin-top: 10px;
+  color: #3a1714;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(27px, 2.2vw, 34px);
+  font-weight: 600;
+  line-height: 1.12;
+}
+
+.cc-detail-saints {
+  color: #63594d;
+  font-size: 14px;
+}
+
+.cc-detail-description {
+  color: #5c554d;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.cc-fast-status {
+  border-color: #e4dbcc;
+  border-radius: 10px;
+  background: #fffdf9;
+  font-family: 'Lora', Georgia, serif;
+}
+
+.cc-fast-status.is-fast {
+  border-color: #dce5e9;
+  background: var(--cc-blue-pale);
+  color: var(--cc-blue);
+}
+
+.cc-fast-status.is-clear {
+  color: #5d6254;
+}
+
+.cc-source-link,
+.cc-footer a {
+  color: #765b2f;
+  font-family: 'Lora', Georgia, serif;
+}
+
+.cc-footer {
+  color: #847a6e;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 11px;
+}
+
+@media (max-width: 520px) {
+  .cc-calendar {
+    padding: 17px 12px;
+    border-radius: 14px;
+  }
+
+  .cc-title {
+    font-size: 33px;
+  }
+
+  .cc-calendar-panel {
+    padding: 10px 6px 12px;
+  }
+
+  .cc-day-number {
+    width: 27px;
+    height: 27px;
+    font-size: 12px;
+  }
+
+  .cc-detail {
+    padding: 18px 15px;
+  }
+}
