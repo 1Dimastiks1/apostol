@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [tailwindcss(), facebookContentPlugin({ ...process.env, ...env })],
-    base: '/apostol/',
+    base: process.env.NETLIFY ? '/' : (process.env.BASE_URL || '/apostol/'),
     build: {
       rolldownOptions: {
         input: {

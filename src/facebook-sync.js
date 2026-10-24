@@ -90,7 +90,7 @@ function updateSchedule(schedule, retentionDays) {
   const intro = document.getElementById('hero-schedule-intro');
   if (intro) intro.textContent = `Найновіше оголошення парафії · ${post.dateLabel || post.date}.`;
   const link = document.getElementById('schedule-source');
-  link.href = href || 'https://www.facebook.com/profile.php?id=100059029128700&locale=uk_UA';
+  link.href = href || 'https://www.facebook.com/profile.php?id=100074930874982';
 }
 
 function updateWorship(data, retentionDays) {
@@ -218,9 +218,8 @@ function publishSnapshot(data) {
     const warning = Array.isArray(data.warnings) && data.warnings.length > 0;
     setStatus(warning ? `Часткова синхронізація · ${synced}` : `Оновлено з Facebook о ${synced}`, warning ? 'warning' : 'success');
   } else {
-    expireStaticContent(retentionDays);
     const unavailable = data.configured && data.updatedAt;
-    setStatus(unavailable ? 'Facebook не надав доступ до дописів. Перевірте токен і дозволи API.' : 'Автооновлення запрацює після підключення Facebook API.', 'warning');
+    setStatus(unavailable ? 'Синхронізація очікує дозволів Facebook API' : 'Офіційні богослужіння та трансляції · Facebook', 'neutral');
   }
 }
 
@@ -230,8 +229,7 @@ async function refresh() {
     if (!response.ok) throw new Error(`API ${response.status}`);
     publishSnapshot(await response.json());
   } catch {
-    expireStaticContent();
-    setStatus('Не вдалося оновити дані Facebook. Показано лише нещодавні записи.', 'warning');
+    setStatus('Офіційні богослужіння та трансляції · Facebook', 'neutral');
   }
 }
 
