@@ -1430,6 +1430,206 @@ a { color: inherit; }
   border: 0;
 }
 
+/* ============================================================ */
+/*  §21. ФОТО ХРАМУ ТА КАРУСЕЛЬ НАСТОЯТЕЛЯ                   */
+/* ============================================================ */
+
+.church-hero-image {
+  overflow: hidden;
+  padding: 0;
+  isolation: isolate;
+}
+
+.church-hero-image img {
+  position: absolute;
+  inset: 18px;
+  width: calc(100% - 36px);
+  height: calc(100% - 36px);
+  border: 1px solid var(--brass);
+  object-fit: cover;
+  object-position: 50% 36%;
+  box-shadow: inset 0 0 0 4px rgba(179, 143, 67, 0.18), 1px 2px 0 #090000;
+}
+
+.church-hero-image::after {
+  content: '';
+  position: absolute;
+  inset: 18px;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 58%, rgba(20, 0, 0, 0.64));
+}
+
+.church-hero-caption {
+  position: absolute;
+  z-index: 2;
+  right: 34px;
+  bottom: 31px;
+  left: 34px;
+  color: #fff2d4;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-shadow: 0 1px 2px #170000;
+}
+
+.rector-photo .rector-slide {
+  opacity: 0;
+  transition: opacity 0.38s ease, transform 0.5s cubic-bezier(.2, .7, .2, 1), filter 0.3s ease;
+}
+
+.rector-photo .rector-slide.is-active { opacity: 1; }
+
+.rector-carousel-controls {
+  position: absolute;
+  z-index: 3;
+  right: 22px;
+  bottom: 24px;
+  left: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 9px;
+  border: 1px solid rgba(197, 160, 89, 0.82);
+  background: rgba(26, 0, 0, 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 245, 218, 0.12), 1px 2px 0 #090000;
+}
+
+.rector-carousel-arrow {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border: 1px solid var(--brass);
+  background: #32100c;
+  color: #f0d58e;
+  font: 400 27px/1 'Cormorant Garamond', Georgia, serif;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -2px 0 rgba(0, 0, 0, 0.4), 1px 2px 0 #6d5121;
+  transition: color var(--t-base), background var(--t-base), transform var(--t-base);
+}
+
+.rector-carousel-arrow:hover {
+  background: #4a1a12;
+  color: #fff2ce;
+  transform: translateY(-1px);
+}
+
+.rector-carousel-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.rector-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 1px solid #d4b36c;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--t-fast), transform var(--t-fast);
+}
+
+.rector-dot[aria-current="true"] {
+  background: #e5b842;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 1px 1px 0 #4b310d;
+  transform: scale(1.12);
+}
+
+.rector-photo-caption {
+  color: #d9c190;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.church-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.church-gallery-card {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--brass);
+  background: var(--parchment);
+  box-shadow: inset 0 0 0 4px rgba(179, 143, 67, 0.16), inset 0 0 0 5px #8d6d33, 1px 3px 0 #6d5121;
+  transition: transform var(--t-base), box-shadow var(--t-base), border-color var(--t-base);
+}
+
+.church-gallery-card:hover {
+  border-color: var(--gold-hi);
+  transform: translateY(-3px);
+  box-shadow: inset 0 0 0 4px rgba(179, 143, 67, 0.2), inset 0 0 0 5px #aa843c, 1px 5px 0 #6d5121;
+}
+
+.church-gallery-card > a {
+  display: block;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.church-gallery-image {
+  aspect-ratio: 4 / 3;
+  margin: 9px;
+  overflow: hidden;
+  border: 1px solid #957238;
+  background: #28120d;
+  box-shadow: inset 0 0 0 3px rgba(179, 143, 67, 0.18), 1px 2px 0 #61471e;
+}
+
+.church-gallery-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s cubic-bezier(.2, .7, .2, 1), filter 0.3s ease;
+}
+
+.church-gallery-card:hover .church-gallery-image img {
+  filter: contrast(1.04) saturate(1.04);
+  transform: scale(1.045);
+}
+
+.church-gallery-card figcaption {
+  display: grid;
+  gap: 4px;
+  min-height: 78px;
+  padding: 11px 17px 15px;
+  border-top: 1px solid rgba(179, 143, 67, 0.62);
+}
+
+.church-gallery-card figcaption span {
+  color: #32100d;
+  font: 700 20px/1.2 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.church-gallery-card figcaption small {
+  color: #6a5c49;
+  font: 400 12px/1.5 'Lora', Georgia, serif;
+}
+
+@media (max-width: 850px) {
+  .church-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 540px) {
+  .church-gallery-grid { grid-template-columns: minmax(0, 1fr); gap: 15px; }
+  .church-gallery-image { aspect-ratio: 5 / 4; }
+  .rector-carousel-controls { right: 18px; bottom: 19px; left: 18px; }
+  .church-hero-image img { inset: 12px; width: calc(100% - 24px); height: calc(100% - 24px); }
+  .church-hero-image::after { inset: 12px; }
+  .church-hero-caption { right: 22px; bottom: 22px; left: 22px; font-size: 11px; }
+}
+
 
 /* ============================================================ */
 /*  §18. АНІМАЦІЇ                                               */
