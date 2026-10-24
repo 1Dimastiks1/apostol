@@ -1,10 +1,1658 @@
+/* ============================================================ */
+/*                                                              */
+/*   ПЕТРОПАВЛІВСЬКИЙ ХРАМ — ГЛОБАЛЬНА ТАБЛИЦЯ СТИЛІВ          */
+/*   Sacred Neo-Baroque · Tailwind CSS Extension Layer          */
+/*                                                              */
+/*   Архітектура:                                               */
+/*     §0  Google Fonts CDN                                     */
+/*     §1  Tailwind base layer                                   */
+/*     §2  CSS токени (:root)                                   */
+/*     §3  Базова типографіка та елементи                       */
+/*     §4  Утиліти .font-display / .eyebrow / .section-title   */
+/*     §5  Металеві ефекти (.metal, .metal-bright, etc.)        */
+/*     §6  Hero / Carousel                                      */
+/*     §7  Слайди                                               */
+/*     §8  Пергаментні картки (.paper-metal, .slide-card)       */
+/*     §9  Буквиця (.dropcap)                                   */
+/*     §10 Пом'яник / Диптих (.memorial-paper, .note-*)        */
+/*     §11 Фото-сітка та галерея                               */
+/*     §12 Ректорська фотографія                               */
+/*     §13 Таймлайн та картки подій                            */
+/*     §14 Навігаційний мобільний dock                         */
+/*     §15 Сервісні кнопки та утиліти                          */
+/*     §16 Форми (FAQ, пошук)                                  */
+/*     §17 Відгуки                                             */
+/*     §18 Анімації та transitions                              */
+/*     §19 Адаптивність                                        */
+/*     §20 Доступність / reduced-motion                        */
+/*                                                              */
+/* ============================================================ */
+
+
+/* ============================================================ */
+/*  §0. ШРИФТИ                                                  */
+/* ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* ============================================================ */
+/*  §1. TAILWIND BASE                                           */
+/* ============================================================ */
+
 @import "tailwindcss";
 
-:root { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #0f172a; background: #fff; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; }
+
+/* ============================================================ */
+/*  §2. CSS ТОКЕНИ                                              */
+/* ============================================================ */
+
+:root {
+  /* Шрифти */
+  font-family: 'Lora', Georgia, 'Times New Roman', serif;
+
+  /* Антиаліасинг та рендер */
+  font-synthesis:          none;
+  text-rendering:          optimizeLegibility;
+  -webkit-font-smoothing:  antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior:         smooth;
+
+  /* ---- Кольорова палітра ---- */
+  --wine:        #1a0000;   /* оксамитовий фон */
+  --wine-2:      #2b0808;   /* трохи світліший wine */
+  --wine-3:      #3a0000;   /* заголовки секцій на темному */
+  --parchment:   #faf6ee;   /* літургійний пергамент */
+  --parchment-2: #f4efe3;   /* трохи тепліший — секції .paper */
+  --ink:         #262019;   /* основне чорнило */
+  --ink-soft:    #40372d;   /* м'якший варіант */
+  --muted:       #655d51;   /* приглушений */
+
+  /* ---- Метал ---- */
+  --brass:       #c5a059;   /* базова латунь */
+  --gold:        #b38f43;   /* матове золото */
+  --gold-hi:     #e5b842;   /* гаряче сусальне (hover) */
+  --gold-dark:   #7a5c00;   /* темна фаска */
+  --edge:        #6d5121;   /* тверда нижня тінь */
+
+  /* ---- Спеціальні кольори ---- */
+  --blue:        #183553;   /* кобальт Диптиху спочилих */
+
+  /* ---- Бордер-товщини ---- */
+  --border-brass: 1px solid var(--brass);
+
+  /* ---- Transitions ---- */
+  --t-fast:   0.18s ease;
+  --t-base:   0.24s cubic-bezier(.25,.46,.45,.94);
+  --t-slow:   0.42s cubic-bezier(.25,.46,.45,.94);
+}
+
+
+/* ============================================================ */
+/*  §3. БАЗОВА ТИПОГРАФІКА ТА ЕЛЕМЕНТИ                         */
+/* ============================================================ */
+
+body {
+  margin:     0;
+  min-width:  320px;
+  background: var(--wine);
+  color:      var(--parchment);
+
+  /* Тонка оксамитова текстура фону */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.012) 0px 1px,
+      transparent 1px 5px
+    );
+}
+
 * { box-sizing: border-box; }
-.hero { scroll-margin-top: 5rem; }
-section[id] { scroll-margin-top: 5.5rem; }
-.section-title { font-size: clamp(2rem, 4vw, 3.25rem); font-weight: 600; letter-spacing: -.045em; line-height: 1.12; color: #0f172a; }
-.eyebrow { color: #03628a; font-size: .72rem; font-weight: 700; letter-spacing: .18em; }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+
+/* Виділення тексту — під колір металу */
+::selection {
+  background-color: var(--gold);
+  color:            var(--wine);
+}
+
+/* Scroll-margin для секцій */
+.hero           { scroll-margin-top: 5rem; }
+section[id]     { scroll-margin-top: 5.5rem; }
+
+/* Посилання */
+a { color: inherit; }
+
+
+/* ============================================================ */
+/*  §4. УТИЛІТИ ТИПОГРАФІКИ                                    */
+/*      .font-display · .eyebrow · .section-title              */
+/* ============================================================ */
+
+/* --- 4.1 Display — Cormorant Garamond, розрідлено, усі великі --- */
+.font-display,
+.display {
+  font-family:    'Cormorant Garamond', 'Palatino Linotype', Georgia, serif;
+  text-transform: uppercase;
+}
+
+/* --- 4.2 Eyebrow — мікрозаголовок над секцією --- */
+.eyebrow {
+  color:          var(--brass);
+  font-family:    'Lora', Georgia, serif;
+  font-size:      0.7rem;     /* ~11px */
+  font-weight:    700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* --- 4.3 Section-title — великий монументальний заголовок --- */
+.section-title {
+  font-family:    'Cormorant Garamond', 'Palatino Linotype', Georgia, serif;
+  font-size:      clamp(2.3rem, 4vw, 3.6rem);
+  font-weight:    500;
+  letter-spacing: -0.035em;
+  line-height:    1.05;
+  color:          var(--wine-3);
+  text-transform: uppercase;
+}
+
+/* Підсекції що стосуються шрифту */
+.rector-section,
+#history,
+#gallery {
+  font-family: 'Lora', Georgia, serif;
+}
+
+
+/* ============================================================ */
+/*  §5. МЕТАЛЕВІ ЕФЕКТИ                                        */
+/*                                                              */
+/*  Принцип bevel (без жодних RGB-glow):                        */
+/*    inset 0 +1px → верхній відблиск фаски                    */
+/*    inset 0 -2px → нижня темна фаска                         */
+/*    0 +1px 0     → тверда зовнішня тінь (blur=0!)            */
+/*    0 +2px 4px   → загальне падіння маси                     */
+/* ============================================================ */
+
+/* --- 5.1 Базова металева кнопка/елемент (.metal) --- */
+.metal {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             9px;
+  min-height:      46px;
+  padding:         10px 20px;
+  border:          1px solid var(--brass);
+  background:      #2a0908;
+  color:           #ead5a4;
+  text-decoration: none;
+  font-family:     'Lora', Georgia, serif;
+  font-size:       inherit;
+  cursor:          pointer;
+
+  /*
+   * Bevel-ефект:
+   *  inset верх: слабкий відблиск
+   *  inset низ:  темна фаска (важкість металу)
+   *  зовні 1px:  тверда тінь (нульове розмиття — друга ключова умова)
+   *  зовні 2px:  шар "товщини" металу
+   */
+  box-shadow:
+    inset 0  1px 0   rgba(255, 255, 255, 0.10),
+    inset 0 -2px 0   rgba(0,   0,   0,   0.45),
+    0        1px 0   var(--edge),
+    0        2px 4px rgba(0, 0, 0, 0.35);
+
+  transition:
+    background  var(--t-base),
+    color       var(--t-base),
+    transform   var(--t-base),
+    box-shadow  var(--t-base);
+}
+
+.metal:hover {
+  background: #3a2513;
+  color:      #fff4d8;
+  transform:  translateY(-2px);
+
+  /* При підйомі — тінь збільшується: ефект реального підйому металу */
+  box-shadow:
+    inset 0  1px 0   rgba(255, 255, 255, 0.14),
+    inset 0 -2px 0   rgba(0,   0,   0,   0.40),
+    0        2px 0   var(--edge),
+    0        5px 8px rgba(0, 0, 0, 0.4);
+}
+
+.metal:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0  2px 4px rgba(0, 0, 0, 0.50),
+    inset 0 -1px 0   rgba(255, 255, 255, 0.08),
+    0        0px 0   transparent;
+}
+
+/* --- 5.2 Яскрава металева кнопка (.metal-bright) — головний CTA --- */
+.metal-bright {
+  background: var(--brass);
+  color:      #1a0000;
+  font-weight: 600;
+
+  box-shadow:
+    inset 0  1px 0   rgba(255, 255, 200, 0.35),
+    inset 0 -2px 0   rgba(0,   0,   0,   0.30),
+    0        1px 0   var(--gold-dark),
+    0        2px 5px rgba(0, 0, 0, 0.35);
+}
+
+.metal-bright:hover {
+  background: #d5b875;
+  color:      #1a0000;
+  transform:  translateY(-2px);
+
+  box-shadow:
+    inset 0  1px 0   rgba(255, 255, 200, 0.45),
+    inset 0 -2px 0   rgba(0,   0,   0,   0.25),
+    0        2px 0   var(--gold-dark),
+    0        5px 8px rgba(0, 0, 0, 0.35);
+}
+
+.metal-bright:active {
+  transform: translateY(1px);
+  background: var(--gold);
+  box-shadow:
+    inset 0  2px 4px rgba(0, 0, 0, 0.35),
+    0        0px 0   transparent;
+}
+
+/* --- 5.3 Кнопки-суми пожертви / типу поминання (.amount-button, .cause-button) --- */
+.amount-button,
+.cause-button,
+.filter-button,
+.note-tab {
+  border:     1px solid rgba(179, 143, 67, 0.80);
+  background: transparent;
+  color:      inherit;
+  padding:    9px 14px;
+  font-size:  13px;
+  cursor:     pointer;
+
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.14),
+    1px      1px 0 var(--edge);
+
+  transition:
+    background  var(--t-fast),
+    color       var(--t-fast),
+    box-shadow  var(--t-fast),
+    transform   var(--t-fast);
+}
+
+.amount-button:hover,
+.cause-button:hover,
+.filter-button:hover {
+  background: rgba(179, 143, 67, 0.12);
+  color:      var(--gold-hi);
+  border-color: var(--gold-hi);
+}
+
+/* Активний стан (aria-pressed="true") */
+.amount-button[aria-pressed="true"],
+.cause-button[aria-pressed="true"],
+.filter-button[aria-pressed="true"] {
+  background:  var(--brass);
+  color:       var(--wine);
+  font-weight: 600;
+
+  box-shadow:
+    inset 0  1px 0  rgba(255, 255, 200, 0.35),
+    inset 0 -1px 0  var(--gold-dark),
+    0        1px 0  rgba(0, 0, 0, 0.60);
+}
+
+/* --- 5.4 Таби розкладу (.schedule-tab) --- */
+.schedule-tabs {
+  display:    flex;
+  flex-wrap:  wrap;
+  gap:        7px;
+}
+
+.schedule-tab {
+  border:     1px solid rgba(179, 143, 67, 0.75);
+  padding:    9px 13px;
+  background: transparent;
+  color:      #efe3c8;
+  font-size:  12px;
+  cursor:     pointer;
+  transition: background var(--t-fast), color var(--t-fast), box-shadow var(--t-fast);
+
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.schedule-tab:hover {
+  background:   rgba(179, 143, 67, 0.10);
+  border-color: var(--gold-hi);
+  color:        var(--gold-hi);
+}
+
+.schedule-tab[aria-selected="true"] {
+  background:  var(--gold);
+  color:       var(--wine);
+  font-weight: 600;
+
+  box-shadow:
+    inset 0  1px 0  rgba(255, 255, 200, 0.30),
+    inset 0 -1px 0  var(--gold-dark),
+    0        1px 0  rgba(0, 0, 0, 0.55);
+}
+
+
+/* ============================================================ */
+/*  §6. HERO-СЕКЦІЯ ТА КАРУСЕЛІ                                */
+/* ============================================================ */
+
+/* --- 6.1 Hero wrapper --- */
+.hero {
+  position:   relative;
+  overflow:   hidden;
+  background: var(--wine);
+}
+
+/* Декоративне внутрішнє обрамлення Hero — тонка золота рамка */
+.hero::before {
+  content:        '';
+  position:       absolute;
+  inset:          18px;
+  border:         1px solid rgba(197, 160, 89, 0.22);
+  pointer-events: none;
+  z-index:        1;
+}
+
+/* --- 6.2 Зернистий фільтр Hero (.hero-grain) --- */
+.hero-grain {
+  background-image:
+    /* Радіальний відблиск — теплий золотистий центр */
+    radial-gradient(
+      ellipse at 72% 50%,
+      rgba(212, 175, 55, 0.12),
+      transparent 42%
+    ),
+    /* Тонка діагональна текстура "тканини" */
+    linear-gradient(
+      135deg,
+      transparent 48%,
+      rgba(255, 255, 255, 0.025) 49%,
+      transparent 50%
+    );
+  background-size: auto, 8px 8px;
+}
+
+/* --- 6.3 Hero-текстура (використовується для фону секції Hero в HeroCarousel) --- */
+.sacred-hero__texture {
+  opacity: 0.55;
+  background-image:
+    radial-gradient(ellipse at 75% 45%, rgba(229, 184, 66, 0.16), transparent 40%),
+    linear-gradient(
+      135deg,
+      transparent 49%,
+      rgba(255, 255, 255, 0.022) 50%,
+      transparent 51%
+    );
+  background-size: auto, 10px 10px;
+}
+
+/* --- 6.4 Карусель (.carousel-shell) --- */
+.carousel-shell {
+  position:   relative;
+  min-height: 560px;
+  border:     1px solid var(--brass);
+  background: #210403;
+
+  /*
+   * Багатошарова рамка-оклад:
+   *  inset 4px: слабке внутрішнє поле (повітря між змістом і рамкою)
+   *  inset 5px: яскравіша внутрішня рамка латуні
+   *  1px 2px:   тверда зовнішня тінь (масивність)
+   */
+  box-shadow:
+    inset 0 0 0 4px rgba(179, 143, 67, 0.14),
+    inset 0 0 0 5px #62491f,
+    1px   2px 0   #090000;
+}
+
+/* Внутрішня декоративна рамка каруселі */
+.carousel-shell::before {
+  content:        '';
+  position:       absolute;
+  inset:          12px;
+  border:         1px solid rgba(197, 160, 89, 0.40);
+  pointer-events: none;
+  z-index:        1;
+}
+
+
+/* ============================================================ */
+/*  §7. СЛАЙДИ ТА ФОНИ СЛАЙДІВ                                 */
+/* ============================================================ */
+
+/* --- 7.1 Базовий слайд --- */
+.hero-slide {
+  position:             relative;
+  z-index:              1;
+  display:              none;
+  min-height:           560px;
+  grid-template-columns: 1fr 1fr;
+  align-items:          stretch;
+}
+
+.hero-slide.active {
+  display:   grid;
+  animation: slide-in 0.35s ease both;
+}
+
+/* --- 7.2 Контентна частина слайду --- */
+.slide-copy {
+  position:       relative;
+  z-index:        2;
+  display:        flex;
+  flex-direction: column;
+  justify-content: center;
+  padding:        48px 58px 72px;
+}
+
+/* --- 7.3 Візуальна частина слайду --- */
+.slide-visual {
+  position:    relative;
+  min-height:  100%;
+  border-left: 1px solid rgba(197, 160, 89, 0.48);
+  background:  #180000;
+}
+
+.slide-visual iframe {
+  position: absolute;
+  inset:    18px;
+  width:    calc(100% - 36px);
+  height:   calc(100% - 36px);
+  border:   1px solid var(--brass);
+
+  box-shadow:
+    inset 0 0 0 4px rgba(179, 143, 67, 0.14),
+    1px   2px 0   #090000;
+}
+
+/* --- 7.4 Фон слайду "Арка" (slide-arch-bg) --- */
+.slide-arch-bg {
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(229, 184, 66, 0.20), transparent 34%),
+    linear-gradient(135deg, #5a1009, #210000 70%);
+}
+
+/* Декоративна арка поверх фону */
+.slide-arch-bg::before {
+  content:  '';
+  position: absolute;
+  inset:    8% 12%;
+  border:         1px solid rgba(229, 184, 66, 0.55);
+  border-radius:  48% 48% 0 0 / 38% 38% 0 0;
+
+  box-shadow:
+    inset 0 0 0  12px rgba(229, 184, 66, 0.06),
+    inset 0 0 0  13px rgba(229, 184, 66, 0.24),
+    0     0  50px rgba(229, 184, 66, 0.08);
+}
+
+/* Хрест над аркою */
+.slide-arch-bg::after {
+  content:     '✣';
+  position:    absolute;
+  top:         16%;
+  left:        50%;
+  transform:   translateX(-50%);
+  color:       var(--gold-hi);
+  font-size:   38px;
+  text-shadow: 0 0 20px rgba(229, 184, 66, 0.40);
+}
+
+/* --- 7.5 Фон слайду "Пожертва" (slide-donation-bg) --- */
+.slide-donation-bg {
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(229, 184, 66, 0.20), transparent 39%),
+    linear-gradient(135deg, #260000, #5a0a0a 50%, #200000);
+}
+
+/* Медальйон пожертви */
+.donation-emblem {
+  box-shadow:
+    0     0  50px rgba(229, 184, 66, 0.12),
+    inset 0  0  34px rgba(229, 184, 66, 0.06);
+}
+
+/* --- 7.6 Крапки-індикатори слайдів (.slide-dot) --- */
+.slide-dots {
+  display:         flex;
+  justify-content: center;
+  gap:             8px;
+  margin-top:      15px;
+}
+
+.slide-dot {
+  width:      28px;
+  height:     6px;
+  border:     1px solid var(--brass);
+  background: transparent;
+  cursor:     pointer;
+  transition: background var(--t-fast), box-shadow var(--t-fast);
+}
+
+.slide-dot[aria-current="true"] {
+  background: var(--gold-hi);
+
+  box-shadow: inset 0 1px 0 rgba(255, 255, 200, 0.28);
+}
+
+/* --- 7.7 Стрілки каруселі (.carousel-arrow) --- */
+.carousel-arrow {
+  display:       grid;
+  place-items:   center;
+  width:         48px;
+  height:        48px;
+  border:        1px solid var(--brass);
+  border-radius: 48% 48% 4px 4px;
+  background:    #210807;
+  color:         #dec180;
+  cursor:        pointer;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    1px   2px 0   #6a4f20;
+
+  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
+}
+
+.carousel-arrow:hover {
+  background: #462a10;
+  color:      var(--gold-hi);
+  transform:  translateY(-1px);
+}
+
+.carousel-arrow:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.45),
+    0     0   0   transparent;
+}
+
+/* --- 7.8 Інструменти каруселі (.carousel-tools) --- */
+.carousel-tools {
+  position: absolute;
+  z-index:  5;
+  right:    28px;
+  bottom:   20px;
+  display:  flex;
+  align-items: center;
+  gap:      9px;
+}
+
+/* --- 7.9 Таблиця розкладу (.schedule-table) --- */
+.schedule-table {
+  width:           100%;
+  border-collapse: collapse;
+  font-size:       14px;
+}
+
+.schedule-table th,
+.schedule-table td {
+  padding:       12px 9px;
+  text-align:    left;
+  border-bottom: 1px solid rgba(179, 143, 67, 0.45);
+}
+
+.schedule-table th {
+  font-size:      10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color:          var(--brass);
+  font-weight:    700;
+}
+
+.schedule-table td:last-child {
+  font-weight: 600;
+  color:       #f0d79e;
+}
+
+/* Точний час — виділений золотим */
+.schedule-table .exact {
+  color:       #ffe6a5;
+  font-weight: 700;
+  font-size:   1.05em;
+}
+
+
+/* ============================================================ */
+/*  §8. ПЕРГАМЕНТНІ КАРТКИ ТА БЛОКИ                           */
+/* ============================================================ */
+
+/* --- 8.1 Базовий пергаментний блок (.paper) --- */
+.paper {
+  background: var(--parchment);
+  color:      var(--ink);
+}
+
+/* --- 8.2 Металева пергаментна картка (.paper-metal) ---
+ *  Три шари обрамлення:
+ *    border (зовнішній) → латунь 1px
+ *    inset 4px transparent → "повітряний" відступ всередині
+ *    inset 5px brass      → внутрішня рамка-оклад
+ *    1px 2px 0            → тверда падаюча тінь (bevel)
+ */
+.paper-metal {
+  background: var(--parchment);
+  color:      var(--ink);
+  border:     1px solid var(--brass);
+
+  box-shadow:
+    inset 0 0 0  4px rgba(179, 143, 67, 0.12),
+    inset 0 0 0  5px rgba(179, 143, 67, 0.45),
+    1px   2px 0  var(--edge);
+}
+
+/* --- 8.3 Слайдова картка (.slide-card) --- */
+.slide-card {
+  border:     1px solid var(--brass);
+  background: #f4efe6;
+  color:      #272019;
+
+  box-shadow:
+    inset 0 0 0  5px rgba(179, 143, 67, 0.15),
+    inset 0 0 0  6px rgba(179, 143, 67, 0.45),
+    1px   2px 0  #0c0000;
+}
+
+/* Hover для слайдових карток */
+.slide-card:hover {
+  box-shadow:
+    inset 0 0 0  5px rgba(179, 143, 67, 0.22),
+    inset 0 0 0  6px rgba(179, 143, 67, 0.58),
+    2px   4px 0  #0c0000,
+    0     6px 14px rgba(0, 0, 0, 0.25);
+  transform: translateY(-2px);
+  transition: transform var(--t-base), box-shadow var(--t-base);
+}
+
+/* --- 8.4 "Свічкова" кнопка-посилання (.candle-button / .candle-glow) --- */
+.candle-button:hover {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.30);
+  color:      var(--gold-hi);
+}
+
+.candle-glow:hover {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.32);
+  color:      var(--gold-hi);
+}
+
+/* --- 8.5 Легка текстурована секція (.textured) --- */
+.velvet   { background: var(--wine); }
+.textured {
+  background: var(--wine);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.012) 0 1px,
+      transparent 1px 5px
+    );
+}
+
+
+/* ============================================================ */
+/*  §9. БУКВИЦЯ (.dropcap)                                     */
+/*      Велика золото-бронзова перша літера абзацу             */
+/* ============================================================ */
+
+.dropcap::first-letter,
+.drop-cap::first-letter {
+  float:       left;
+  padding:     0.02em 0.13em 0 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size:   4.5rem;
+  font-weight: 700;
+  font-style:  italic;
+  line-height: 0.78;           /* менше 1 — ключово для правильного розміщення */
+
+  color: #b38f43;
+
+  /*
+   * Bevel-ефект ініціали:
+   *  1px 1px     → нижня права тінь — об'єм
+   * -1px -1px    → верхня ліва фаска (відблиск)
+   *  1px 2px     → другий шар глибини
+   */
+  text-shadow:
+     1px  1px 0  #fff0c7,  /* верхній відблиск на пергаменті */
+    -1px -1px 0  #71541d,  /* темна ліва фаска */
+     1px  2px 0  #160d00;  /* глибока нижня тінь */
+}
+
+/* Буквиця на темному оксамитовому тлі */
+.dark-bg .dropcap::first-letter,
+.dark-bg .drop-cap::first-letter {
+  color: var(--gold-hi);
+  text-shadow:
+     1px  2px 0  rgba(0,   0,   0, 0.90),
+     0   -1px 0  rgba(242, 208, 96, 0.40),
+     2px  3px 0  rgba(0,   0,   0, 0.50);
+}
+
+
+/* ============================================================ */
+/*  §10. ПОМ'ЯНИК / ДИПТИХ                                    */
+/*       .memorial-paper · .note-form · .note-tab              */
+/* ============================================================ */
+
+/* --- 10.1 Лінований папір пом'яника (.memorial-paper) --- */
+.memorial-paper {
+  background-image: linear-gradient(
+    to bottom,
+    transparent calc(2.5rem - 1px),
+    rgba(178, 143, 61, 0.18) calc(2.5rem - 1px),
+    rgba(178, 143, 61, 0.18) 2.5rem,
+    transparent 2.5rem
+  );
+  background-size: 100% 2.5rem;
+  line-height:     1.9;    /* синхронізовано з висотою рядка паперу */
+}
+
+/* --- 10.2 Форма Диптиху (.note-form) --- */
+.note-form {
+  transition:
+    border-color var(--t-slow),
+    box-shadow   var(--t-slow);
+}
+
+/* Активний стан — «За здоров'я» (бордово-червоний оклад) */
+.note-form.health {
+  border-color: #81251e;
+
+  box-shadow:
+    inset 0 0 0  5px rgba(129, 37, 30, 0.08),
+    inset 0 0 0  6px #81251e;
+}
+
+/* Активний стан — «За упокій» (кобальтово-синій оклад) */
+.note-form.repose {
+  border-color: var(--blue);
+
+  box-shadow:
+    inset 0 0 0  5px rgba(24, 53, 83, 0.08),
+    inset 0 0 0  6px var(--blue);
+}
+
+/* --- 10.3 Таби типу поминання (.note-tab) --- */
+.note-tab {
+  /* базові стилі вже описані в §5 (.amount-button та ін.) */
+}
+
+/* «За здоров'я» — активний */
+.note-tab[aria-selected="true"] {
+  background: #791f1a;
+  color:      #fff0d2;
+  border-color: #9c2b24;
+
+  box-shadow:
+    inset 0  1px 0  rgba(255, 255, 200, 0.20),
+    inset 0 -1px 0  #4a0e0a,
+    0        1px 0  rgba(0, 0, 0, 0.60);
+}
+
+/* «За упокій» — активний */
+.note-tab[data-note-type="repose"][aria-selected="true"] {
+  background:   var(--blue);
+  color:        #f4efe6;
+  border-color: #1e4a6e;
+
+  box-shadow:
+    inset 0  1px 0  rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0  #0d2035,
+    0        1px 0  rgba(0, 0, 0, 0.60);
+}
+
+/* --- 10.4 Поле введення імен (.name-list input) --- */
+.name-list input {
+  width:         100%;
+  border:        0;
+  border-bottom: 1px solid rgba(121, 93, 34, 0.55);
+  outline:       none;
+  background:    transparent;
+  padding:       10px 4px;
+  color:         var(--ink);
+  font-size:     16px;
+  font-family:   'Lora', Georgia, serif;
+  transition:    border-color var(--t-fast);
+}
+
+.name-list input:focus {
+  border-color: #8b6a31;
+}
+
+.name-list input::placeholder {
+  color:      rgba(90, 70, 30, 0.5);
+  font-style: italic;
+}
+
+/* --- 10.5 Рядок статусу --- */
+.status {
+  min-height:  24px;
+  color:       #725522;
+  font-size:   13px;
+  line-height: 1.5;
+}
+
+
+/* ============================================================ */
+/*  §11. ФОТО-СІТКА ТА ГАЛЕРЕЯ                                 */
+/* ============================================================ */
+
+/* --- 11.1 Базова сітка фото --- */
+.photo-grid {
+  display:               grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:                   12px;
+}
+
+/* Розміри тайлів */
+.photo-tile-1                             { grid-row: span 2; min-height: 510px; }
+.photo-tile-2,
+.photo-tile-3,
+.photo-tile-4,
+.photo-tile-5,
+.photo-tile-6                             { min-height: 245px; }
+
+
+/* ============================================================ */
+/*  §12. РЕКТОРСЬКА ФОТОГРАФІЯ (.rector-photo)                 */
+/* ============================================================ */
+
+/*
+ * Три шари обрамлення фото:
+ *  border: 1px solid brass    → зовнішня рамка-оклад
+ *  inset 5px rgba(brass,.12)  → м'яке внутрішнє поле
+ *  inset 6px #80612b          → внутрішня бронзова рамка
+ *  1px 2px 0 #090000          → тверда нижня тінь
+ */
+.rector-photo {
+  position:      relative;
+  aspect-ratio:  380 / 540;
+  overflow:      hidden;
+  background:    #160000;
+  border:        1px solid var(--brass);
+
+  box-shadow:
+    inset 0 0 0  5px rgba(179, 143, 67, 0.12),
+    inset 0 0 0  6px #80612b,
+    1px   2px 0  #090000;
+}
+
+.rector-photo img {
+  position:       absolute;
+  inset:          8px;
+  width:          calc(100% - 16px);
+  height:         calc(100% - 16px);
+  object-fit:     cover;
+  object-position: 50% 24%;
+  clip-path: polygon(
+    4% 100%,  4% 33%,  4.5% 27%,   6% 21%,
+    9% 15%,  14% 10%,  21%  6%,   30% 4%,
+    40% 3%,  50% 2.6%, 60%  3%,   70% 4%,
+    79% 6%,  86% 10%,  91% 15%,   94% 21%,
+    95.5% 27%, 96% 33%, 96% 100%
+  );
+}
+
+/* SVG-декорація поверх фото */
+.rector-photo svg {
+  position:       absolute;
+  inset:          0;
+  width:          100%;
+  height:         100%;
+  pointer-events: none;
+  color:          var(--brass);
+  filter:         drop-shadow(1px 1px 0 #44310f);
+}
+
+/* Табличка-підпис під фото */
+.rector-plate {
+  border:     1px solid var(--brass);
+  background: #260807;
+
+  box-shadow:
+    inset 0 0 0  4px rgba(0,   0,   0,   0.20),
+    inset 0  1px 0   rgba(255, 255, 255, 0.10),
+    1px   2px 0  var(--edge);
+}
+
+
+/* ============================================================ */
+/*  §13. ТАЙМЛАЙН ТА КАРТКИ ПОДІЙ                             */
+/* ============================================================ */
+
+/* --- 13.1 Таймлайн-лінія --- */
+.timeline {
+  position:     relative;
+  display:      grid;
+  gap:          25px;
+  padding-left: 34px;
+}
+
+/* Вертикальна лінія — стовп часу */
+.timeline::before {
+  content:    '';
+  position:   absolute;
+  left:       10px;
+  top:        8px;
+  bottom:     8px;
+  width:      2px;
+  background: #987439;
+
+  /* Bevel-ефект вертикальної лінії */
+  box-shadow:
+     1px 0 rgba(255, 255, 255, 0.22),
+    -1px 0 rgba(0, 0, 0, 0.70);
+}
+
+/* --- 13.2 Картка події (.event-card) --- */
+.event-card {
+  position:   relative;
+  display:    grid;
+  grid-template-columns: minmax(220px, 0.82fr) minmax(0, 1.18fr);
+  overflow:   hidden;
+  transition: opacity var(--t-base), transform var(--t-base);
+}
+
+/* Крапка на таймлайні */
+.event-card::before {
+  content:      '';
+  position:     absolute;
+  left:         -30px;
+  top:          30px;
+  width:        15px;
+  height:       15px;
+  border:       2px solid #d4b46d;
+  border-radius: 50%;
+  background:   #30190d;
+
+  box-shadow:
+    inset 0 0 0  3px #5e471e,
+    1px   1px 0  #090000;
+}
+
+.event-card.is-hidden { display: none; }
+
+/* --- 13.3 Медіа картки --- */
+.event-media {
+  position:   relative;
+  min-height: 255px;
+  background: #1b0505;
+}
+
+.event-media iframe {
+  position: absolute;
+  inset:    0;
+  width:    100%;
+  height:   100%;
+  border:   0;
+}
+
+.event-media button {
+  position:   absolute;
+  inset:      0;
+  width:      100%;
+  height:     100%;
+  border:     0;
+  background: transparent;
+  cursor:     zoom-in;
+}
+
+/* --- 13.4 Текстова частина картки --- */
+.event-copy     { padding: 24px; }
+
+.event-meta {
+  font-family:    'Lora', Georgia, serif;
+  font-size:      10px;
+  font-weight:    600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color:          #715523;
+  line-height:    1.5;
+}
+
+.event-copy h3 {
+  margin-top:     7px;
+  font-family:    'Cormorant Garamond', Georgia, serif;
+  font-size:      25px;
+  font-weight:    700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color:          #32100d;
+  line-height:    1.15;
+}
+
+.event-copy p {
+  font-size:   15px;
+  line-height: 1.7;
+}
+
+.event-link {
+  display:              inline-block;
+  margin-top:           10px;
+  color:                #591712;
+  font-size:            12px;
+  text-decoration:      underline;
+  text-decoration-color: var(--brass);
+  text-underline-offset: 4px;
+  transition:           color var(--t-fast);
+}
+
+.event-link:hover { color: var(--gold-hi); }
+
+
+/* ============================================================ */
+/*  §14. МОБІЛЬНИЙ DOCK (.mobile-dock)                         */
+/* ============================================================ */
+
+.mobile-dock {
+  position: fixed;
+  z-index:  40;
+  right:    0;
+  bottom:   0;
+  left:     0;
+  display:  grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:      1px;
+  padding:  7px 8px calc(7px + env(safe-area-inset-bottom));
+
+  border-top: 1px solid var(--brass);
+  background: #190101;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0    -1px 0   #090000;
+}
+
+.mobile-dock a,
+.mobile-dock button {
+  display:         flex;
+  min-height:      44px;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             1px;
+  border:          0;
+  background:      transparent;
+  color:           #e2c990;
+  text-decoration: none;
+  font-family:     'Lora', Georgia, serif;
+  font-size:       10px;
+  font-weight:     500;
+  line-height:     1.25;
+  cursor:          pointer;
+  transition:      color var(--t-fast);
+}
+
+.mobile-dock a:hover,
+.mobile-dock button:hover {
+  color: var(--gold-hi);
+}
+
+.mobile-dock .dock-mark {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size:   18px;
+  line-height: 1;
+  color:       var(--brass);
+}
+
+
+/* ============================================================ */
+/*  §15. СЕРВІСНІ КНОПКИ ТА УТИЛІТИ                           */
+/* ============================================================ */
+
+/* --- 15.1 Кнопка "Нагору" (.back-to-top) --- */
+.back-to-top {
+  position:   fixed;
+  z-index:    45;
+  right:      22px;
+  bottom:     22px;
+  width:      46px;
+  height:     46px;
+  border:     1px solid var(--brass);
+  background: #2b0a08;
+  color:      #e2c990;
+  cursor:     pointer;
+  transition: background var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    1px   2px 0   var(--edge);
+}
+
+.back-to-top:hover {
+  background: #3e1a10;
+  color:      var(--gold-hi);
+  transform:  translateY(-2px);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    1px   4px 0   var(--edge),
+    0     4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.back-to-top[hidden] { display: none; }
+
+/* --- 15.2 Іконна кнопка (.icon-button) --- */
+.icon-button {
+  width:      46px;
+  height:     46px;
+  border:     1px solid var(--brass);
+  background: #2b0a08;
+  color:      #e2c990;
+  cursor:     pointer;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    1px   2px 0   var(--edge);
+
+  transition: background var(--t-fast), color var(--t-fast), transform var(--t-fast);
+}
+
+.icon-button:hover {
+  background: #3e1a10;
+  color:      var(--gold-hi);
+  transform:  translateY(-1px);
+}
+
+/* --- 15.3 Смуга прогресу читання (#reading-progress) --- */
+#reading-progress {
+  position:         fixed;
+  z-index:          120;
+  top:              0;
+  left:             0;
+  width:            100%;
+  height:           3px;
+  background:       var(--brass);
+  transform:        scaleX(0);
+  transform-origin: left;
+
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.20);
+  pointer-events: none;
+}
+
+/* --- 15.4 Адреса статус --- */
+#address-status {
+  min-height: 20px;
+  color:      #d8c9aa;
+  font-size:  12px;
+}
+
+
+/* ============================================================ */
+/*  §16. ФОРМИ — FAQ, пошук                                    */
+/* ============================================================ */
+
+/* --- 16.1 Пошук FAQ (.faq-search) --- */
+.faq-search {
+  width:      100%;
+  border:     1px solid rgba(179, 143, 67, 0.65);
+  background: #fffdf8;
+  padding:    12px 14px;
+  color:      var(--ink);
+  font-size:  14px;
+  outline:    none;
+  font-family: 'Lora', Georgia, serif;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+.faq-search:focus {
+  border-color: #795d22;
+  box-shadow:   inset 0 0 0 1px #795d22;
+}
+
+.faq-search::placeholder {
+  color:      #9a8060;
+  font-style: italic;
+}
+
+/* --- 16.2 Категорії FAQ (.faq-category) --- */
+.faq-category {
+  border:     1px solid rgba(179, 143, 67, 0.75);
+  padding:    8px 12px;
+  background: transparent;
+  color:      #5d4d30;
+  font-size:  11px;
+  cursor:     pointer;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+}
+
+.faq-category:hover {
+  background:   rgba(179, 143, 67, 0.10);
+  color:        var(--wine-3);
+  border-color: var(--gold);
+}
+
+.faq-category[aria-pressed="true"] {
+  background:  var(--wine-3);
+  color:       #f4e8ce;
+  border-color: #5a1a16;
+
+  box-shadow:
+    inset 0  1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 -1px 0 #6f5422;
+}
+
+/* --- 16.3 Елементи FAQ (.faq-item) --- */
+.faq-item {
+  border-bottom: 1px solid rgba(179, 143, 67, 0.40);
+}
+
+.faq-item summary {
+  display:         flex;
+  cursor:          pointer;
+  list-style:      none;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             12px;
+  padding:         15px 2px;
+  color:           #32100d;
+  font-family:     'Cormorant Garamond', Georgia, serif;
+  font-size:       18px;
+  font-weight:     600;
+  line-height:     1.35;
+  transition:      color var(--t-fast);
+}
+
+.faq-item summary:hover { color: var(--wine-3); }
+
+.faq-item summary::-webkit-details-marker { display: none; }
+
+/* + / − символ */
+.faq-item summary::after {
+  content:    '+';
+  flex:       none;
+  color:      #8c6b2e;
+  font-family: 'Lora', Georgia, serif;
+  font-size:  24px;
+  font-weight: 400;
+  line-height: 1;
+  transition: transform var(--t-base), color var(--t-base);
+}
+
+.faq-item[open] summary::after {
+  content:   '−';
+  color:     var(--gold);
+  transform: rotate(0deg);
+}
+
+.faq-answer {
+  padding:     0 18px 18px 2px;
+  color:       #5e5548;
+  font-size:   14px;
+  line-height: 1.75;
+}
+
+
+/* ============================================================ */
+/*  §17. ВІДГУКИ — Редакційні картки (.review-editorial-card)  */
+/* ============================================================ */
+
+.reviews-row {
+  display:               grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap:                   14px;
+}
+
+/*
+ * Картка відгуку — повноцінний bevel-оклад:
+ *  border → зовнішня латунна рамка
+ *  inset 4px → поле
+ *  inset 5px → внутрішня тонка рамка
+ *  1px 2px → тверда тінь
+ */
+.review-editorial-card {
+  display:               grid;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 0.28fr);
+  grid-template-rows:    auto 1fr;
+  align-items:           start;
+  gap:                   12px 24px;
+  min-width:             0;
+  min-height:            190px;
+  border:                1px solid var(--brass);
+  background:            var(--wine);
+  padding:               24px;
+  color:                 var(--parchment);
+
+  box-shadow:
+    inset 0 0 0  4px rgba(179, 143, 67, 0.12),
+    inset 0 0 0  5px rgba(179, 143, 67, 0.40),
+    1px   2px 0  #070000;
+
+  transition: box-shadow var(--t-base), transform var(--t-base);
+}
+
+.review-editorial-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    inset 0 0 0  4px rgba(179, 143, 67, 0.18),
+    inset 0 0 0  5px rgba(179, 143, 67, 0.55),
+    2px   4px 0  #070000,
+    0     6px 14px rgba(0, 0, 0, 0.30);
+}
+
+/* Символ-марка ✦ */
+.review-mark {
+  grid-column:  1;
+  grid-row:     1;
+  color:        var(--gold-hi);
+  font-family:  'Cormorant Garamond', Georgia, serif;
+  font-size:    28px;
+  line-height:  1;
+}
+
+.review-topic {
+  grid-column:    1;
+  grid-row:       1;
+  margin:         5px 0 0 36px;
+  color:          #d9bd7b;
+  font-family:    'Cormorant Garamond', Georgia, serif;
+  font-size:      17px;
+  font-weight:    700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height:    1.2;
+}
+
+.review-editorial-text {
+  grid-column:  1;
+  grid-row:     2;
+  margin:       0;
+  font-size:    14px;
+  line-height:  1.8;
+  color:        #f1e8d8;
+}
+
+.review-caption {
+  grid-column:   2;
+  grid-row:      1 / 3;
+  align-self:    end;
+  margin:        0;
+  border-left:   1px solid rgba(197, 160, 89, 0.55);
+  padding:       10px 0 10px 16px;
+  color:         var(--brass);
+  font-size:     11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* --- Лайтбокс (.lightbox) --- */
+.lightbox {
+  position:   fixed;
+  inset:      0;
+  z-index:    100;
+  display:    none;
+  place-items: center;
+  padding:    18px;
+  background: rgba(8, 0, 0, 0.96);
+  backdrop-filter: blur(4px);
+}
+
+.lightbox.open { display: grid; }
+
+.lightbox-frame {
+  width:      min(950px, 100%);
+  max-height: 92vh;
+  padding:    12px;
+  border:     1px solid var(--brass);
+  background: var(--wine);
+  display:    grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap:        12px;
+
+  box-shadow:
+    inset 0 0 0  5px rgba(179, 143, 67, 0.16),
+    inset 0 0 0  6px #735523,
+    1px   2px 0  #050000;
+}
+
+.lightbox-media {
+  height:     min(70vh, 680px);
+  border:     1px solid var(--gold);
+  background: var(--parchment);
+}
+
+.lightbox-media iframe {
+  width:  100%;
+  height: 100%;
+  border: 0;
+}
+
+
+/* ============================================================ */
+/*  §18. АНІМАЦІЇ                                               */
+/* ============================================================ */
+
+/* --- Вхід слайду каруселі --- */
+@keyframes slide-in {
+  from { opacity: 0.25; transform: translateY(6px); }
+  to   { opacity: 1;    transform: translateY(0); }
+}
+
+/* --- Плавне появлення елементів (.fade-in) --- */
+.fade-in { animation: fade-in 0.32s ease both; }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+/* --- Пульсація "Живого" диптиху --- */
+@keyframes living-pulse {
+  0%, 100% { box-shadow: inset 0 0 0 5px rgba(129, 37, 30, 0.08), inset 0 0 0 6px #81251e; }
+  50%       { box-shadow: inset 0 0 0 5px rgba(129, 37, 30, 0.16), inset 0 0 0 6px #a33028; }
+}
+
+/* --- Мерехтіння "Спочилого" диптиху --- */
+@keyframes resting-glow {
+  0%, 100% { box-shadow: inset 0 0 0 5px rgba(24, 53, 83, 0.08), inset 0 0 0 6px var(--blue); }
+  50%       { box-shadow: inset 0 0 0 5px rgba(24, 53, 83, 0.16), inset 0 0 0 6px #1e4a6e; }
+}
+
+/* Застосовуємо пульсацію до активних форм */
+.note-form.health { animation: living-pulse 4.5s ease-in-out infinite; }
+.note-form.repose { animation: resting-glow 6s   ease-in-out infinite; }
+
+/* --- Підйом hero-секції --- */
+.hero-section { animation: fade-in 0.5s ease both; }
+
+
+/* ============================================================ */
+/*  §19. АДАПТИВНІСТЬ (RESPONSIVE)                             */
+/* ============================================================ */
+
+/* --- ≥768px: Desktop фото-сітка --- */
+@media (min-width: 768px) {
+  .photo-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .photo-tile-1 {
+    grid-column: span 2;
+    grid-row:    span 2;
+    min-height:  520px;
+  }
+
+  .photo-tile-2,
+  .photo-tile-3,
+  .photo-tile-4,
+  .photo-tile-5,
+  .photo-tile-6 { min-height: 252px; }
+
+  /* Показуємо desktop-dock, ховаємо мобільний */
+  .mobile-dock { display: none; }
+}
+
+/* --- ≤900px: Карусель — стек --- */
+@media (max-width: 900px) {
+  .hero-slide {
+    grid-template-columns: 1fr;
+  }
+
+  .slide-visual {
+    min-height:  390px;
+    border-top:  1px solid rgba(197, 160, 89, 0.48);
+    border-left: 0;
+  }
+
+  .slide-copy {
+    padding: 38px 32px 68px;
+  }
+
+  .carousel-shell,
+  .hero-slide { min-height: 0; }
+
+  .event-card {
+    grid-template-columns: 1fr;
+  }
+
+  .event-media { min-height: 250px; }
+}
+
+/* --- ≤767px: Body padding для мобільного dock --- */
+@media (max-width: 767px) {
+  body          { padding-bottom: 70px; }
+  .back-to-top  { right: 14px; bottom: 84px; }
+}
+
+/* --- ≤580px: Компактна версія --- */
+@media (max-width: 580px) {
+  body { font-size: 17px; }
+
+  .shell   { width: calc(100% - 28px); }
+  .section { padding: 56px 0; }
+
+  .display { letter-spacing: 0.10em; }
+
+  .carousel-shell::before { inset: 7px; }
+
+  .slide-copy    { padding: 32px 22px 68px; }
+  .slide-visual  { min-height: 310px; }
+  .carousel-tools { right: 16px; bottom: 14px; }
+
+  .event-card    { margin-right: 0; }
+  .event-copy    { padding: 19px; }
+  .event-media   { min-height: 220px; }
+
+  .schedule-table          { font-size: 10px; }
+  .schedule-table th,
+  .schedule-table td        { padding: 7px 4px; }
+  .schedule-table th        { font-size: 8px; letter-spacing: 0.08em; }
+
+  .schedule-tab  { padding: 8px 9px; font-size: 11px; }
+
+  .hero::before  { inset: 8px; }
+
+  /* Відгуки */
+  .review-editorial-card {
+    grid-template-columns: minmax(0, 1fr) minmax(95px, 0.32fr);
+    gap:        10px 14px;
+    min-height: 0;
+    padding:    18px;
+  }
+
+  .review-topic   { font-size: 15px; letter-spacing: 0.08em; }
+  .review-caption { padding-left: 10px; font-size: 10px; }
+}
+
+/* --- ≤380px: Надкомпактна --- */
+@media (max-width: 380px) {
+  .shell { width: calc(100% - 24px); }
+
+  header .shell { gap: 8px; }
+
+  .slide-copy    { padding-right: 16px; padding-left: 16px; }
+
+  .schedule-table               { table-layout: fixed; }
+  .schedule-table th:nth-child(3),
+  .schedule-table td:nth-child(3) { display: none; }
+  .schedule-table th,
+  .schedule-table td              { overflow-wrap: anywhere; padding: 7px 5px; }
+  .schedule-table th:nth-child(1),
+  .schedule-table td:nth-child(1) { width: 48%; }
+  .schedule-table th:nth-child(2),
+  .schedule-table td:nth-child(2) { width: 52%; }
+
+  .amount-button,
+  .cause-button,
+  .filter-button,
+  .note-tab       { padding: 8px 10px; font-size: 12px; }
+
+  .lightbox       { padding: 8px; }
+  .lightbox-frame { padding: 8px; gap: 8px; }
+
+  .review-editorial-card {
+    grid-template-columns: minmax(0, 1fr) 78px;
+    gap:     9px 10px;
+    padding: 14px;
+  }
+
+  .review-topic          { margin-left: 31px; font-size: 14px; }
+  .review-editorial-text { font-size: 12px; line-height: 1.65; }
+  .review-caption        { font-size: 9px; letter-spacing: 0.04em; }
+}
+
+/* --- Mobile-label видимість --- */
+.mobile-facebook-label { display: none; }
+
+@media (max-width: 380px) {
+  .desktop-facebook-label { display: none; }
+  .mobile-facebook-label  { display: inline; }
+}
+
+
+/* ============================================================ */
+/*  §20. ДОСТУПНІСТЬ (A11Y) / prefers-reduced-motion           */
+/* ============================================================ */
+
+/* Фокус-стан для клавіатури */
+:focus-visible {
+  outline:        2px solid var(--gold-hi);
+  outline-offset: 3px;
+}
+
+/* Прибираємо власні outline де є кастомний фокус */
+.metal:focus-visible,
+.btn:focus-visible { outline-offset: 4px; }
+
+/* Вимкнення анімацій */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior:           auto !important;
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration:       0.01ms !important;
+  }
+
+  .fade-in { animation: none; }
+}
+
+/* Кастомний scrollbar — латунний */
+::-webkit-scrollbar       { width: 10px; }
+::-webkit-scrollbar-track { background: #110000; }
+
+::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(to bottom, #5c4a1a, #8b6914, #5c4a1a);
+  border: 1px solid #3d2b00;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(to bottom, #7a5c00, #b38f43, #7a5c00);
+}
