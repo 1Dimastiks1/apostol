@@ -999,6 +999,17 @@ a { color: inherit; }
   border:   0;
 }
 
+.event-media > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .35s ease;
+}
+
+.event-card:hover .event-media > img { transform: scale(1.035); }
+
 .event-media button {
   position:   absolute;
   inset:      0;
@@ -1063,7 +1074,7 @@ a { color: inherit; }
   bottom:   0;
   left:     0;
   display:  grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap:      1px;
   padding:  7px 8px calc(7px + env(safe-area-inset-bottom));
 
@@ -1430,6 +1441,13 @@ a { color: inherit; }
   border: 0;
 }
 
+.lightbox-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 /* ============================================================ */
 /*  §21. ФОТО ХРАМУ ТА КАРУСЕЛЬ НАСТОЯТЕЛЯ                   */
 /* ============================================================ */
@@ -1692,7 +1710,9 @@ a { color: inherit; }
   .photo-tile-5,
   .photo-tile-6 { min-height: 252px; }
 
-  /* Показуємо desktop-dock, ховаємо мобільний */
+}
+
+@media (min-width: 1024px) {
   .mobile-dock { display: none; }
 }
 
@@ -1855,4 +1875,262 @@ a { color: inherit; }
 ::-webkit-scrollbar-thumb:hover {
   background:
     linear-gradient(to bottom, #7a5c00, #b38f43, #7a5c00);
+}
+
+/* Facebook-плеєр та архів записів богослужінь. */
+.worship-section-heading {
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgb(179 143 67 / 48%);
+}
+
+.worship-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.worship-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 5px 11px;
+  border: 1px solid #d8ccb4;
+  border-radius: 999px;
+  background: #f4efe3;
+  color: #6c5a37;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  white-space: nowrap;
+}
+
+.worship-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9b7c45;
+}
+
+.worship-live-badge.is-live {
+  border-color: #b42318;
+  background: #fff4f2;
+  color: #a71912;
+}
+
+.worship-live-badge.is-live .worship-live-dot {
+  background: #d12a20;
+  box-shadow: 0 0 0 3px rgb(209 42 32 / 12%);
+  animation: worship-live-pulse 1.8s ease-out infinite;
+}
+
+@keyframes worship-live-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgb(209 42 32 / 12%); }
+  50% { box-shadow: 0 0 0 6px rgb(209 42 32 / 5%); }
+}
+
+.worship-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, .8fr);
+  align-items: stretch;
+  gap: clamp(20px, 3vw, 38px);
+  padding: clamp(16px, 2.5vw, 28px);
+  border: 1px solid rgb(179 143 67 / 44%);
+  border-radius: 14px;
+  background: #fffdf8;
+  box-shadow: 0 10px 26px rgb(34 15 6 / 8%);
+}
+
+.worship-feature[hidden],
+.schedule-announcement[hidden],
+.worship-archive-card[hidden] { display: none !important; }
+
+.schedule-announcement {
+  border: 1px solid rgb(197 160 89 / 70%);
+  padding: 16px;
+  background: #170303;
+  box-shadow: inset 0 0 0 1px rgb(229 184 66 / 15%), 1px 2px 0 #080000;
+}
+
+.schedule-announcement-text {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.facebook-sync-status {
+  display: inline-block;
+  margin-top: 5px;
+  color: #715727;
+  font-size: 12px;
+}
+
+.facebook-sync-status[data-state="success"] { color: #496642; }
+.facebook-sync-status[data-state="warning"] { color: #80642f; }
+
+.worship-player-frame,
+.worship-archive-player {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgb(179 143 67 / 68%);
+  border-radius: 10px;
+  background: #190101;
+}
+
+.worship-player-frame iframe,
+.worship-archive-player iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.worship-feature-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4px 2px;
+}
+
+.worship-meta {
+  margin: 0;
+  color: #80642f;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  line-height: 1.5;
+}
+
+.worship-feature-copy h3 {
+  margin: 11px 0 0;
+  color: #351a15;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(27px, 2.6vw, 36px);
+  font-weight: 600;
+  line-height: 1.12;
+}
+
+.worship-feature-copy > p:not(.worship-meta) {
+  margin: 12px 0 0;
+  color: #5d554a;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.worship-feature-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 19px;
+}
+
+.worship-record-link {
+  color: #6b241c;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 13px;
+  text-decoration-color: #b38f43;
+  text-underline-offset: 4px;
+}
+
+.worship-archive-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 46px 0 18px;
+}
+
+.worship-all-videos,
+.worship-archive-copy > a {
+  color: #6b241c;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 13px;
+  text-decoration-color: #b38f43;
+  text-underline-offset: 4px;
+}
+
+.worship-archive-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.worship-archive-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e4d8c4;
+  border-radius: 12px;
+  background: #fffdf8;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.worship-archive-card:hover {
+  transform: translateY(-2px);
+  border-color: #b38f43;
+  box-shadow: 0 8px 20px rgb(34 15 6 / 9%);
+}
+
+.worship-archive-player {
+  border: 0;
+  border-bottom: 1px solid #e4d8c4;
+  border-radius: 0;
+}
+
+.worship-archive-copy {
+  padding: 16px 17px 18px;
+}
+
+.worship-archive-copy h4 {
+  margin: 7px 0 12px;
+  color: #351a15;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.worship-note {
+  margin: 16px 0 0;
+  color: #847a6e;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .worship-feature {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .worship-archive-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .worship-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .worship-archive-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    margin-top: 34px;
+  }
+
+  .worship-archive-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .worship-feature {
+    padding: 12px;
+  }
 }
