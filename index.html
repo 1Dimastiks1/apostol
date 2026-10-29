@@ -290,6 +290,146 @@
     function openLightbox(events,index){lightboxPosts=events.filter(post=>post.imageUrl);const selected=events[index];lightboxIndex=Math.max(0,lightboxPosts.findIndex(post=>post.id===selected.id));previousFocus=document.activeElement;savedOverflow=document.body.style.overflow;document.body.style.overflow='hidden';lightbox.classList.add('open');lightbox.setAttribute('aria-hidden','false');showLightbox(lightboxIndex);document.getElementById('close-lightbox').focus();}
     function closeLightbox(){lightbox.classList.remove('open');lightbox.setAttribute('aria-hidden','true');lightboxMedia.replaceChildren();document.body.style.overflow=savedOverflow;if(previousFocus?.focus)previousFocus.focus();}
     document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));renderTimeline(button.dataset.filter);}));renderTimeline();
+
+    // ── Admin-events integration ─────────────────────────────────────────────
+    // Fetches events from the admin API (/api/events) and prepends them to the
+    // public timeline WITHOUT touching any styles or static content.
+    function safeAnyUrl(value){
+      if(!value||typeof value!=='string')return'#';
+      try{
+        const u=new URL(value,document.baseURI);
+        return(u.protocol==='https:'||u.protocol==='http:')?u.href:'#';
+      }catch{return'#';}
+    }
+    function safeRichHtml(input){
+      if(!input)return'';
+      try{
+        const parser=new DOMParser();
+        const doc=parser.parseFromString(String(input),'text/html');
+        const allowed=new Set(['A','B','STRONG','I','EM','BR','SPAN','P','#text']);
+        function clean(node){
+          const bad=[];
+          for(const child of node.childNodes){
+            if(!allowed.has(child.nodeName)){bad.push(child);}
+            else{
+              if(child.nodeName==='A'){
+                const href=safeAnyUrl(child.getAttribute('href')||'');
+                child.setAttribute('href',href);
+                child.setAttribute('target','_blank');
+                child.setAttribute('rel','noopener noreferrer');
+                for(const a of[...child.attributes])
+                  if(!['href','target','rel','title'].includes(a.name))child.removeAttribute(a.name);
+              }else if(child.nodeType===1){
+                for(const a of[...child.attributes])
+                  if(a.name.startsWith('on')||a.name==='style')child.removeAttribute(a.name);
+              }
+              clean(child);
+            }
+          }
+          for(const b of bad)node.replaceChild(document.createTextNode(b.textContent),b);
+        }
+        clean(doc.body);
+        return doc.body.innerHTML;
+      }catch{return escapeHTML(input);}
+    }
+    async function loadAdminEvents(){
+      const base=window.location.pathname.startsWith('/apostol')?'/apostol':'';
+      try{
+        const res=await fetch(base+'/api/events',{cache:'no-store'});
+        if(!res.ok)return;
+        const data=await res.json();
+        if(!Array.isArray(data)||!data.length)return;
+        const adminPosts=data.map(item=>{
+          let dateLabel=item.date||'';
+          try{
+            const d=new Date(item.date);
+            if(!isNaN(d)){
+              dateLabel=new Intl.DateTimeFormat('uk-UA',{
+                day:'numeric',month:'long',year:'numeric',
+                hour:'2-digit',minute:'2-digit'
+              }).format(d);
+            }
+          }catch(_){}
+          return{
+            id:item.id,
+            date:(item.date||'').slice(0,10),
+            dateLabel:dateLabel,
+            type:'Богослужіння та події',
+            category:'schedule',
+            title:item.title||'',
+            text:item.description||'',
+            href:item.link||'',
+            imageUrl:null,
+            createdAt:item.createdAt||item.date||new Date().toISOString(),
+            _isAdmin:true
+          };
+        });
+
+        // Override renderTimeline so admin posts use safeRichHtml + safeAnyUrl
+        const _origRender=renderTimeline;
+        (function patchRender(){
+          const origFilter=facebookPosts.filter.bind(facebookPosts);
+          // Merge: admin posts always on top, no duplicates
+          const existingIds=new Set(facebookPosts.map(p=>p.id));
+          const newPosts=adminPosts.filter(p=>!existingIds.has(p.id));
+          facebookPosts=[...newPosts,...facebookPosts];
+        })();
+
+        // Patch renderTimeline to handle admin posts (rich html + any url)
+        window.__origRenderTimeline=renderTimeline;
+        window.renderTimeline=function(filter){
+          activeFeedFilter=filter||activeFeedFilter;
+          const events=facebookPosts.filter(post=>
+            activeFeedFilter==='all'||
+            (activeFeedFilter==='schedule'&&(post.category==='schedule'||post.category==='service'))||
+            (activeFeedFilter==='volunteer'&&post.category==='volunteer')
+          );
+          timeline.innerHTML=events.map((post,index)=>{
+            const image=safePostImage(post.imageUrl);
+            const href=post._isAdmin?safeAnyUrl(post.href):safePostUrl(post.href);
+            const bodyHtml=post._isAdmin?safeRichHtml(post.text):escapeHTML(post.text);
+            const linkText=post._isAdmin&&href&&href!=='#'?'Перейти до ефіру / посилання ↗':(href&&href!=='#'?'Відкрити оригінал у Facebook ↗':'');
+            return `<article class="event-card paper-metal fade-in" style="animation-delay:${index*45}ms"><div class="event-media">${image?`<img src="${escapeHTML(image)}" alt="${escapeHTML(post.title)}" loading="lazy"><button type="button" data-photo-index="${index}" aria-label="Відкрити фото: ${escapeHTML(post.title)}"></button>`:`<div class="flex h-full min-h-[180px] flex-col items-center justify-center gap-3 p-6 text-center text-[#7b6335]"><span class="text-4xl" aria-hidden="true">✠</span><span class="eyebrow !text-[#725522]">${post._isAdmin?'ОГОЛОШЕННЯ АДМІНІСТРАТОРА':'ОГОЛОШЕННЯ ПАРАФІЇ'}</span><span class="text-sm">${escapeHTML(post.dateLabel)}</span></div>`}</div><div class="event-copy"><p class="event-meta">${escapeHTML(post.dateLabel)} · ${escapeHTML(post.type)}</p><h3>${escapeHTML(post.title)}</h3><p class="mt-3">${bodyHtml}</p>${linkText?`<a class="event-link" href="${escapeHTML(href)}" target="_blank" rel="noopener noreferrer">${linkText}</a>`:''}</div></article>`;
+          }).join('');
+          emptyMessage.classList.toggle('hidden',events.length>0);
+          timeline.querySelectorAll('[data-photo-index]').forEach(btn=>btn.addEventListener('click',()=>openLightbox(events,Number(btn.dataset.photoIndex))));
+        };
+
+        // Update hero schedule announcement with most recent admin event
+        const latest=adminPosts[0];
+        if(latest){
+          const cur=document.getElementById('schedule-current');
+          const emp=document.getElementById('schedule-empty');
+          const datEl=document.getElementById('schedule-post-date');
+          const titEl=document.getElementById('schedule-post-title');
+          const txtEl=document.getElementById('schedule-post-text');
+          const srcEl=document.getElementById('schedule-source');
+          const eyEl=document.getElementById('schedule-hero-eyebrow');
+          const intEl=document.getElementById('hero-schedule-intro');
+          if(cur&&datEl&&titEl&&txtEl){
+            cur.hidden=false;
+            if(emp)emp.hidden=true;
+            cur.dataset.createdAt=latest.createdAt;
+            datEl.textContent='Оголошення: '+latest.dateLabel;
+            titEl.textContent=latest.title;
+            txtEl.innerHTML=safeRichHtml(latest.text);
+            if(eyEl)eyEl.textContent='ПАРАФІЯЛЬНЕ ОГОЛОШЕННЯ · '+latest.dateLabel;
+            if(intEl)intEl.textContent='Найновіше оголошення парафії · '+latest.dateLabel+'.';
+            if(srcEl){
+              const lnk=safeAnyUrl(latest.href);
+              if(lnk&&lnk!=='#'){srcEl.href=lnk;srcEl.textContent='Перейти до ефіру / оголошення ↗';srcEl.hidden=false;}
+              else{srcEl.hidden=true;}
+            }
+          }
+        }
+
+        // Re-render with patched function
+        window.renderTimeline(activeFeedFilter);
+      }catch(err){
+        console.warn('[Apostol] Admin events load failed:',err);
+      }
+    }
+    loadAdminEvents();
     document.getElementById('close-lightbox').addEventListener('click',closeLightbox);document.getElementById('previous-photo').addEventListener('click',()=>showLightbox(lightboxIndex-1));document.getElementById('next-photo').addEventListener('click',()=>showLightbox(lightboxIndex+1));lightbox.addEventListener('click',event=>{if(event.target===lightbox)closeLightbox();});
     document.addEventListener('keydown',event=>{if(!lightbox.classList.contains('open'))return;if(event.key==='Escape')closeLightbox();if(event.key==='ArrowLeft')showLightbox(lightboxIndex-1);if(event.key==='ArrowRight')showLightbox(lightboxIndex+1);if(event.key==='Tab'){const controls=[...lightbox.querySelectorAll('button,a[href]')],first=controls[0],last=controls[controls.length-1];if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
 

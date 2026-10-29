@@ -1,0 +1,18 @@
+[
+  {
+    "id": "evt_sample_1",
+    "title": "Недільна Божественна Літургія",
+    "date": "2026-11-01T09:00",
+    "description": "Запрошуємо парафіян та гостей на спільну молитву. Пряма трансляція богослужіння буде доступна на <a href=\"https://www.facebook.com/protoierej.oleksandr.cisar?locale=uk_UA\" target=\"_blank\" rel=\"noopener noreferrer\">Facebook-сторінці настоятеля о. Олександра</a>.",
+    "link": "https://www.facebook.com/protoierej.oleksandr.cisar?locale=uk_UA",
+    "createdAt": "2026-10-28T20:00:00.000Z"
+  },
+  {
+    "id": "evt_sample_2",
+    "title": "Вечірнє богослужіння з акафістом",
+    "date": "2026-10-31T17:00",
+    "description": "Молитва за мир в Україні, наших воїнів-захисників та здоров'я парафіян Петропавлівського храму. Оголошення та світлини на <a href=\"https://www.facebook.com/100059029128700\" target=\"_blank\" rel=\"noopener noreferrer\">офіційній сторінці парафії</a>.",
+    "link": "https://www.facebook.com/100059029128700",
+    "createdAt": "2026-10-28T18:00:00.000Z"
+  }
+]

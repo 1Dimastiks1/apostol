@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель керування · Петропавлівський храм</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; background-color: #f7f5f0; color: #2b251f; }
+    .font-serif-title { font-family: 'Cormorant Garamond', Georgia, serif; }
+    .rendered-content a { color: #9a7837; text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
+    .rendered-content a:hover { color: #6d5220; }
+    /* Tab active state */
+    .tab-btn.active { background-color: #9a7837; color: white; border-color: #9a7837; }
+    /* Modal overlay */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-box { background: white; border-radius: 1rem; box-shadow: 0 25px 50px rgba(0,0,0,0.25); width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; }
+    /* Expired badge */
+    .expired-badge { background: #fef2f2; color: #dc2626; font-size: 10px; font-weight: 700; letter-spacing: .08em; padding: 2px 7px; border-radius: 99px; border: 1px solid #fecaca; text-transform: uppercase; }
+    /* Primary badge */
+    .primary-badge { background: #f0fdf4; color: #16a34a; font-size: 10px; font-weight: 700; letter-spacing: .08em; padding: 2px 7px; border-radius: 99px; border: 1px solid #bbf7d0; text-transform: uppercase; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- HEADER -->
+  <header class="bg-[#1f1a17] text-[#f7f5f0] border-b border-[#3c342f] sticky top-0 z-30 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl text-[#d4b067]" aria-hidden="true">✠</span>
+        <div>
+          <h1 class="font-serif-title text-xl sm:text-2xl font-bold tracking-wide leading-none text-[#f3ebdc]">Петропавлівський храм</h1>
+          <p class="text-xs text-[#a99c8f] mt-0.5">Адміністративна панель</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/" target="_blank" class="text-xs text-[#d4b067] hover:text-[#f3ebdc] transition px-3 py-1.5 rounded-lg border border-[#4d423b] flex items-center gap-1.5">На сайт ↗</a>
+        <button id="logoutBtn" onclick="handleLogout()" class="hidden text-xs bg-red-950/40 text-red-300 hover:bg-red-900/60 border border-red-800/50 transition px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <span>Вийти</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
+
+    <!-- LOGIN SECTION -->
+    <section id="loginSection" class="max-w-md mx-auto mt-12 bg-white rounded-2xl shadow-xl border border-stone-200/80 p-6 sm:p-8">
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 bg-stone-100 border border-stone-200 rounded-full flex items-center justify-center mx-auto mb-3">
+          <svg class="w-7 h-7 text-[#9a7837]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <h2 class="text-xl font-bold text-stone-900 font-serif-title sm:text-2xl">Вхід для адміністратора</h2>
+      </div>
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+        <div class="relative">
+          <input type="password" id="passwordInput" required placeholder="Пароль доступу"
+            class="w-full px-4 py-2.5 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] focus:border-[#9a7837] text-stone-900 text-sm outline-none pr-10">
+          <button type="button" onclick="document.getElementById('passwordInput').type=document.getElementById('passwordInput').type==='password'?'text':'password'" class="absolute inset-y-0 right-0 pr-3 flex items-center text-stone-400 hover:text-stone-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          </button>
+        </div>
+        <div id="loginError" class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg"></div>
+        <button type="submit" id="loginSubmitBtn" class="w-full py-2.5 bg-[#9a7837] hover:bg-[#82642a] text-white font-medium text-sm rounded-xl transition flex items-center justify-center gap-2">
+          <span id="loginBtnText">Увійти</span>
+          <svg id="loginSpinner" class="hidden animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dashboardSection" class="hidden">
+
+      <!-- Tab navigation -->
+      <div class="mb-6 flex gap-2 border-b border-stone-200 pb-0 flex-wrap">
+        <button onclick="switchTab('events')" id="tab-events" class="tab-btn active text-sm font-semibold px-5 py-2.5 rounded-t-xl border border-b-0 border-stone-200 bg-[#9a7837] text-white transition">
+          📅 Події та оголошення
+        </button>
+        <button onclick="switchTab('streams')" id="tab-streams" class="tab-btn text-sm font-semibold px-5 py-2.5 rounded-t-xl border border-b-0 border-stone-200 bg-white text-stone-700 hover:bg-stone-50 transition">
+          📺 Ефіри та трансляції
+        </button>
+      </div>
+
+      <!-- ==================== EVENTS TAB ==================== -->
+      <div id="tab-content-events" class="tab-content">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+          <!-- Add event form -->
+          <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm sticky top-20">
+            <div class="flex items-center gap-2 pb-4 mb-4 border-b border-stone-100">
+              <span class="text-lg text-[#9a7837]">✚</span>
+              <h2 class="text-lg font-bold text-stone-900 font-serif-title">Додати нову подію</h2>
+            </div>
+            <form id="addEventForm" onsubmit="handleCreateEvent(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Заголовок <span class="text-red-500">*</span></label>
+                <input type="text" id="eventTitle" required placeholder="Назва події або оголошення"
+                  class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] focus:border-[#9a7837] text-stone-900 text-sm outline-none">
+              </div>
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="text-xs font-semibold text-stone-700 uppercase tracking-wider">Дата та час <span class="text-red-500">*</span></label>
+                  <div class="flex gap-2 text-[11px] text-[#9a7837]">
+                    <button type="button" onclick="setQuickDate('today','eventDate')">Сьогодні</button>
+                    <span>·</span>
+                    <button type="button" onclick="setQuickDate('sunday','eventDate')">Неділя 09:00</button>
+                  </div>
+                </div>
+                <input type="datetime-local" id="eventDate" required
+                  class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] focus:border-[#9a7837] text-stone-900 text-sm outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Посилання (ефір/Facebook)</label>
+                <input type="url" id="eventLink" placeholder="https://..."
+                  class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] focus:border-[#9a7837] text-stone-900 text-sm outline-none">
+              </div>
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="text-xs font-semibold text-stone-700 uppercase tracking-wider">Опис (підтримує HTML) <span class="text-red-500">*</span></label>
+                  <button type="button" onclick="togglePreview('eventDescription','addPreviewBox','addPreviewContent','addPreviewBtn')" id="addPreviewBtn" class="text-[11px] text-[#9a7837] hover:underline">Перегляд</button>
+                </div>
+                <div class="flex flex-wrap gap-1 p-1.5 bg-stone-100 rounded-t-xl border-t border-x border-stone-300 text-xs">
+                  <button type="button" onclick="insertLink('eventDescription')" class="px-2 py-1 bg-white hover:bg-stone-200 border border-stone-200 rounded text-stone-700 text-xs">🔗 Посилання &lt;a&gt;</button>
+                  <button type="button" onclick="wrapText('eventDescription','<strong>','</strong>')" class="px-2 py-1 bg-white hover:bg-stone-200 border border-stone-200 rounded font-bold">B</button>
+                  <button type="button" onclick="wrapText('eventDescription','<em>','</em>')" class="px-2 py-1 bg-white hover:bg-stone-200 border border-stone-200 rounded italic">I</button>
+                  <button type="button" onclick="insertAt('eventDescription','<br>\n')" class="px-2 py-1 bg-white hover:bg-stone-200 border border-stone-200 rounded">&lt;br&gt;</button>
+                </div>
+                <textarea id="eventDescription" rows="4" required placeholder="Текст оголошення. Можна вставляти <a href='https://...'>посилання</a>."
+                  class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-b-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none font-sans"
+                  oninput="updatePreview('eventDescription','addPreviewBox','addPreviewContent')"></textarea>
+                <div id="addPreviewBox" class="hidden mt-2 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-stone-700">
+                  <div class="text-[10px] font-semibold uppercase tracking-wider text-[#9a7837] mb-1">Вигляд:</div>
+                  <div id="addPreviewContent" class="rendered-content leading-relaxed"></div>
+                </div>
+              </div>
+              <button type="submit" id="addEventSubmitBtn" class="w-full py-2.5 bg-[#9a7837] hover:bg-[#82642a] text-white font-medium text-sm rounded-xl transition flex items-center justify-center gap-2">
+                <span id="addBtnText">Опублікувати</span>
+                <svg id="addSpinner" class="hidden animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
+              </button>
+            </form>
+          </div>
+
+          <!-- Events list -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-stone-200 gap-2">
+              <div>
+                <h2 class="text-xl font-bold text-stone-900 font-serif-title flex items-center gap-2">
+                  Поточні події
+                  <span id="eventsCounterBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-stone-200 text-stone-700 font-semibold font-sans">0</span>
+                </h2>
+                <p class="text-xs text-stone-500 mt-0.5">Збережено у <code class="bg-stone-100 px-1.5 rounded text-stone-600">events.json</code></p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="loadEvents(true)" class="px-3 py-1.5 text-xs font-medium text-stone-700 bg-white hover:bg-stone-100 border border-stone-300 rounded-lg flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                  Оновити
+                </button>
+                <button onclick="deleteExpiredEvents()" class="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg">
+                  🗑 Видалити застарілі
+                </button>
+              </div>
+            </div>
+            <div id="eventsList" class="space-y-3">
+              <div class="p-8 text-center bg-white rounded-2xl border border-stone-200 text-stone-400">
+                <p class="text-sm">Завантаження...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== STREAMS TAB ==================== -->
+      <div id="tab-content-streams" class="tab-content hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+          <!-- Add stream form -->
+          <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm sticky top-20">
+            <div class="flex items-center gap-2 pb-4 mb-4 border-b border-stone-100">
+              <span class="text-lg text-[#9a7837]">📺</span>
+              <h2 class="text-lg font-bold text-stone-900 font-serif-title">Додати ефір / трансляцію</h2>
+            </div>
+            <form id="addStreamForm" onsubmit="handleCreateStream(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Назва трансляції <span class="text-red-500">*</span></label>
+                <input type="text" id="streamTitle" required placeholder="напр. Недільна Літургія — пряма трансляція"
+                  class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none">
+              </div>
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="text-xs font-semibold text-stone-700 uppercase tracking-wider">Дата <span class="text-red-500">*</span></label>
+                  <div class="flex gap-2 text-[11px] text-[#9a7837]">
+                    <button type="button" onclick="setQuickDate('today','streamDate')">Сьогодні</button>
+                    <span>·</span>
+                    <button type="button" onclick="setQuickDate('sunday','streamDate')">Неділя</button>
+                  </div>
+                </div>
+                <input type="datetime-local" id="streamDate" required
+                  class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">URL відео на Facebook / YouTube <span class="text-red-500">*</span></label>
+                <input type="url" id="streamVideoUrl" required placeholder="https://www.facebook.com/.../videos/123/"
+                  class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none">
+                <p class="text-[11px] text-stone-400 mt-1">Посилання на відео у Facebook або YouTube. Система автоматично вбудує плеєр.</p>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Опис (необов'язково)</label>
+                <textarea id="streamDescription" rows="3" placeholder="Короткий опис богослужіння або події..."
+                  class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none font-sans"></textarea>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                <input type="checkbox" id="streamIsPrimary" class="w-4 h-4 accent-[#9a7837] rounded">
+                <div>
+                  <label for="streamIsPrimary" class="text-xs font-semibold text-stone-800 cursor-pointer">Зробити головним ефіром</label>
+                  <p class="text-[11px] text-stone-500">Відображається у великому плеєрі на сайті (перший слот)</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-xl">
+                <input type="checkbox" id="streamIsLive" class="w-4 h-4 accent-red-600 rounded">
+                <div>
+                  <label for="streamIsLive" class="text-xs font-semibold text-stone-800 cursor-pointer">Зараз іде LIVE-трансляція</label>
+                  <p class="text-[11px] text-stone-500">Показує значок "LIVE" на сайті</p>
+                </div>
+              </div>
+              <button type="submit" id="addStreamSubmitBtn" class="w-full py-2.5 bg-[#9a7837] hover:bg-[#82642a] text-white font-medium text-sm rounded-xl transition flex items-center justify-center gap-2">
+                <span id="addStreamBtnText">Опублікувати ефір</span>
+                <svg id="addStreamSpinner" class="hidden animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
+              </button>
+            </form>
+          </div>
+
+          <!-- Streams list -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-stone-200 gap-2">
+              <div>
+                <h2 class="text-xl font-bold text-stone-900 font-serif-title flex items-center gap-2">
+                  Ефіри та трансляції
+                  <span id="streamsCounterBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-stone-200 text-stone-700 font-semibold font-sans">0</span>
+                </h2>
+                <p class="text-xs text-stone-500 mt-0.5">Збережено у <code class="bg-stone-100 px-1.5 rounded text-stone-600">streams.json</code></p>
+              </div>
+              <button onclick="loadStreams(true)" class="px-3 py-1.5 text-xs font-medium text-stone-700 bg-white hover:bg-stone-100 border border-stone-300 rounded-lg flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Оновити
+              </button>
+            </div>
+            <div id="streamsList" class="space-y-3">
+              <div class="p-8 text-center bg-white rounded-2xl border border-stone-200 text-stone-400">
+                <p class="text-sm">Завантаження...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-stone-200 mt-12 py-4">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-stone-400">Петропавлівський храм · Адміністративна панель</div>
+  </footer>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- EDIT EVENT MODAL -->
+  <div id="editEventModal" class="modal-overlay hidden" onclick="closeEditModal(event)">
+    <div class="modal-box p-6" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold font-serif-title text-stone-900">✏️ Редагування події</h3>
+        <button onclick="closeModal('editEventModal')" class="text-stone-400 hover:text-stone-700 p-1 rounded-lg hover:bg-stone-100">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="editEventForm" onsubmit="handleUpdateEvent(event)" class="space-y-4">
+        <input type="hidden" id="editEventId">
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Заголовок <span class="text-red-500">*</span></label>
+          <input type="text" id="editEventTitle" required class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Дата та час <span class="text-red-500">*</span></label>
+          <input type="datetime-local" id="editEventDate" required class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Посилання</label>
+          <input type="url" id="editEventLink" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none">
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs font-semibold text-stone-700 uppercase tracking-wider">Опис (HTML)</label>
+            <button type="button" onclick="togglePreview('editEventDescription','editPreviewBox','editPreviewContent','editPreviewBtn')" id="editPreviewBtn" class="text-[11px] text-[#9a7837] hover:underline">Перегляд</button>
+          </div>
+          <div class="flex flex-wrap gap-1 p-1.5 bg-stone-100 rounded-t-xl border-t border-x border-stone-300 text-xs">
+            <button type="button" onclick="insertLink('editEventDescription')" class="px-2 py-1 bg-white hover:bg-stone-200 border border-stone-200 rounded text-xs">🔗 Посилання</button>
+            <button type="button" onclick="wrapText('editEventDescription','<strong>','</strong>')" class="px-2 py-1 bg-white hover:bg-stone-200 border border-stone-200 rounded font-bold">B</button>
+            <button type="button" onclick="wrapText('editEventDescription','<em>','</em>')" class="px-2 py-1 bg-white hover:bg-stone-200 border border-stone-200 rounded italic">I</button>
+          </div>
+          <textarea id="editEventDescription" rows="5" class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-b-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none font-sans"
+            oninput="updatePreview('editEventDescription','editPreviewBox','editPreviewContent')"></textarea>
+          <div id="editPreviewBox" class="hidden mt-2 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-stone-700">
+            <div class="text-[10px] font-semibold uppercase tracking-wider text-[#9a7837] mb-1">Вигляд:</div>
+            <div id="editPreviewContent" class="rendered-content leading-relaxed"></div>
+          </div>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeModal('editEventModal')" class="flex-1 py-2.5 border border-stone-300 text-stone-700 hover:bg-stone-50 text-sm rounded-xl">Скасувати</button>
+          <button type="submit" id="editEventSubmitBtn" class="flex-1 py-2.5 bg-[#9a7837] hover:bg-[#82642a] text-white font-medium text-sm rounded-xl transition flex items-center justify-center gap-2">
+            <span id="editEventBtnText">Зберегти зміни</span>
+            <svg id="editEventSpinner" class="hidden animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT STREAM MODAL -->
+  <div id="editStreamModal" class="modal-overlay hidden" onclick="closeEditModal(event)">
+    <div class="modal-box p-6" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold font-serif-title text-stone-900">✏️ Редагування ефіру</h3>
+        <button onclick="closeModal('editStreamModal')" class="text-stone-400 hover:text-stone-700 p-1 rounded-lg hover:bg-stone-100">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="editStreamForm" onsubmit="handleUpdateStream(event)" class="space-y-4">
+        <input type="hidden" id="editStreamId">
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Назва <span class="text-red-500">*</span></label>
+          <input type="text" id="editStreamTitle" required class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Дата <span class="text-red-500">*</span></label>
+          <input type="datetime-local" id="editStreamDate" required class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">URL відео <span class="text-red-500">*</span></label>
+          <input type="url" id="editStreamVideoUrl" required class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">Опис</label>
+          <textarea id="editStreamDescription" rows="3" class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-xl focus:ring-2 focus:ring-[#9a7837] text-stone-900 text-sm outline-none font-sans"></textarea>
+        </div>
+        <div class="flex gap-4">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="editStreamIsPrimary" class="w-4 h-4 accent-[#9a7837]">
+            <span class="text-xs font-medium text-stone-700">Головний ефір</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="editStreamIsLive" class="w-4 h-4 accent-red-600">
+            <span class="text-xs font-medium text-stone-700">LIVE зараз</span>
+          </label>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeModal('editStreamModal')" class="flex-1 py-2.5 border border-stone-300 text-stone-700 hover:bg-stone-50 text-sm rounded-xl">Скасувати</button>
+          <button type="submit" id="editStreamSubmitBtn" class="flex-1 py-2.5 bg-[#9a7837] hover:bg-[#82642a] text-white font-medium text-sm rounded-xl transition flex items-center justify-center gap-2">
+            <span id="editStreamBtnText">Зберегти</span>
+            <svg id="editStreamSpinner" class="hidden animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.pathname.startsWith('/apostol') ? '/apostol/api' : '/api';
+    const TOKEN_KEY = 'apostol_admin_token';
+
+    // ── Auth helpers ──────────────────────────────────────────────────────────
+    const getToken = () => localStorage.getItem(TOKEN_KEY);
+    const setToken = t => t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY);
+
+    // ── Toast ─────────────────────────────────────────────────────────────────
+    function showToast(msg, type = 'success') {
+      const c = document.getElementById('toastContainer');
+      const d = document.createElement('div');
+      d.className = `pointer-events-auto p-4 rounded-xl shadow-lg border text-sm flex items-start gap-3 transition-all duration-300 translate-y-3 opacity-0 ${type === 'success' ? 'bg-emerald-900 text-emerald-100 border-emerald-700' : 'bg-red-900 text-red-100 border-red-700'}`;
+      d.innerHTML = `<span class="font-bold">${type === 'success' ? '✓' : '✕'}</span><div>${msg}</div>`;
+      c.appendChild(d);
+      requestAnimationFrame(() => d.classList.remove('translate-y-3', 'opacity-0'));
+      setTimeout(() => { d.classList.add('translate-y-3', 'opacity-0'); setTimeout(() => d.remove(), 300); }, 3500);
+    }
+
+    // ── Tab switching ─────────────────────────────────────────────────────────
+    function switchTab(name) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-[#9a7837]', 'text-white', 'border-[#9a7837]');
+        btn.classList.add('bg-white', 'text-stone-700');
+      });
+      document.getElementById(`tab-content-${name}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${name}`);
+      activeBtn.classList.add('active');
+      activeBtn.classList.remove('bg-white', 'text-stone-700');
+
+      if (name === 'streams') loadStreams();
+    }
+
+    // ── Login / Logout ────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', async () => {
+      setDefaultDate('eventDate');
+      setDefaultDate('streamDate');
+      const token = getToken();
+      if (token) {
+        try {
+          const r = await fetch(`${API_BASE}/admin/verify`, { headers: { Authorization: `Bearer ${token}` } });
+          if (r.ok) { showDashboard(); loadEvents(); return; }
+        } catch (_) {}
+        setToken(null);
+      }
+      showLogin();
+    });
+
+    function showLogin() {
+      document.getElementById('loginSection').classList.remove('hidden');
+      document.getElementById('dashboardSection').classList.add('hidden');
+      document.getElementById('logoutBtn').classList.add('hidden');
+    }
+    function showDashboard() {
+      document.getElementById('loginSection').classList.add('hidden');
+      document.getElementById('dashboardSection').classList.remove('hidden');
+      document.getElementById('logoutBtn').classList.remove('hidden');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const password = document.getElementById('passwordInput').value.trim();
+      const errBox = document.getElementById('loginError');
+      const btn = document.getElementById('loginSubmitBtn');
+      const txt = document.getElementById('loginBtnText');
+      const spin = document.getElementById('loginSpinner');
+      errBox.classList.add('hidden');
+      txt.textContent = 'Перевірка...'; spin.classList.remove('hidden'); btn.disabled = true;
+      try {
+        const r = await fetch(`${API_BASE}/admin/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+        const d = await r.json();
+        if (r.ok && d.token) {
+          setToken(d.token);
+          document.getElementById('passwordInput').value = '';
+          showToast('Успішний вхід!');
+          showDashboard();
+          loadEvents();
+        } else {
+          errBox.textContent = d.error || 'Невірний пароль'; errBox.classList.remove('hidden');
+        }
+      } catch { errBox.textContent = 'Помилка з\'єднання із сервером'; errBox.classList.remove('hidden'); }
+      finally { txt.textContent = 'Увійти'; spin.classList.add('hidden'); btn.disabled = false; }
+    }
+
+    async function handleLogout() {
+      const token = getToken();
+      if (token) { try { await fetch(`${API_BASE}/admin/logout`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } }); } catch (_) {} }
+      setToken(null);
+      showToast('Вийшли з панелі');
+      showLogin();
+    }
+
+    // ── Date helpers ──────────────────────────────────────────────────────────
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function toDateTimeLocal(d) {
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+    function setDefaultDate(fieldId) {
+      const d = new Date(); d.setDate(d.getDate() + 1); d.setHours(9, 0, 0, 0);
+      document.getElementById(fieldId).value = toDateTimeLocal(d);
+    }
+    function setQuickDate(type, fieldId) {
+      const d = new Date();
+      if (type === 'today') { d.setHours(17, 0, 0, 0); }
+      else if (type === 'sunday') {
+        const days = (7 - d.getDay()) % 7 || 7;
+        d.setDate(d.getDate() + days); d.setHours(9, 0, 0, 0);
+      }
+      document.getElementById(fieldId).value = toDateTimeLocal(d);
+    }
+    function formatDateUk(dateStr) {
+      try {
+        const d = new Date(dateStr);
+        if (isNaN(d)) return dateStr;
+        return new Intl.DateTimeFormat('uk-UA', { weekday:'short', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' }).format(d);
+      } catch { return dateStr; }
+    }
+    function isExpired(dateStr) {
+      try { return new Date(dateStr) < new Date(); } catch { return false; }
+    }
+
+    // ── HTML preview helpers ──────────────────────────────────────────────────
+    function safeHtml(input) {
+      if (!input) return '';
+      try {
+        const doc = new DOMParser().parseFromString(String(input), 'text/html');
+        const allowed = new Set(['A','B','STRONG','I','EM','BR','SPAN','P','#text']);
+        function clean(node) {
+          const bad = [];
+          for (const c of node.childNodes) {
+            if (!allowed.has(c.nodeName)) { bad.push(c); continue; }
+            if (c.nodeName === 'A') {
+              const h = c.getAttribute('href') || '';
+              c.setAttribute('href', /^https?:\/\//i.test(h) ? h : '#');
+              c.setAttribute('target', '_blank'); c.setAttribute('rel', 'noopener noreferrer');
+              [...c.attributes].forEach(a => { if (!['href','target','rel','title'].includes(a.name)) c.removeAttribute(a.name); });
+            } else if (c.nodeType === 1) { [...c.attributes].forEach(a => { if (a.name.startsWith('on') || a.name === 'style') c.removeAttribute(a.name); }); }
+            clean(c);
+          }
+          bad.forEach(b => node.replaceChild(document.createTextNode(b.textContent), b));
+        }
+        clean(doc.body);
+        return doc.body.innerHTML;
+      } catch { return escHtml(input); }
+    }
+    function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    function togglePreview(textareaId, boxId, contentId, btnId) {
+      const box = document.getElementById(boxId);
+      const isHidden = box.classList.contains('hidden');
+      box.classList.toggle('hidden', !isHidden);
+      document.getElementById(btnId).textContent = isHidden ? 'Сховати' : 'Перегляд';
+      if (isHidden) updatePreview(textareaId, boxId, contentId);
+    }
+    function updatePreview(textareaId, boxId, contentId) {
+      const box = document.getElementById(boxId);
+      if (box.classList.contains('hidden')) return;
+      const v = document.getElementById(textareaId).value;
+      document.getElementById(contentId).innerHTML = v ? safeHtml(v) : '<span class="italic text-stone-400">Порожньо</span>';
+    }
+    function insertLink(textareaId) {
+      const ta = document.getElementById(textareaId);
+      const start = ta.selectionStart, end = ta.selectionEnd;
+      const sel = ta.value.substring(start, end);
+      const url = prompt('URL посилання:', 'https://');
+      if (!url) return;
+      const text = prompt('Текст посилання:', sel || 'Перейти');
+      if (!text) return;
+      const tag = `<a href="${url.trim()}" target="_blank" rel="noopener noreferrer">${text.trim()}</a>`;
+      ta.value = ta.value.substring(0,start) + tag + ta.value.substring(end);
+      ta.focus(); ta.selectionStart = ta.selectionEnd = start + tag.length;
+    }
+    function wrapText(textareaId, open, close) {
+      const ta = document.getElementById(textareaId);
+      const s = ta.selectionStart, e = ta.selectionEnd;
+      const sel = ta.value.substring(s, e) || 'текст';
+      ta.value = ta.value.substring(0,s) + open + sel + close + ta.value.substring(e);
+      ta.focus();
+    }
+    function insertAt(textareaId, str) {
+      const ta = document.getElementById(textareaId);
+      const s = ta.selectionStart;
+      ta.value = ta.value.substring(0,s) + str + ta.value.substring(s);
+      ta.focus(); ta.selectionStart = ta.selectionEnd = s + str.length;
+    }
+
+    // ── Modal helpers ─────────────────────────────────────────────────────────
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.body.style.overflow = ''; }
+    function closeEditModal(e) { if (e.target.classList.contains('modal-overlay')) { document.querySelectorAll('.modal-overlay').forEach(m => { m.classList.add('hidden'); }); document.body.style.overflow = ''; } }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.add('hidden')); document.body.style.overflow = ''; } });
+
+    // ── setBtn helper ─────────────────────────────────────────────────────────
+    function setBtn(btnId, textId, spinnerId, loading, text) {
+      const btn = document.getElementById(btnId);
+      document.getElementById(textId).textContent = loading ? text : text;
+      document.getElementById(spinnerId).classList.toggle('hidden', !loading);
+      btn.disabled = loading;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // EVENTS
+    // ══════════════════════════════════════════════════════════════════════════
+
+    async function loadEvents(showToastMsg = false) {
+      const c = document.getElementById('eventsList');
+      try {
+        const r = await fetch(`${API_BASE}/events`, { cache: 'no-store' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const events = await r.json();
+        renderEvents(events);
+        if (showToastMsg) showToast('Список оновлено');
+      } catch (err) {
+        c.innerHTML = `<div class="p-6 bg-red-50 border border-red-200 rounded-2xl text-center text-red-700 text-sm">${err.message}<br><button onclick="loadEvents()" class="mt-2 text-xs underline">Спробувати знову</button></div>`;
+      }
+    }
+
+    function renderEvents(events) {
+      const c = document.getElementById('eventsList');
+      document.getElementById('eventsCounterBadge').textContent = events ? events.length : 0;
+      if (!events || !events.length) {
+        c.innerHTML = `<div class="p-8 text-center bg-white rounded-2xl border border-stone-200 text-stone-400"><p class="text-sm">Немає збережених подій</p></div>`;
+        return;
+      }
+      c.innerHTML = events.map(evt => {
+        const expired = isExpired(evt.date);
+        const fmt = formatDateUk(evt.date);
+        return `
+        <article class="bg-white p-5 rounded-2xl border ${expired ? 'border-red-200 bg-red-50/20' : 'border-stone-200'} shadow-sm">
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-50 border border-amber-200 text-[11px] font-semibold text-[#8b6b2d]">📅 ${escHtml(fmt)}</span>
+              ${expired ? '<span class="expired-badge">Застаріла</span>' : ''}
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button onclick="openEditEvent(${JSON.stringify(evt).replace(/"/g,'&quot;')})" class="p-1.5 text-stone-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Редагувати">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.172-8.172z"/></svg>
+              </button>
+              <button onclick="handleDeleteEvent('${escHtml(evt.id)}','${escHtml(evt.title)}')" class="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Видалити">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+          <h3 class="text-base font-bold text-stone-900 font-serif-title">${escHtml(evt.title)}</h3>
+          <div class="rendered-content text-xs text-stone-600 mt-2 leading-relaxed bg-stone-50 p-2.5 rounded-xl border border-stone-100">${safeHtml(evt.description||'')}</div>
+          ${evt.link ? `<a href="${escHtml(evt.link)}" target="_blank" rel="noopener noreferrer" class="mt-2 text-xs text-[#9a7837] underline underline-offset-2 inline-block">Посилання ↗</a>` : ''}
+          <p class="text-[10px] text-stone-400 mt-2 font-mono">ID: ${escHtml(evt.id)}</p>
+        </article>`;
+      }).join('');
+    }
+
+    // Open edit modal for an event
+    function openEditEvent(evt) {
+      document.getElementById('editEventId').value = evt.id;
+      document.getElementById('editEventTitle').value = evt.title || '';
+      document.getElementById('editEventDate').value = evt.date ? evt.date.slice(0,16) : '';
+      document.getElementById('editEventLink').value = evt.link || '';
+      document.getElementById('editEventDescription').value = evt.description || '';
+      document.getElementById('editPreviewBox').classList.add('hidden');
+      document.getElementById('editPreviewBtn').textContent = 'Перегляд';
+      openModal('editEventModal');
+    }
+
+    async function handleCreateEvent(e) {
+      e.preventDefault();
+      const token = getToken(); if (!token) { showToast('Необхідна авторизація', 'error'); return; }
+      setBtn('addEventSubmitBtn','addBtnText','addSpinner',true,'Збереження...');
+      try {
+        const r = await fetch(`${API_BASE}/events`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            title: document.getElementById('eventTitle').value.trim(),
+            date: document.getElementById('eventDate').value,
+            link: document.getElementById('eventLink').value.trim(),
+            description: document.getElementById('eventDescription').value.trim()
+          })
+        });
+        const d = await r.json();
+        if (r.ok && d.success) {
+          showToast('Подію опубліковано!');
+          document.getElementById('addEventForm').reset();
+          setDefaultDate('eventDate');
+          document.getElementById('addPreviewBox').classList.add('hidden');
+          await loadEvents();
+        } else { showToast(d.error || 'Помилка збереження', 'error'); }
+      } catch (err) { showToast('Помилка: ' + err.message, 'error'); }
+      finally { setBtn('addEventSubmitBtn','addBtnText','addSpinner',false,'Опублікувати'); }
+    }
+
+    async function handleUpdateEvent(e) {
+      e.preventDefault();
+      const token = getToken(); if (!token) return;
+      const id = document.getElementById('editEventId').value;
+      setBtn('editEventSubmitBtn','editEventBtnText','editEventSpinner',true,'Збереження...');
+      try {
+        const r = await fetch(`${API_BASE}/events/${encodeURIComponent(id)}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            title: document.getElementById('editEventTitle').value.trim(),
+            date: document.getElementById('editEventDate').value,
+            link: document.getElementById('editEventLink').value.trim(),
+            description: document.getElementById('editEventDescription').value.trim()
+          })
+        });
+        const d = await r.json();
+        if (r.ok && d.success) { showToast('Зміни збережено!'); closeModal('editEventModal'); await loadEvents(); }
+        else { showToast(d.error || 'Помилка оновлення', 'error'); }
+      } catch (err) { showToast('Помилка: ' + err.message, 'error'); }
+      finally { setBtn('editEventSubmitBtn','editEventBtnText','editEventSpinner',false,'Зберегти зміни'); }
+    }
+
+    async function handleDeleteEvent(id, title) {
+      if (!confirm(`Видалити подію:\n"${title}"?`)) return;
+      const token = getToken(); if (!token) return;
+      try {
+        const r = await fetch(`${API_BASE}/events/${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        const d = await r.json();
+        if (r.ok && d.success) { showToast('Подію видалено!'); await loadEvents(); }
+        else { showToast(d.error || 'Помилка видалення', 'error'); }
+      } catch (err) { showToast('Помилка: ' + err.message, 'error'); }
+    }
+
+    async function deleteExpiredEvents() {
+      const container = document.getElementById('eventsList');
+      const articles = container.querySelectorAll('article');
+      const expiredIds = [];
+      articles.forEach(art => {
+        if (art.querySelector('.expired-badge')) {
+          const idEl = art.querySelector('[class*="font-mono"]');
+          if (idEl) {
+            const match = idEl.textContent.match(/ID: (.+)/);
+            if (match) expiredIds.push(match[1].trim());
+          }
+        }
+      });
+      if (!expiredIds.length) { showToast('Застарілих подій немає'); return; }
+      if (!confirm(`Видалити ${expiredIds.length} застарілих подій?`)) return;
+      const token = getToken(); if (!token) return;
+      let ok = 0;
+      for (const id of expiredIds) {
+        try {
+          const r = await fetch(`${API_BASE}/events/${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+          if (r.ok) ok++;
+        } catch (_) {}
+      }
+      showToast(`Видалено ${ok} з ${expiredIds.length} застарілих подій`);
+      await loadEvents();
+    }
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // STREAMS
+    // ══════════════════════════════════════════════════════════════════════════
+
+    async function loadStreams(showToastMsg = false) {
+      const c = document.getElementById('streamsList');
+      try {
+        const r = await fetch(`${API_BASE}/streams`, { cache: 'no-store' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const streams = await r.json();
+        renderStreams(streams);
+        if (showToastMsg) showToast('Ефіри оновлено');
+      } catch (err) {
+        c.innerHTML = `<div class="p-6 bg-red-50 border border-red-200 rounded-2xl text-center text-red-700 text-sm">${err.message}</div>`;
+      }
+    }
+
+    function renderStreams(streams) {
+      const c = document.getElementById('streamsList');
+      document.getElementById('streamsCounterBadge').textContent = streams ? streams.length : 0;
+      if (!streams || !streams.length) {
+        c.innerHTML = `<div class="p-8 text-center bg-white rounded-2xl border border-stone-200 text-stone-400"><p class="text-sm">Немає збережених ефірів</p></div>`;
+        return;
+      }
+      c.innerHTML = streams.map(s => {
+        const fmt = formatDateUk(s.date || s.dateLabel || '');
+        const embedUrl = buildEmbedUrl(s.videoUrl);
+        return `
+        <article class="bg-white p-5 rounded-2xl border border-stone-200 shadow-sm">
+          <div class="flex items-start justify-between gap-2 mb-3">
+            <div class="flex items-center gap-2 flex-wrap">
+              ${s.isPrimary ? '<span class="primary-badge">⭐ Головний</span>' : ''}
+              ${s.isLive ? '<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-red-100 border border-red-300 text-[11px] font-bold text-red-700">🔴 LIVE</span>' : ''}
+              <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-50 border border-amber-200 text-[11px] font-semibold text-[#8b6b2d]">📺 ${escHtml(fmt || s.dateLabel || '')}</span>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              ${!s.isPrimary ? `<button onclick="setStreamPrimary('${escHtml(s.id)}')" class="px-2 py-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg" title="Зробити головним">⭐ Головним</button>` : ''}
+              <button onclick="openEditStream(${JSON.stringify(s).replace(/"/g,'&quot;')})" class="p-1.5 text-stone-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Редагувати">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.172-8.172z"/></svg>
+              </button>
+              <button onclick="handleDeleteStream('${escHtml(s.id)}','${escHtml(s.title)}')" class="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Видалити">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+          <h3 class="text-base font-bold text-stone-900 font-serif-title">${escHtml(s.title)}</h3>
+          ${s.description ? `<p class="text-xs text-stone-500 mt-1">${escHtml(s.description)}</p>` : ''}
+          ${embedUrl ? `
+          <div class="mt-3 rounded-xl overflow-hidden border border-stone-200 bg-stone-100" style="aspect-ratio:16/9;max-height:200px">
+            <iframe src="${escHtml(embedUrl)}" class="w-full h-full" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen title="${escHtml(s.title)}"></iframe>
+          </div>` : `<p class="text-xs text-stone-400 mt-2">URL: <code class="bg-stone-100 px-1.5 rounded">${escHtml(s.videoUrl)}</code></p>`}
+          <p class="text-[10px] text-stone-400 mt-2 font-mono">ID: ${escHtml(s.id)}</p>
+        </article>`;
+      }).join('');
+    }
+
+    // Build Facebook embed URL from video URL
+    function buildEmbedUrl(url) {
+      if (!url) return null;
+      try {
+        const u = new URL(url);
+        if (u.hostname.includes('facebook.com') || u.hostname.includes('fb.watch')) {
+          const embed = new URL('https://www.facebook.com/plugins/video.php');
+          embed.searchParams.set('href', url);
+          embed.searchParams.set('show_text', 'false');
+          embed.searchParams.set('width', '560');
+          return embed.href;
+        }
+        if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) {
+          let videoId = u.searchParams.get('v');
+          if (!videoId && u.hostname === 'youtu.be') videoId = u.pathname.slice(1);
+          if (!videoId && u.pathname.includes('/embed/')) videoId = u.pathname.split('/embed/')[1];
+          if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+        }
+        return null;
+      } catch { return null; }
+    }
+
+    function openEditStream(s) {
+      document.getElementById('editStreamId').value = s.id;
+      document.getElementById('editStreamTitle').value = s.title || '';
+      document.getElementById('editStreamDate').value = s.date ? s.date.slice(0,16) : '';
+      document.getElementById('editStreamVideoUrl').value = s.videoUrl || '';
+      document.getElementById('editStreamDescription').value = s.description || '';
+      document.getElementById('editStreamIsPrimary').checked = !!s.isPrimary;
+      document.getElementById('editStreamIsLive').checked = !!s.isLive;
+      openModal('editStreamModal');
+    }
+
+    async function handleCreateStream(e) {
+      e.preventDefault();
+      const token = getToken(); if (!token) { showToast('Необхідна авторизація', 'error'); return; }
+      setBtn('addStreamSubmitBtn','addStreamBtnText','addStreamSpinner',true,'Збереження...');
+      const dateVal = document.getElementById('streamDate').value;
+      let dateLabel = dateVal;
+      try { dateLabel = new Intl.DateTimeFormat('uk-UA', { day:'numeric', month:'long', year:'numeric' }).format(new Date(dateVal)); } catch (_) {}
+      try {
+        const r = await fetch(`${API_BASE}/streams`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            title: document.getElementById('streamTitle').value.trim(),
+            date: dateVal,
+            dateLabel,
+            videoUrl: document.getElementById('streamVideoUrl').value.trim(),
+            description: document.getElementById('streamDescription').value.trim(),
+            isPrimary: document.getElementById('streamIsPrimary').checked,
+            isLive: document.getElementById('streamIsLive').checked
+          })
+        });
+        const d = await r.json();
+        if (r.ok && d.success) {
+          showToast('Ефір опубліковано!');
+          document.getElementById('addStreamForm').reset();
+          setDefaultDate('streamDate');
+          await loadStreams();
+        } else { showToast(d.error || 'Помилка', 'error'); }
+      } catch (err) { showToast('Помилка: ' + err.message, 'error'); }
+      finally { setBtn('addStreamSubmitBtn','addStreamBtnText','addStreamSpinner',false,'Опублікувати ефір'); }
+    }
+
+    async function handleUpdateStream(e) {
+      e.preventDefault();
+      const token = getToken(); if (!token) return;
+      const id = document.getElementById('editStreamId').value;
+      const dateVal = document.getElementById('editStreamDate').value;
+      let dateLabel = dateVal;
+      try { dateLabel = new Intl.DateTimeFormat('uk-UA', { day:'numeric', month:'long', year:'numeric' }).format(new Date(dateVal)); } catch (_) {}
+      setBtn('editStreamSubmitBtn','editStreamBtnText','editStreamSpinner',true,'Збереження...');
+      try {
+        const r = await fetch(`${API_BASE}/streams/${encodeURIComponent(id)}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            title: document.getElementById('editStreamTitle').value.trim(),
+            date: dateVal,
+            dateLabel,
+            videoUrl: document.getElementById('editStreamVideoUrl').value.trim(),
+            description: document.getElementById('editStreamDescription').value.trim(),
+            isPrimary: document.getElementById('editStreamIsPrimary').checked,
+            isLive: document.getElementById('editStreamIsLive').checked
+          })
+        });
+        const d = await r.json();
+        if (r.ok && d.success) { showToast('Зміни збережено!'); closeModal('editStreamModal'); await loadStreams(); }
+        else { showToast(d.error || 'Помилка', 'error'); }
+      } catch (err) { showToast('Помилка: ' + err.message, 'error'); }
+      finally { setBtn('editStreamSubmitBtn','editStreamBtnText','editStreamSpinner',false,'Зберегти'); }
+    }
+
+    async function setStreamPrimary(id) {
+      const token = getToken(); if (!token) return;
+      try {
+        const r = await fetch(`${API_BASE}/streams/${encodeURIComponent(id)}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ isPrimary: true })
+        });
+        const d = await r.json();
+        if (r.ok && d.success) { showToast('Встановлено як головний!'); await loadStreams(); }
+        else { showToast(d.error || 'Помилка', 'error'); }
+      } catch (err) { showToast('Помилка: ' + err.message, 'error'); }
+    }
+
+    async function handleDeleteStream(id, title) {
+      if (!confirm(`Видалити ефір:\n"${title}"?`)) return;
+      const token = getToken(); if (!token) return;
+      try {
+        const r = await fetch(`${API_BASE}/streams/${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        const d = await r.json();
+        if (r.ok && d.success) { showToast('Ефір видалено!'); await loadStreams(); }
+        else { showToast(d.error || 'Помилка', 'error'); }
+      } catch (err) { showToast('Помилка: ' + err.message, 'error'); }
+    }
+  </script>
+</body>
+</html>
