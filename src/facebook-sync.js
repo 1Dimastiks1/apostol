@@ -103,6 +103,7 @@ function updateWorship(data, retentionDays) {
   const archive = document.getElementById('worship-archive-grid') || document.querySelector('.worship-archive-grid');
   const emptyArchive = document.getElementById('worship-archive-empty');
   if (!player || !badge || !feature || !archive || !emptyArchive) return;
+  if (player.dataset.source === 'admin') return;
 
   const videos = (Array.isArray(data.videos) ? data.videos : []).filter((video) => isRecent(video, retentionDays));
   const current = data.liveVideo && isRecent(data.liveVideo, retentionDays) ? data.liveVideo : (videos[0] || null);
@@ -176,7 +177,7 @@ function expireStaticContent(retentionDays = FALLBACK_RETENTION_DAYS) {
 
   const mainPlayer = document.getElementById('worship-player');
   const feature = document.getElementById('worship-feature');
-  if (mainPlayer && feature) {
+  if (mainPlayer && feature && mainPlayer.dataset.source !== 'admin') {
     const recent = isRecent({ createdAt: mainPlayer.dataset.createdAt }, retentionDays);
     feature.hidden = !recent;
     if (!recent) {

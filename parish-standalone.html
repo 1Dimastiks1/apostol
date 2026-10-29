@@ -334,11 +334,14 @@
       }catch{return escapeHTML(input);}
     }
     async function loadAdminEvents(){
-      const base=window.location.pathname.startsWith('/apostol')?'/apostol':'';
       try{
-        const res=await fetch(base+'/api/events',{cache:'no-store'});
-        if(!res.ok)return;
-        const data=await res.json();
+        let data=null;
+        for(const path of['api/events','data/events.json']){
+          try{
+            const res=await fetch(new URL(path,document.baseURI),{cache:'no-store'});
+            if(res.ok){data=await res.json();break;}
+          }catch(_){}
+        }
         if(!Array.isArray(data)||!data.length)return;
         const adminPosts=data.map(item=>{
           let dateLabel=item.date||'';
@@ -458,6 +461,7 @@
     })();
   </script>
   <script type="module" src="./src/facebook-sync.js"></script>
+  <script type="module" src="./src/admin-streams.js"></script>
   <script type="module" src="./src/calendar-entry.js"></script>
 </body>
 </html>

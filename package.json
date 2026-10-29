@@ -8,7 +8,8 @@
     "start": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "serve": "node --env-file-if-exists=.env server.mjs"
+    "serve": "vite build && node --env-file-if-exists=.env server.mjs",
+    "publish-data": "git add events.json streams.json && git commit -m \"Оновлення подій та ефірів\" && git push"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

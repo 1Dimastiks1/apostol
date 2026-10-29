@@ -45,9 +45,23 @@ export function parishDataPlugin(projectRoot) {
     });
   }
 
+  async function readJsonArray(filePath) {
+    try {
+      const parsed = JSON.parse(await readFile(filePath, 'utf-8'));
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
   return {
     name: 'parish-data-api',
     configureServer: attach,
-    configurePreviewServer: attach
+    configurePreviewServer: attach,
+    async generateBundle() {
+      for (const [fileName, filePath] of [['data/events.json', eventsFile], ['data/streams.json', streamsFile]]) {
+        this.emitFile({ type: 'asset', fileName, source: JSON.stringify(await readJsonArray(filePath), null, 2) });
+      }
+    }
   };
 }
