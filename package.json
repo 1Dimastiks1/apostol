@@ -12,6 +12,7 @@
     "publish-data": "git add events.json streams.json && git commit -m \"Оновлення подій та ефірів\" && git push"
   },
   "dependencies": {
+    "@netlify/blobs": "^11.1.7",
     "@tailwindcss/vite": "^4.3.3",
     "express": "^5.3.0",
     "lucide-react": "^0.468.0",
