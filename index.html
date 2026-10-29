@@ -11,7 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="./src/style.css">
-  <link rel="stylesheet" href="./calendar-module/styles.css">
   <style>
     /* ← Inline-блок залишено для Tailwind CDN-конфігурації.
        Усі кастомні стилі тепер у src/style.css              */
@@ -114,7 +113,7 @@
           <a class="worship-all-videos" href="https://www.facebook.com/protoierej.oleksandr.cisar/videos" target="_blank" rel="noopener noreferrer">Усі відео на Facebook ↗</a>
         </div>
 
-        <div class="worship-archive-grid">
+        <div id="worship-archive-grid" class="worship-archive-grid">
           <article class="worship-archive-card" data-created-at="2026-10-17T12:00:00+03:00">
             <div class="worship-archive-player"><iframe title="Запис трансляції з Facebook, опублікований тиждень тому" loading="lazy" src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fprotoierej.oleksandr.cisar%2Fvideos%2F28535462586064504%2F&amp;show_text=false&amp;width=560" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe></div>
             <div class="worship-archive-copy"><p class="worship-meta">ТИЖДЕНЬ ТОМУ · FACEBOOK</p><h4>Запис трансляції</h4><a href="https://www.facebook.com/protoierej.oleksandr.cisar/videos/28535462586064504/" target="_blank" rel="noopener noreferrer">Дивитися ↗</a></div>
@@ -212,7 +211,7 @@
     const photoSet='pb.100059029128700.-2207520000';
     const photoUrl=id=>`https://www.facebook.com/photo/?fbid=${id}&set=${photoSet}`;
     const imagePath=file=>location.protocol==='file:'?new URL(`./public/images/${file}`,location.href).href:new URL(`./images/${file}`,document.baseURI).href;
-    document.querySelectorAll('[data-image-file]').forEach(image=>{image.src=imagePath(image.dataset.imageFile);});
+    if(location.protocol==='file:'){document.querySelectorAll('[data-image-file]').forEach(image=>{image.src=imagePath(image.dataset.imageFile);});}
 
     const rectorCarousel=document.getElementById('rector-carousel');
     const rectorSlides=[...rectorCarousel.querySelectorAll('.rector-slide')];
@@ -286,7 +285,9 @@
       timeline.querySelectorAll('[data-photo-index]').forEach(button=>button.addEventListener('click',()=>openLightbox(events,Number(button.dataset.photoIndex))));
     }
     function showLightbox(index){lightboxIndex=(index+lightboxPosts.length)%lightboxPosts.length;const post=lightboxPosts[lightboxIndex];lightboxTitle.textContent=`${post.dateLabel} · ${post.title}`;lightboxLink.href=safePostUrl(post.href);lightboxMedia.innerHTML=`<img src="${escapeHTML(safePostImage(post.imageUrl)||'')}" alt="${escapeHTML(post.title)}" loading="eager">`;}
-    window.addEventListener('parish-facebook-content',event=>{const data=event.detail;if(!data?.configured)return;facebookPosts=(data.posts||[]).filter(post=>Date.parse(post.createdAt||post.date)>=Date.now()-Number(data.retentionDays||14)*86400000).map(post=>({...post,dateLabel:post.dateLabel||post.date}));renderTimeline(activeFeedFilter);});window.addEventListener('parish-facebook-retention',event=>{const detail=event.detail||{};const cutoff=(Number(detail.now)||Date.now())-(Number(detail.retentionDays)||14)*86400000;facebookPosts=facebookPosts.filter(post=>Date.parse(post.createdAt||`${post.date}T23:59:59+03:00`)>=cutoff);renderTimeline(activeFeedFilter);});
+    let adminPostsCache=[];
+    function mergeAdminPosts(list){const ids=new Set(list.map(post=>post.id));return[...adminPostsCache.filter(post=>!ids.has(post.id)),...list];}
+    window.addEventListener('parish-facebook-content',event=>{const data=event.detail;if(!data?.configured)return;const next=(data.posts||[]).filter(post=>Date.parse(post.createdAt||post.date)>=Date.now()-Number(data.retentionDays||14)*86400000).map(post=>({...post,dateLabel:post.dateLabel||post.date}));facebookPosts=mergeAdminPosts(next);(window.renderTimeline||renderTimeline)(activeFeedFilter);});window.addEventListener('parish-facebook-retention',event=>{const detail=event.detail||{};const cutoff=(Number(detail.now)||Date.now())-(Number(detail.retentionDays)||14)*86400000;facebookPosts=facebookPosts.filter(post=>Date.parse(post.createdAt||`${post.date}T23:59:59+03:00`)>=cutoff);(window.renderTimeline||renderTimeline)(activeFeedFilter);});
     function openLightbox(events,index){lightboxPosts=events.filter(post=>post.imageUrl);const selected=events[index];lightboxIndex=Math.max(0,lightboxPosts.findIndex(post=>post.id===selected.id));previousFocus=document.activeElement;savedOverflow=document.body.style.overflow;document.body.style.overflow='hidden';lightbox.classList.add('open');lightbox.setAttribute('aria-hidden','false');showLightbox(lightboxIndex);document.getElementById('close-lightbox').focus();}
     function closeLightbox(){lightbox.classList.remove('open');lightbox.setAttribute('aria-hidden','true');lightboxMedia.replaceChildren();document.body.style.overflow=savedOverflow;if(previousFocus?.focus)previousFocus.focus();}
     document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));renderTimeline(button.dataset.filter);}));renderTimeline();
@@ -333,11 +334,14 @@
       }catch{return escapeHTML(input);}
     }
     async function loadAdminEvents(){
-      const base=window.location.pathname.startsWith('/apostol')?'/apostol':'';
       try{
-        const res=await fetch(base+'/api/events',{cache:'no-store'});
-        if(!res.ok)return;
-        const data=await res.json();
+        let data=null;
+        for(const path of['api/events','data/events.json']){
+          try{
+            const res=await fetch(new URL(path,document.baseURI),{cache:'no-store'});
+            if(res.ok){data=await res.json();break;}
+          }catch(_){}
+        }
         if(!Array.isArray(data)||!data.length)return;
         const adminPosts=data.map(item=>{
           let dateLabel=item.date||'';
@@ -365,15 +369,8 @@
           };
         });
 
-        // Override renderTimeline so admin posts use safeRichHtml + safeAnyUrl
-        const _origRender=renderTimeline;
-        (function patchRender(){
-          const origFilter=facebookPosts.filter.bind(facebookPosts);
-          // Merge: admin posts always on top, no duplicates
-          const existingIds=new Set(facebookPosts.map(p=>p.id));
-          const newPosts=adminPosts.filter(p=>!existingIds.has(p.id));
-          facebookPosts=[...newPosts,...facebookPosts];
-        })();
+        adminPostsCache=adminPosts;
+        facebookPosts=mergeAdminPosts(facebookPosts);
 
         // Patch renderTimeline to handle admin posts (rich html + any url)
         window.__origRenderTimeline=renderTimeline;
@@ -425,9 +422,7 @@
 
         // Re-render with patched function
         window.renderTimeline(activeFeedFilter);
-      }catch(err){
-        console.warn('[Apostol] Admin events load failed:',err);
-      }
+      }catch(_){}
     }
     loadAdminEvents();
     document.getElementById('close-lightbox').addEventListener('click',closeLightbox);document.getElementById('previous-photo').addEventListener('click',()=>showLightbox(lightboxIndex-1));document.getElementById('next-photo').addEventListener('click',()=>showLightbox(lightboxIndex+1));lightbox.addEventListener('click',event=>{if(event.target===lightbox)closeLightbox();});
@@ -448,20 +443,25 @@
     (() => {
       const player = document.getElementById('worship-player');
       const badge = document.getElementById('worship-live-badge');
+      if (!player || !badge) return;
       const frame = player.querySelector('iframe');
-      const embed = new URL('https://www.facebook.com/plugins/video.php');
-      embed.searchParams.set('href', player.dataset.videoUrl);
-      embed.searchParams.set('show_text', 'false');
-      embed.searchParams.set('width', '560');
-      frame.src = embed.toString();
+      const videoUrl = player.dataset.videoUrl;
+      if (frame && videoUrl) {
+        const embed = new URL('https://www.facebook.com/plugins/video.php');
+        embed.searchParams.set('href', videoUrl);
+        embed.searchParams.set('show_text', 'false');
+        embed.searchParams.set('width', '560');
+        frame.src = embed.toString();
+      }
       const isLive = player.dataset.live === 'true';
       badge.classList.toggle('is-live', isLive);
-      badge.querySelector('.worship-live-label').textContent = isLive ? 'LIVE' : 'Останній запис';
+      const liveLabel = badge.querySelector('.worship-live-label');
+      if (liveLabel) liveLabel.textContent = isLive ? 'LIVE' : 'Останній запис';
       badge.setAttribute('aria-label', isLive ? 'Зараз триває прямий ефір' : 'Показано останній збережений запис');
     })();
   </script>
   <script type="module" src="./src/facebook-sync.js"></script>
-  <script src="./calendar-module/app.js"></script>
-  <script>mountChurchCalendar('#church-calendar-widget');</script>
+  <script type="module" src="./src/admin-streams.js"></script>
+  <script type="module" src="./src/calendar-entry.js"></script>
 </body>
 </html>
