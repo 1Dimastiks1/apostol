@@ -1,6 +1,7 @@
 [
   {
 <<<<<<< HEAD
+<<<<<<< HEAD
     "id": "str_1793297655637_be3100",
     "title": "dasd",
     "videoUrl": "https://www.youtube.com/",
@@ -14,13 +15,19 @@
   {
 =======
 >>>>>>> b591e06ffd972e29e1ca9b34acda350484da6e89
+=======
+>>>>>>> b591e06ffd972e29e1ca9b34acda350484da6e89
     "id": "str_sample_1",
     "title": "Дмитрівська поминальна субота — пряма трансляція",
     "videoUrl": "https://www.facebook.com/protoierej.oleksandr.cisar/videos/2240800903146412/",
     "description": "Запис Божественної літургії та панахиди у Петропавлівському храмі, 24 жовтня 2026.",
     "dateLabel": "24 жовтня 2026",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "date": "2026-10-24",
+=======
+    "date": "2026-10-24T09:00",
+>>>>>>> b591e06ffd972e29e1ca9b34acda350484da6e89
 =======
     "date": "2026-10-24T09:00",
 >>>>>>> b591e06ffd972e29e1ca9b34acda350484da6e89
@@ -29,7 +36,11 @@
     "createdAt": "2026-10-24T09:00:00.000Z"
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 ]
+=======
+]
+>>>>>>> b591e06ffd972e29e1ca9b34acda350484da6e89
 =======
 ]
 >>>>>>> b591e06ffd972e29e1ca9b34acda350484da6e89
