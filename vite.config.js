@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
       facebookContentPlugin({ ...process.env, ...env }),
       parishDataPlugin(projectRoot)
     ],
-    base: process.env.NETLIFY ? '/' : (process.env.BASE_URL || '/apostol/'),
+    base: process.env.NETLIFY || process.env.VERCEL ? '/' : (process.env.BASE_URL || '/apostol/'),
     build: {
       rolldownOptions: {
         input: {
