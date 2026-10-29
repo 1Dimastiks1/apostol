@@ -4,7 +4,7 @@ import { createParishApi } from '../server/parish-api.mjs';
 const pathname = (key) => `parish-data/${key}.json`;
 const hasBlobCredentials = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
 
-// A Blob store is either private or public; the right mode is detected on first use.
+// A Blob store is either private or public; the mode is remembered once a read finds data or a write succeeds.
 let access = process.env.BLOB_ACCESS || null;
 const accessOrder = () => (access ? [access] : ['private', 'public']);
 
@@ -13,7 +13,7 @@ async function withAccess(operation) {
   for (const mode of accessOrder()) {
     try {
       const result = await operation(mode);
-      access = mode;
+      if (result !== null) access = mode;
       return result;
     } catch (error) {
       lastError = error;
