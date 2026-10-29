@@ -14,9 +14,9 @@ const port = Number(process.env.PORT) || 4173;
 const host = process.env.HOST || '127.0.0.1';
 
 // Налаштування безпеки та пароля адміністратора
-// Можна налаштувати у файлі .env (ADMIN_PASSWORD=ваш_пароль)
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'apostol2026';
-const SESSION_SECRET = process.env.SESSION_SECRET || 'apostol_secret_key_' + (process.env.ADMIN_PASSWORD || 'dev_secret_key');
+// Задайте у файлі .env (ADMIN_PASSWORD=ваш_пароль); без нього при кожному запуску генерується тимчасовий пароль
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || crypto.randomBytes(6).toString('hex');
+const SESSION_SECRET = process.env.SESSION_SECRET || 'apostol_secret_key_' + ADMIN_PASSWORD;
 
 // Шляхи до файлів та папок
 const EVENTS_FILE = resolve(process.cwd(), 'events.json');
@@ -609,7 +609,7 @@ const server = app.listen(port, host, () => {
   console.log(` Петропавлівський храм — сервер запущено успішно!`);
   console.log(` Головний сайт:   http://${host}:${port}/ (або /apostol/)`);
   console.log(` Адмін-панель:    http://${host}:${port}/admin`);
-  console.log(` Пароль за замовчуванням: "${ADMIN_PASSWORD}"`);
+  console.log(`${process.env.ADMIN_PASSWORD ? ' Пароль адмінки: з ADMIN_PASSWORD у .env' : ` Тимчасовий пароль адмінки: "${ADMIN_PASSWORD}"`}`);
   console.log(` Файл збереження: ${EVENTS_FILE}`);
   console.log(`======================================================\n`);
   console.log(service.configured ? 'Автоматична синхронізація Facebook увімкнена.' : 'Facebook API: токени відсутні у .env (працює у резервному режимі).');
