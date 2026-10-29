@@ -4,6 +4,7 @@ import { createParishApi } from '../server/parish-api.mjs';
 let access = process.env.BLOB_ACCESS || null;
 const accessOrder = () => (access ? [access] : ['private', 'public']);
 const pathname = (key) => `parish-data/${key}.json`;
+const hasBlobCredentials = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
 
 async function withAccess(operation) {
   let lastError;
@@ -22,13 +23,13 @@ async function withAccess(operation) {
 
 const parishApi = createParishApi({
   async readList(key) {
-    if (!process.env.BLOB_READ_WRITE_TOKEN) return null;
+    if (!hasBlobCredentials()) return null;
     const result = await withAccess((mode) => get(pathname(key), { access: mode, useCache: false }));
     if (!result || result.statusCode !== 200) return null;
     return JSON.parse(await new Response(result.stream).text());
   },
   async writeList(key, list) {
-    if (!process.env.BLOB_READ_WRITE_TOKEN) throw new Error('BLOB_READ_WRITE_TOKEN is not configured');
+    if (!hasBlobCredentials()) throw new Error('Vercel Blob store is not connected to this project');
     await withAccess((mode) => put(pathname(key), JSON.stringify(list), {
       access: mode,
       allowOverwrite: true,
