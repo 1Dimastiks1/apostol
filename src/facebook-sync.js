@@ -1,4 +1,4 @@
-const API_URL = '/api/facebook-content';
+const API_URL = `${String(import.meta.env.BASE_URL || '/').replace(/\/+$/, '')}/api/facebook-content`;
 const FALLBACK_RETENTION_DAYS = 14;
 const FALLBACK_POLL_MS = 60_000;
 let lastScheduleSignature = null;
@@ -82,24 +82,28 @@ function updateSchedule(schedule, retentionDays) {
   empty.hidden = true;
   wrapper.dataset.createdAt = post.createdAt || `${post.date}T12:00:00+03:00`;
   wrapper.dataset.source = 'facebook-api';
-  document.getElementById('schedule-post-date').textContent = `Оголошення опубліковано ${post.dateLabel || post.date}`;
-  document.getElementById('schedule-post-title').textContent = post.title || 'Оголошення про богослужіння';
-  document.getElementById('schedule-post-text').textContent = post.text || '';
+  const dateEl = document.getElementById('schedule-post-date');
+  const titleEl = document.getElementById('schedule-post-title');
+  const textEl = document.getElementById('schedule-post-text');
+  if (dateEl) dateEl.textContent = `Оголошення опубліковано ${post.dateLabel || post.date}`;
+  if (titleEl) titleEl.textContent = post.title || 'Оголошення про богослужіння';
+  if (textEl) textEl.textContent = post.text || '';
   const eyebrow = document.getElementById('schedule-hero-eyebrow');
   if (eyebrow) eyebrow.textContent = `ПАРАФІЯЛЬНЕ ОГОЛОШЕННЯ · ${post.dateLabel || post.date}`;
   const intro = document.getElementById('hero-schedule-intro');
   if (intro) intro.textContent = `Найновіше оголошення парафії · ${post.dateLabel || post.date}.`;
   const link = document.getElementById('schedule-source');
-  link.href = href || 'https://www.facebook.com/profile.php?id=100074930874982';
+  if (link) link.href = href || 'https://www.facebook.com/profile.php?id=100074930874982';
 }
 
 function updateWorship(data, retentionDays) {
   const player = document.getElementById('worship-player');
   const badge = document.getElementById('worship-live-badge');
   const feature = document.getElementById('worship-feature');
-  const archive = document.getElementById('worship-archive-grid');
+  const archive = document.getElementById('worship-archive-grid') || document.querySelector('.worship-archive-grid');
   const emptyArchive = document.getElementById('worship-archive-empty');
   if (!player || !badge || !feature || !archive || !emptyArchive) return;
+  if (player.dataset.source === 'admin') return;
 
   const videos = (Array.isArray(data.videos) ? data.videos : []).filter((video) => isRecent(video, retentionDays));
   const current = data.liveVideo && isRecent(data.liveVideo, retentionDays) ? data.liveVideo : (videos[0] || null);
@@ -109,7 +113,7 @@ function updateWorship(data, retentionDays) {
   if (current) {
     const href = safeFacebookUrl(current.href);
     const embed = href ? facebookEmbedUrl(href) : null;
-    if (embed) frame.src = embed;
+    if (embed && frame) frame.src = embed;
     player.dataset.videoUrl = href || '';
     player.dataset.live = String(Boolean(data.liveVideo && current.id === data.liveVideo.id));
     player.dataset.createdAt = current.createdAt || '';
@@ -117,19 +121,26 @@ function updateWorship(data, retentionDays) {
     feature.hidden = false;
     badge.classList.toggle('is-live', Boolean(current.isLive));
     badge.dataset.live = String(Boolean(current.isLive));
-    badge.querySelector('.worship-live-label').textContent = current.isLive ? 'LIVE' : 'Останній запис';
+    const liveLabel = badge.querySelector('.worship-live-label');
+    if (liveLabel) liveLabel.textContent = current.isLive ? 'LIVE' : 'Останній запис';
     badge.setAttribute('aria-label', current.isLive ? 'Зараз триває прямий ефір' : 'Показано останній збережений запис');
-    document.getElementById('worship-feature-date').textContent = `${current.isLive ? 'ПРЯМИЙ ЕФІР' : 'ОСТАННІЙ ЗАПИС'} · ${current.dateLabel || ''}`;
-    document.getElementById('worship-feature-title').textContent = current.title || 'Богослужіння у Петропавлівському храмі';
-    document.getElementById('worship-feature-description').textContent = current.text || 'Перегляньте богослужіння зі сторінки Петропавлівської парафії.';
-    document.getElementById('worship-feature-link').href = href || 'https://www.facebook.com/protoierej.oleksandr.cisar';
-    document.getElementById('worship-feature-record-link').href = href || 'https://www.facebook.com/protoierej.oleksandr.cisar';
-    frame.title = `${current.title || 'Богослужіння'} · Facebook`;
+    const featureDate = document.getElementById('worship-feature-date');
+    const featureTitle = document.getElementById('worship-feature-title');
+    const featureDescription = document.getElementById('worship-feature-description');
+    const featureLink = document.getElementById('worship-feature-link');
+    const featureRecord = document.getElementById('worship-feature-record-link');
+    if (featureDate) featureDate.textContent = `${current.isLive ? 'ПРЯМИЙ ЕФІР' : 'ОСТАННІЙ ЗАПИС'} · ${current.dateLabel || ''}`;
+    if (featureTitle) featureTitle.textContent = current.title || 'Богослужіння у Петропавлівському храмі';
+    if (featureDescription) featureDescription.textContent = current.text || 'Перегляньте богослужіння зі сторінки Петропавлівської парафії.';
+    if (featureLink) featureLink.href = href || 'https://www.facebook.com/protoierej.oleksandr.cisar';
+    if (featureRecord) featureRecord.href = href || 'https://www.facebook.com/protoierej.oleksandr.cisar';
+    if (frame) frame.title = `${current.title || 'Богослужіння'} · Facebook`;
   } else {
     feature.hidden = true;
     badge.classList.remove('is-live');
     badge.dataset.live = 'false';
-    badge.querySelector('.worship-live-label').textContent = 'Немає записів за 14 днів';
+    const liveLabel = badge.querySelector('.worship-live-label');
+    if (liveLabel) liveLabel.textContent = 'Немає записів за 14 днів';
     badge.setAttribute('aria-label', 'Немає нещодавніх відеозаписів');
   }
 
@@ -166,19 +177,22 @@ function expireStaticContent(retentionDays = FALLBACK_RETENTION_DAYS) {
 
   const mainPlayer = document.getElementById('worship-player');
   const feature = document.getElementById('worship-feature');
-  if (mainPlayer && feature) {
+  if (mainPlayer && feature && mainPlayer.dataset.source !== 'admin') {
     const recent = isRecent({ createdAt: mainPlayer.dataset.createdAt }, retentionDays);
     feature.hidden = !recent;
     if (!recent) {
       const badge = document.getElementById('worship-live-badge');
-      badge.classList.remove('is-live');
-      badge.dataset.live = 'false';
-      badge.querySelector('.worship-live-label').textContent = 'Немає записів за 14 днів';
-      badge.setAttribute('aria-label', 'Немає нещодавніх відеозаписів');
+      if (badge) {
+        badge.classList.remove('is-live');
+        badge.dataset.live = 'false';
+        const liveLabel = badge.querySelector('.worship-live-label');
+        if (liveLabel) liveLabel.textContent = 'Немає записів за 14 днів';
+        badge.setAttribute('aria-label', 'Немає нещодавніх відеозаписів');
+      }
     }
   }
 
-  const archive = document.getElementById('worship-archive-grid');
+  const archive = document.getElementById('worship-archive-grid') || document.querySelector('.worship-archive-grid');
   const emptyArchive = document.getElementById('worship-archive-empty');
   if (archive && emptyArchive) emptyArchive.hidden = [...archive.querySelectorAll('.worship-archive-card')].some((card) => !card.hidden);
   window.dispatchEvent(new CustomEvent('parish-facebook-retention', { detail: { retentionDays, now: Date.now() } }));
@@ -186,6 +200,7 @@ function expireStaticContent(retentionDays = FALLBACK_RETENTION_DAYS) {
 
 function publishSnapshot(data) {
   const retentionDays = Number(data.retentionDays) || FALLBACK_RETENTION_DAYS;
+  expireStaticContent(retentionDays);
   const recentPosts = (Array.isArray(data.posts) ? data.posts : []).filter((post) => isRecent(post, retentionDays));
   const recentVideos = (Array.isArray(data.videos) ? data.videos : []).filter((video) => isRecent(video, retentionDays));
   const snapshot = {
@@ -233,5 +248,6 @@ async function refresh() {
   }
 }
 
+expireStaticContent();
 refresh();
 window.setInterval(refresh, FALLBACK_POLL_MS);

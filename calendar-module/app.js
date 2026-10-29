@@ -7,12 +7,14 @@
   ];
   const WEEKDAYS_UK = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
   const SOURCE_URL = 'https://www.pomisna.info/uk/tserkva/kalendar/';
-  let officialDailyData = {};
+  let officialDailyData = (typeof window !== 'undefined' && window.__CHURCH_CALENDAR_OFFICIAL_DATA__ && typeof window.__CHURCH_CALENDAR_OFFICIAL_DATA__ === 'object')
+    ? window.__CHURCH_CALENDAR_OFFICIAL_DATA__
+    : {};
   const mountedCalendars = new Set();
   const ownScriptUrl = document.currentScript && document.currentScript.src;
-  window.churchCalendarDataReady = Promise.resolve({});
+  window.churchCalendarDataReady = Promise.resolve(officialDailyData);
 
-  if (ownScriptUrl && location.protocol !== 'file:') {
+  if (!Object.keys(officialDailyData).length && ownScriptUrl && location.protocol !== 'file:') {
     window.churchCalendarDataReady = fetch(new URL('./calendar-2026.json', ownScriptUrl))
       .then((response) => response.ok ? response.json() : {})
       .then((data) => {
@@ -462,7 +464,7 @@
 
   function mountChurchCalendar(target, options = {}) {
     const root = typeof target === 'string' ? document.querySelector(target) : target;
-    if (!(root instanceof HTMLElement)) throw new Error('mountChurchCalendar: передайте наявний HTML-контейнер або його селектор.');
+    if (!(root instanceof HTMLElement)) return null;
 
     const today = new Date();
     let viewYear = Number(options.year) || today.getFullYear();
@@ -566,7 +568,17 @@
 
       for (let day = 1; day <= monthLength; day += 1) {
         const date = localDate(viewYear, viewMonth, day);
-        const record = dayRecord(date);
+        const record = dayRecord(date) || {
+          date: isoDate(date),
+          title: 'Пам’ять святих цього дня',
+          saints: '',
+          description: '',
+          isMajor: false,
+          isGreat12: false,
+          isPascha: false,
+          isFast: false,
+          fastingLabel: ''
+        };
         const isToday = compareDateOnly(date, today);
         const isSelected = compareDateOnly(date, selectedDate);
         const matchesSearch = !query || normalize(`${record.title} ${record.saints} ${record.description}`).includes(normalize(query));

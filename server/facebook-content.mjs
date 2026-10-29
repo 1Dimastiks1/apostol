@@ -282,7 +282,8 @@ export function createFacebookContentService(env = {}) {
 export function createFacebookContentMiddleware(service) {
   return async function facebookContentMiddleware(request, response, next) {
     const requestUrl = new URL(request.url || '/', 'http://localhost');
-    if (requestUrl.pathname !== '/api/facebook-content') return next();
+    const path = requestUrl.pathname.replace(/^\/apostol(?=\/|$)/, '') || '/';
+    if (path !== '/api/facebook-content') return next();
     if (request.method !== 'GET') {
       response.statusCode = 405;
       response.setHeader('Allow', 'GET');
