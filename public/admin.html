@@ -151,18 +151,37 @@
                 <h2 class="text-xl font-bold text-stone-900 font-serif-title flex items-center gap-2">
                   Поточні події
                   <span id="eventsCounterBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-stone-200 text-stone-700 font-semibold font-sans">0</span>
+                  <span id="eventsExpiredBadge" class="hidden text-xs px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 font-semibold font-sans">0 застарілих</span>
                 </h2>
                 <p class="text-xs text-stone-500 mt-0.5">Збережено у <code class="bg-stone-100 px-1.5 rounded text-stone-600">events.json</code></p>
               </div>
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
                 <button onclick="loadEvents(true)" class="px-3 py-1.5 text-xs font-medium text-stone-700 bg-white hover:bg-stone-100 border border-stone-300 rounded-lg flex items-center gap-1.5">
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                   Оновити
                 </button>
-                <button onclick="deleteExpiredEvents()" class="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg">
+                <button onclick="deleteExpiredEvents()" class="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg flex items-center gap-1.5">
                   🗑 Видалити застарілі
                 </button>
               </div>
+            </div>
+
+            <!-- Quick filter & status bar -->
+            <div class="flex items-center justify-between gap-2 flex-wrap text-xs">
+              <div class="inline-flex rounded-lg border border-stone-200 bg-stone-50 p-0.5 gap-0.5" role="group">
+                <button type="button" onclick="setEventsFilter('all')" data-filter="all" class="events-filter-btn px-2.5 py-1 rounded-md font-medium bg-amber-100 text-amber-900 border border-amber-300">Усі</button>
+                <button type="button" onclick="setEventsFilter('active')" data-filter="active" class="events-filter-btn px-2.5 py-1 rounded-md font-medium text-stone-600 hover:text-stone-900">Актуальні</button>
+                <button type="button" onclick="setEventsFilter('expired')" data-filter="expired" class="events-filter-btn px-2.5 py-1 rounded-md font-medium text-stone-600 hover:text-stone-900">Застарілі</button>
+              </div>
+            </div>
+
+            <!-- Alert banner for expired events -->
+            <div id="expiredNoticeBanner" class="hidden p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between gap-3 text-amber-900 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="text-base">⚠️</span>
+                <span id="expiredNoticeText">Знайдено застарілі події, які вже минули.</span>
+              </div>
+              <button onclick="deleteExpiredEvents()" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shrink-0">Видалити зараз</button>
             </div>
             <div id="eventsList" class="space-y-3">
               <div class="p-8 text-center bg-white rounded-2xl border border-stone-200 text-stone-400">
@@ -485,7 +504,19 @@
       } catch { return dateStr; }
     }
     function isExpired(dateStr) {
-      try { return new Date(dateStr) < new Date(); } catch { return false; }
+      if (!dateStr) return false;
+      try {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return false;
+        if (!String(dateStr).includes('T') && !String(dateStr).includes(':')) {
+          const endOfDay = new Date(dateStr);
+          endOfDay.setHours(23, 59, 59, 999);
+          return endOfDay < new Date();
+        }
+        return d < new Date();
+      } catch {
+        return false;
+      }
     }
 
     // ── HTML preview helpers ──────────────────────────────────────────────────
@@ -570,27 +601,75 @@
     // EVENTS
     // ══════════════════════════════════════════════════════════════════════════
 
+    let currentEvents = [];
+    let currentEventsFilter = 'all';
+
     async function loadEvents(showToastMsg = false) {
       const c = document.getElementById('eventsList');
+      c.innerHTML = '<div class="p-8 text-center bg-white rounded-2xl border border-stone-200 text-stone-400"><p class="text-sm">Завантаження подій...</p></div>';
       try {
         const r = await fetch(`${API_BASE}/events`, { cache: 'no-store' });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const events = await r.json();
-        renderEvents(events);
-        if (showToastMsg) showToast('Список оновлено');
+        currentEvents = Array.isArray(events) ? events : [];
+        renderEvents();
+        if (showToastMsg) showToast('Список подій оновлено');
       } catch (err) {
-        c.innerHTML = `<div class="p-6 bg-red-50 border border-red-200 rounded-2xl text-center text-red-700 text-sm">${err.message}<br><button onclick="loadEvents()" class="mt-2 text-xs underline">Спробувати знову</button></div>`;
+        c.innerHTML = `<div class="p-6 bg-red-50 border border-red-200 rounded-2xl text-center text-red-700 text-sm">Не вдалося завантажити події: ${escHtml(err.message)}<br><button onclick="loadEvents()" class="mt-2 text-xs underline font-semibold">Спробувати знову</button></div>`;
       }
     }
 
-    function renderEvents(events) {
+    function setEventsFilter(filter) {
+      currentEventsFilter = filter;
+      document.querySelectorAll('.events-filter-btn').forEach(btn => {
+        const isActive = btn.dataset.filter === filter;
+        btn.classList.toggle('bg-amber-100', isActive);
+        btn.classList.toggle('text-amber-900', isActive);
+        btn.classList.toggle('border-amber-300', isActive);
+        btn.classList.toggle('text-stone-600', !isActive);
+      });
+      renderEvents();
+    }
+
+    function renderEvents() {
       const c = document.getElementById('eventsList');
-      document.getElementById('eventsCounterBadge').textContent = events ? events.length : 0;
-      if (!events || !events.length) {
-        c.innerHTML = `<div class="p-8 text-center bg-white rounded-2xl border border-stone-200 text-stone-400"><p class="text-sm">Немає збережених подій</p></div>`;
+      const total = currentEvents.length;
+      const expiredCount = currentEvents.filter(e => isExpired(e.date)).length;
+
+      document.getElementById('eventsCounterBadge').textContent = total;
+      const expBadge = document.getElementById('eventsExpiredBadge');
+      if (expBadge) {
+        expBadge.textContent = `${expiredCount} застарілих`;
+        expBadge.classList.toggle('hidden', expiredCount === 0);
+      }
+
+      const notice = document.getElementById('expiredNoticeBanner');
+      if (notice) {
+        if (expiredCount > 0) {
+          notice.classList.remove('hidden');
+          const noticeText = document.getElementById('expiredNoticeText');
+          if (noticeText) noticeText.textContent = `Знайдено ${expiredCount} застарілих подій, час яких уже минув.`;
+        } else {
+          notice.classList.add('hidden');
+        }
+      }
+
+      let filtered = currentEvents;
+      if (currentEventsFilter === 'active') {
+        filtered = currentEvents.filter(e => !isExpired(e.date));
+      } else if (currentEventsFilter === 'expired') {
+        filtered = currentEvents.filter(e => isExpired(e.date));
+      }
+
+      if (!filtered.length) {
+        const msg = currentEventsFilter === 'expired' 
+          ? 'Немає застарілих подій' 
+          : (currentEventsFilter === 'active' ? 'Немає актуальних майбутніх подій' : 'Немає збережених подій');
+        c.innerHTML = `<div class="p-8 text-center bg-white rounded-2xl border border-stone-200 text-stone-400"><p class="text-sm">${msg}</p></div>`;
         return;
       }
-      c.innerHTML = events.map(evt => {
+
+      c.innerHTML = filtered.map(evt => {
         const expired = isExpired(evt.date);
         const fmt = formatDateUk(evt.date);
         return `
@@ -601,10 +680,10 @@
               ${expired ? '<span class="expired-badge">Застаріла</span>' : ''}
             </div>
             <div class="flex items-center gap-1 shrink-0">
-              <button onclick="openEditEvent(${JSON.stringify(evt).replace(/"/g,'&quot;')})" class="p-1.5 text-stone-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Редагувати">
+              <button onclick="openEditEventById('${escHtml(evt.id)}')" class="p-1.5 text-stone-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Редагувати">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.172-8.172z"/></svg>
               </button>
-              <button onclick="handleDeleteEvent('${escHtml(evt.id)}','${escHtml(evt.title)}')" class="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Видалити">
+              <button onclick="handleDeleteEventById('${escHtml(evt.id)}')" class="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Видалити">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
               </button>
             </div>
@@ -618,7 +697,9 @@
     }
 
     // Open edit modal for an event
-    function openEditEvent(evt) {
+    function openEditEventById(id) {
+      const evt = currentEvents.find(e => e.id === id);
+      if (!evt) return;
       document.getElementById('editEventId').value = evt.id;
       document.getElementById('editEventTitle').value = evt.title || '';
       document.getElementById('editEventDate').value = evt.date ? evt.date.slice(0,16) : '';
@@ -677,9 +758,11 @@
       finally { setBtn('editEventSubmitBtn','editEventBtnText','editEventSpinner',false,'Зберегти зміни'); }
     }
 
-    async function handleDeleteEvent(id, title) {
+    async function handleDeleteEventById(id) {
+      const evt = currentEvents.find(e => e.id === id);
+      const title = evt ? evt.title : id;
       if (!confirm(`Видалити подію:\n"${title}"?`)) return;
-      const token = getToken(); if (!token) return;
+      const token = getToken(); if (!token) { showToast('Необхідна авторизація', 'error'); return; }
       try {
         const r = await fetch(`${API_BASE}/events/${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
         const d = await r.json();
@@ -689,35 +772,39 @@
     }
 
     async function deleteExpiredEvents() {
-      const container = document.getElementById('eventsList');
-      const articles = container.querySelectorAll('article');
-      const expiredIds = [];
-      articles.forEach(art => {
-        if (art.querySelector('.expired-badge')) {
-          const idEl = art.querySelector('[class*="font-mono"]');
-          if (idEl) {
-            const match = idEl.textContent.match(/ID: (.+)/);
-            if (match) expiredIds.push(match[1].trim());
-          }
+      const expired = currentEvents.filter(evt => isExpired(evt.date));
+      if (!expired.length) { showToast('Застарілих подій немає'); return; }
+      if (!confirm(`Видалити ${expired.length} застарілих подій, що відбулися раніше?`)) return;
+      const token = getToken(); if (!token) { showToast('Необхідна авторизація', 'error'); return; }
+
+      // Try bulk delete endpoint first
+      try {
+        const r = await fetch(`${API_BASE}/events/expired`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        if (r.ok) {
+          const d = await r.json();
+          showToast(d.message || `Видалено ${expired.length} застарілих подій`);
+          await loadEvents(true);
+          return;
         }
-      });
-      if (!expiredIds.length) { showToast('Застарілих подій немає'); return; }
-      if (!confirm(`Видалити ${expiredIds.length} застарілих подій?`)) return;
-      const token = getToken(); if (!token) return;
+      } catch (_) {}
+
+      // Fallback: delete sequentially if bulk delete is unavailable
       let ok = 0;
-      for (const id of expiredIds) {
+      for (const evt of expired) {
         try {
-          const r = await fetch(`${API_BASE}/events/${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+          const r = await fetch(`${API_BASE}/events/${encodeURIComponent(evt.id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
           if (r.ok) ok++;
         } catch (_) {}
       }
-      showToast(`Видалено ${ok} з ${expiredIds.length} застарілих подій`);
-      await loadEvents();
+      showToast(`Видалено ${ok} з ${expired.length} застарілих подій`);
+      await loadEvents(true);
     }
 
     // ══════════════════════════════════════════════════════════════════════════
     // STREAMS
     // ══════════════════════════════════════════════════════════════════════════
+
+    let currentStreams = [];
 
     async function loadStreams(showToastMsg = false) {
       const c = document.getElementById('streamsList');
@@ -725,10 +812,11 @@
         const r = await fetch(`${API_BASE}/streams`, { cache: 'no-store' });
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const streams = await r.json();
-        renderStreams(streams);
+        currentStreams = Array.isArray(streams) ? streams : [];
+        renderStreams(currentStreams);
         if (showToastMsg) showToast('Ефіри оновлено');
       } catch (err) {
-        c.innerHTML = `<div class="p-6 bg-red-50 border border-red-200 rounded-2xl text-center text-red-700 text-sm">${err.message}</div>`;
+        c.innerHTML = `<div class="p-6 bg-red-50 border border-red-200 rounded-2xl text-center text-red-700 text-sm">${escHtml(err.message)}</div>`;
       }
     }
 
@@ -752,10 +840,10 @@
             </div>
             <div class="flex items-center gap-1 shrink-0">
               ${!s.isPrimary ? `<button onclick="setStreamPrimary('${escHtml(s.id)}')" class="px-2 py-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg" title="Зробити головним">⭐ Головним</button>` : ''}
-              <button onclick="openEditStream(${JSON.stringify(s).replace(/"/g,'&quot;')})" class="p-1.5 text-stone-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Редагувати">
+              <button onclick="openEditStreamById('${escHtml(s.id)}')" class="p-1.5 text-stone-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Редагувати">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.172-8.172z"/></svg>
               </button>
-              <button onclick="handleDeleteStream('${escHtml(s.id)}','${escHtml(s.title)}')" class="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Видалити">
+              <button onclick="handleDeleteStreamById('${escHtml(s.id)}')" class="p-1.5 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Видалити">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
               </button>
             </div>
@@ -769,6 +857,25 @@
           <p class="text-[10px] text-stone-400 mt-2 font-mono">ID: ${escHtml(s.id)}</p>
         </article>`;
       }).join('');
+    }
+
+    function openEditStreamById(id) {
+      const s = currentStreams.find(item => item.id === id);
+      if (!s) return;
+      openEditStream(s);
+    }
+
+    async function handleDeleteStreamById(id) {
+      const s = currentStreams.find(item => item.id === id);
+      const title = s ? s.title : id;
+      if (!confirm(`Видалити ефір:\n"${title}"?`)) return;
+      const token = getToken(); if (!token) { showToast('Необхідна авторизація', 'error'); return; }
+      try {
+        const r = await fetch(`${API_BASE}/streams/${encodeURIComponent(id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+        const d = await r.json();
+        if (r.ok && d.success) { showToast('Ефір видалено!'); await loadStreams(); }
+        else { showToast(d.error || 'Помилка', 'error'); }
+      } catch (err) { showToast('Помилка: ' + err.message, 'error'); }
     }
 
     // Build Facebook embed URL from video URL

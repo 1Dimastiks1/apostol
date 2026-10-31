@@ -41,6 +41,22 @@ const text = (value) => (typeof value === 'string' ? value.trim() : '');
 const flag = (value) => value === true || value === 'true';
 const newId = (prefix) => `${prefix}_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
 
+export function isEventExpired(dateStr) {
+  if (!dateStr) return false;
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return false;
+    if (!String(dateStr).includes('T') && !String(dateStr).includes(':')) {
+      const endOfDay = new Date(dateStr);
+      endOfDay.setHours(23, 59, 59, 999);
+      return endOfDay < new Date();
+    }
+    return d < new Date();
+  } catch {
+    return false;
+  }
+}
+
 async function readBody(req) {
   try {
     return await req.json();
@@ -62,6 +78,20 @@ export function createParishApi({ readList, writeList }) {
     const events = await loadList('events', seedEvents);
     if (req.method === 'GET' && !id) return json(events);
     if (!isAuthorized(req)) return fail(401, 'Сесія недійсна або термін її дії закінчився. Будь ласка, увійдіть знову.');
+
+    if ((req.method === 'DELETE' && id === 'expired') || (req.method === 'POST' && (id === 'cleanup' || id === 'delete-expired'))) {
+      const initialCount = events.length;
+      const remaining = events.filter((e) => !isEventExpired(e.date));
+      const deletedCount = initialCount - remaining.length;
+      if (deletedCount > 0) {
+        await writeList('events', remaining);
+      }
+      return json({
+        success: true,
+        count: deletedCount,
+        message: `Видалено ${deletedCount} застарілих подій`
+      });
+    }
 
     const index = id ? events.findIndex((event) => event.id === id) : -1;
     if (id && index === -1) return fail(404, 'Подію з таким ID не знайдено');

@@ -91,6 +91,30 @@
 /*  §3. БАЗОВА ТИПОГРАФІКА ТА ЕЛЕМЕНТИ                         */
 /* ============================================================ */
 
+/* Загальний захист від горизонтального скролу на мобільних */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Гарантуємо, що всі коробки адаптивні і не розпирають екран */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Зображення, відео та інші медіа-елементи не перевищують ширину екрана */
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
 body {
   margin:     0;
   min-width:  320px;
@@ -1154,6 +1178,7 @@ a { color: inherit; }
 }
 
 .back-to-top[hidden] { display: none; }
+[data-schedule-type][hidden] { display: none !important; }
 
 /* --- 15.2 Іконна кнопка (.icon-button) --- */
 .icon-button {

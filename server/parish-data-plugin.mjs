@@ -1,47 +1,74 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { createParishApi } from './parish-api.mjs';
 
 function normalizeApiPath(pathname) {
   const stripped = pathname.replace(/^\/apostol(?=\/|$)/, '');
   return stripped || '/';
 }
 
-async function sendJsonFile(filePath, fallback, response) {
-  response.statusCode = 200;
-  response.setHeader('Content-Type', 'application/json; charset=utf-8');
-  response.setHeader('Cache-Control', 'no-store, max-age=0');
-  try {
-    if (!existsSync(filePath)) {
-      response.end(JSON.stringify(fallback));
-      return;
-    }
-    const raw = await readFile(filePath, 'utf-8');
-    const parsed = JSON.parse(raw);
-    response.end(JSON.stringify(Array.isArray(parsed) ? parsed : fallback));
-  } catch {
-    response.end(JSON.stringify(fallback));
-  }
-}
-
 export function parishDataPlugin(projectRoot) {
   const eventsFile = resolve(projectRoot, 'events.json');
   const streamsFile = resolve(projectRoot, 'streams.json');
 
+  const parishApi = createParishApi({
+    async readList(key) {
+      const file = key === 'events' ? eventsFile : streamsFile;
+      if (!existsSync(file)) return [];
+      try {
+        const raw = await readFile(file, 'utf-8');
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    },
+    async writeList(key, list) {
+      const file = key === 'events' ? eventsFile : streamsFile;
+      await writeFile(file, JSON.stringify(list, null, 2), 'utf-8');
+    }
+  });
+
   function attach(server) {
     server.middlewares.use(async (request, response, next) => {
-      const requestUrl = new URL(request.url || '/', 'http://localhost');
+      const requestUrl = new URL(request.url || '/', `http://${request.headers.host || 'localhost'}`);
       const path = normalizeApiPath(requestUrl.pathname);
-      if (request.method !== 'GET') return next();
-      if (path === '/api/events') {
-        await sendJsonFile(eventsFile, [], response);
-        return;
+      if (!path.startsWith('/api/')) return next();
+
+      try {
+        let body = undefined;
+        if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
+          const buffers = [];
+          for await (const chunk of request) {
+            buffers.push(chunk);
+          }
+          if (buffers.length > 0) {
+            body = Buffer.concat(buffers);
+          }
+        }
+
+        const headers = new Headers();
+        for (const [key, val] of Object.entries(request.headers)) {
+          if (val) headers.set(key, Array.isArray(val) ? val.join(', ') : val);
+        }
+
+        const fetchReq = new Request(new URL(path, requestUrl.origin), {
+          method: request.method,
+          headers,
+          body
+        });
+
+        const apiRes = await parishApi(fetchReq);
+        response.statusCode = apiRes.status;
+        for (const [k, v] of apiRes.headers.entries()) {
+          response.setHeader(k, v);
+        }
+        const text = await apiRes.text();
+        response.end(text);
+      } catch (err) {
+        next(err);
       }
-      if (path === '/api/streams') {
-        await sendJsonFile(streamsFile, [], response);
-        return;
-      }
-      next();
     });
   }
 

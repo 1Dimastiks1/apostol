@@ -462,6 +462,71 @@
     return value.toLocaleLowerCase('uk-UA').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[’‘`']/g, '’').trim();
   }
 
+  const MAJOR_FEASTS_2026 = [
+    { title: 'Богоявлення (Водохреще)', date: '2026-01-06', icon: '💧' },
+    { title: 'Стрітення Господнє', date: '2026-02-02', icon: '🕯️' },
+    { title: 'Благовіщення', date: '2026-03-25', icon: '🕊️' },
+    { title: 'Вербна неділя', date: '2026-04-05', icon: '🌿' },
+    { title: 'Великдень (Пасха)', date: '2026-04-12', icon: '☦️' },
+    { title: 'Вознесіння Господнє', date: '2026-05-21', icon: '☁️' },
+    { title: 'Трійця (П’ятдесятниця)', date: '2026-05-31', icon: '🌿' },
+    { title: 'Петра і Павла (Храмове свято)', date: '2026-06-29', icon: '🔑', patronal: true },
+    { title: 'Преображення (Спас)', date: '2026-08-06', icon: '🍇' },
+    { title: 'Успіння Богородиці', date: '2026-08-15', icon: '🌸' },
+    { title: 'Покрова Пресвятої Богородиці', date: '2026-10-01', icon: '🛡️' },
+    { title: 'Святителя Миколая', date: '2026-12-06', icon: '🎅' },
+    { title: 'Різдво Христове', date: '2026-12-25', icon: '🌟' }
+  ];
+
+  function makeGoogleCalendarUrl(title, dateStr, description) {
+    const dStr = String(dateStr || '').replace(/-/g, '');
+    const nextDay = new Date(dateStr);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const endStr = nextDay.toISOString().slice(0, 10).replace(/-/g, '');
+    const url = new URL('https://calendar.google.com/calendar/render');
+    url.searchParams.set('action', 'TEMPLATE');
+    url.searchParams.set('text', `${title} — Петропавлівський храм`);
+    url.searchParams.set('dates', `${dStr}/${endStr}`);
+    url.searchParams.set('details', `${description}\n\nХрам святих апостолів Петра і Павла ПЦУ\nм. Кам’янець-Подільський, вул. Татарська, 9\nТелефон: +38 (097) 131-28-86`);
+    url.searchParams.set('location', 'вулиця Татарська, 9, Кам’янець-Подільський, Хмельницька область');
+    return url.toString();
+  }
+
+  function downloadIcsFile(title, dateStr, description) {
+    const dStr = String(dateStr || '').replace(/-/g, '');
+    const nextDay = new Date(dateStr);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const endStr = nextDay.toISOString().slice(0, 10).replace(/-/g, '');
+    const safeTitle = String(title || 'Церковне свято').replace(/[\\,;]/g, ' ');
+    const safeDesc = String(description || '').replace(/\n/g, '\\n').replace(/[\\,;]/g, ' ');
+    const icsLines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Petropavlivsky Khram//Church Calendar//UA',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `UID:church-${dStr}-${Math.random().toString(36).slice(2, 7)}@apostol.church`,
+      `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+      `DTSTART;VALUE=DATE:${dStr}`,
+      `DTEND;VALUE=DATE:${endStr}`,
+      `SUMMARY:${safeTitle} — Петропавлівський храм`,
+      `DESCRIPTION:${safeDesc}\\n\\nХрам свв. апп. Петра і Павла ПЦУ, вул. Татарська, 9, Кам’янець-Подільський`,
+      'LOCATION:вулиця Татарська\\, 9\\, Кам’янець-Подільський\\, Україна',
+      'STATUS:CONFIRMED',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ];
+    const blob = new Blob([icsLines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `cerkva-${dStr}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
   function mountChurchCalendar(target, options = {}) {
     const root = typeof target === 'string' ? document.querySelector(target) : target;
     if (!(root instanceof HTMLElement)) return null;
@@ -505,6 +570,17 @@
           </label>
         </div>
 
+        <div class="cc-quick-feasts-wrap">
+          <span class="cc-quick-feasts-label">Швидкий вибір свята:</span>
+          <div class="cc-quick-feasts" role="tablist" aria-label="Головні свята року">
+            ${MAJOR_FEASTS_2026.map(f => `
+              <button type="button" class="cc-feast-chip ${f.patronal ? 'is-patronal' : ''}" data-feast-date="${f.date}" title="${escapeHtml(f.title)}">
+                <span>${f.icon}</span> <span>${escapeHtml(f.title.split('(')[0].trim())}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
         <div class="cc-layout">
           <div class="cc-calendar-panel">
             <div class="cc-weekdays" aria-hidden="true">${WEEKDAYS_UK.map((day) => `<span>${day}</span>`).join('')}</div>
@@ -543,6 +619,35 @@
       const dateTitle = capitalize(formatFullDate(selectedDate));
       const holidayClass = record.isPascha ? ' cc-detail--pascha' : record.isGreat12 ? ' cc-detail--great' : '';
       detail.className = `cc-detail${holidayClass}`;
+
+      const isSunday = selectedDate.getDay() === 0;
+      const isGreatHoliday = record.isPascha || record.isGreat12 || record.isMajor;
+      let scheduleNote = '';
+      if (isSunday || isGreatHoliday) {
+        scheduleNote = `
+          <div class="cc-parish-schedule-box">
+            <div class="cc-parish-schedule-title">✠ Розклад у Петропавлівському храмі:</div>
+            <ul class="cc-parish-schedule-list">
+              <li><strong>08:00</strong> — Сповідь для парафіян та прочан</li>
+              <li><strong>09:00</strong> — Святкова Божественна Літургія</li>
+              <li><strong>11:00</strong> — Молебень за Україну, воїнів-захисників та мир</li>
+              <li><strong>16:00</strong> — Катехитична зустріч, недільна школа для дітей</li>
+            </ul>
+          </div>`;
+      } else {
+        scheduleNote = `
+          <div class="cc-parish-schedule-box">
+            <div class="cc-parish-schedule-title">✠ Богослужіння дня:</div>
+            <ul class="cc-parish-schedule-list">
+              <li><strong>08:30</strong> — Ранкова сповідь</li>
+              <li><strong>09:00</strong> — Божественна Літургія, поминання за здоров’я та упокій</li>
+              <li><strong>17:00</strong> — Вечірнє богослужіння, читання акафісту</li>
+            </ul>
+          </div>`;
+      }
+
+      const gcalUrl = makeGoogleCalendarUrl(record.title, record.date, record.description || record.saints);
+
       detail.innerHTML = `
         <p class="cc-detail-kicker">${record.isPascha ? 'Свято свят' : record.isGreat12 ? 'Дванадесяте свято' : record.isMajor ? 'Церковне свято' : 'Пам’ять дня'}</p>
         <p class="cc-detail-date">${escapeHtml(dateTitle)}</p>
@@ -550,7 +655,19 @@
         <p class="cc-detail-saints">${escapeHtml(record.saints)}</p>
         <p class="cc-detail-description">${escapeHtml(record.description)}</p>
         <div class="cc-fast-status ${record.isFast ? 'is-fast' : 'is-clear'}"><span class="cc-fast-symbol" aria-hidden="true">${record.isFast ? '◒' : '○'}</span><span><strong>${escapeHtml(record.fastingLabel)}</strong><small>${escapeHtml(record.fastingReason)}</small></span></div>
-        <a class="cc-source-link" href="${SOURCE_URL}" target="_blank" rel="noopener noreferrer">Звірити день з календарем ПЦУ ↗</a>`;
+        ${scheduleNote}
+        <div class="cc-export-actions">
+          <a class="cc-btn-export cc-btn-google" href="${escapeHtml(gcalUrl)}" target="_blank" rel="noopener noreferrer">
+            📅 Додати в Google Календар
+          </a>
+          <button type="button" class="cc-btn-export cc-btn-apple" data-action="download-ics" data-title="${escapeHtml(record.title)}" data-date="${escapeHtml(record.date)}" data-desc="${escapeHtml(record.saints || record.title)}">
+            🍏 Додати в Apple / Телефон (.ics)
+          </button>
+        </div>
+        <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:gap;gap:8px;">
+          <a class="cc-btn-order-prayer" href="#prayer">✍️ Замовити службу на цей день</a>
+          <a class="cc-source-link" href="${SOURCE_URL}" target="_blank" rel="noopener noreferrer">Офіційний календар ПЦУ ↗</a>
+        </div>`;
     }
 
     function passesFilter(record) {
@@ -646,6 +763,18 @@
     }
 
     root.addEventListener('click', (event) => {
+      const feastChip = event.target.closest('[data-feast-date]');
+      if (feastChip && root.contains(feastChip)) {
+        selectDate(feastChip.dataset.feastDate);
+        return;
+      }
+
+      const icsButton = event.target.closest('[data-action="download-ics"]');
+      if (icsButton && root.contains(icsButton)) {
+        downloadIcsFile(icsButton.dataset.title, icsButton.dataset.date, icsButton.dataset.desc);
+        return;
+      }
+
       const actionButton = event.target.closest('[data-action]');
       if (actionButton && root.contains(actionButton)) {
         const action = actionButton.dataset.action;

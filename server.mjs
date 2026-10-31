@@ -297,7 +297,23 @@ const createEventHandler = async (req, res) => {
 app.post('/api/events', requireAuth, createEventHandler);
 app.post('/apostol/api/events', requireAuth, createEventHandler);
 
-// Видалення події за її ID (лише для авторизованого адміністратора)
+function isEventExpired(dateStr) {
+  if (!dateStr) return false;
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return false;
+    if (!String(dateStr).includes('T') && !String(dateStr).includes(':')) {
+      const endOfDay = new Date(dateStr);
+      endOfDay.setHours(23, 59, 59, 999);
+      return endOfDay < new Date();
+    }
+    return d < new Date();
+  } catch {
+    return false;
+  }
+}
+
+// Видалення події за її ID або видалення всіх застарілих (лише для авторизованого адміністратора)
 const deleteEventHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -306,6 +322,21 @@ const deleteEventHandler = async (req, res) => {
     }
 
     const events = await readEventsFromFile();
+
+    if (id === 'expired' || id === 'cleanup' || id === 'delete-expired') {
+      const initialCount = events.length;
+      const remaining = events.filter((e) => !isEventExpired(e.date));
+      const deletedCount = initialCount - remaining.length;
+      if (deletedCount > 0) {
+        await writeEventsToFile(remaining);
+      }
+      return res.json({
+        success: true,
+        count: deletedCount,
+        message: `Видалено ${deletedCount} застарілих подій`
+      });
+    }
+
     const eventIndex = events.findIndex(e => e.id === id);
 
     if (eventIndex === -1) {
@@ -329,6 +360,8 @@ const deleteEventHandler = async (req, res) => {
 
 app.delete('/api/events/:id', requireAuth, deleteEventHandler);
 app.delete('/apostol/api/events/:id', requireAuth, deleteEventHandler);
+app.post('/api/events/cleanup', requireAuth, (req, res) => { req.params.id = 'expired'; deleteEventHandler(req, res); });
+app.post('/apostol/api/events/cleanup', requireAuth, (req, res) => { req.params.id = 'expired'; deleteEventHandler(req, res); });
 
 // Оновлення існуючої події за її ID (лише для авторизованого адміністратора)
 const updateEventHandler = async (req, res) => {
