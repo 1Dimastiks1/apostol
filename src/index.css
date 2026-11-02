@@ -1,0 +1,314 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── Токени shadcn у палітрі храму: слонова кістка, вино, сусальне золото ── */
+:root {
+  --background: #f8f3ea;
+  --foreground: #1d1511;
+  --card: #fffdf8;
+  --card-foreground: #1d1511;
+  --primary: #5a1418;
+  --primary-foreground: #f8f3ea;
+  --secondary: #efe6d6;
+  --secondary-foreground: #1d1511;
+  --muted: #ece3d3;
+  --muted-foreground: #6b5f52;
+  --accent: #e9dcc2;
+  --accent-foreground: #1d1511;
+  --destructive: #a3262a;
+  --border: rgb(138 106 42 / 0.22);
+  --input: rgb(138 106 42 / 0.35);
+  --ring: #c6a052;
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@theme {
+  --font-display: "Cormorant Garamond", "Cormorant", Georgia, serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --color-ink: #16100c;
+  --color-night: #0f0706;
+  --color-wine: #4a0f12;
+  --color-wine-deep: #1b0607;
+  --color-ivory: #f8f3ea;
+  --color-parchment: #efe6d6;
+  --color-gold: #c6a052;
+  --color-gold-light: #e8cf8d;
+  --color-gold-deep: #8a6a2a;
+
+  --animate-marquee: marquee 48s linear infinite;
+  --animate-flicker: flicker 3.2s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  45% { opacity: 0.55; }
+  55% { opacity: 0.85; }
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(32px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-16px) scale(.97); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes ken-burns {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to { transform: scale(1.08) translate3d(-1.2%, -1%, 0); }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(36px); filter: blur(8px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes rays-spin { to { transform: rotate(360deg); } }
+@keyframes clip-in {
+  from { clip-path: inset(9% 6% round 1.25rem); }
+  to { clip-path: inset(0 round 1.25rem); }
+}
+@keyframes line-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+@keyframes hero-zoom {
+  from { transform: scale(1.12); }
+  to { transform: scale(1); }
+}
+
+/* ── Розмір шрифту для старших парафіян: масштабує всі rem ── */
+html { font-size: 100%; scroll-behavior: smooth; scroll-padding-top: 88px; }
+html[data-text-size="1"] { font-size: 112.5%; }
+html[data-text-size="2"] { font-size: 125%; }
+
+@layer base {
+  * { border-color: var(--border); }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: #5a1418; color: #f8f3ea; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+}
+
+@layer components {
+  .shell { width: min(1320px, 100% - 2.5rem); margin-inline: auto; }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-gold-deep);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 2rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+  }
+  .on-dark .eyebrow, .eyebrow.on-dark { color: var(--color-gold-light); }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.015em;
+  }
+
+  /* Тонкий шум на темних поверхнях, щоб градієнти не виглядали «пластиково» */
+  .grain { position: relative; isolation: isolate; }
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.07;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .hairline { height: 1px; background: linear-gradient(90deg, transparent, var(--color-gold), transparent); }
+
+  .arch { border-radius: 999px 999px 1.25rem 1.25rem; }
+
+  /* Світло, що йде за курсором по картці (координати задає PageChrome) */
+  .spotlight { position: relative; isolation: isolate; }
+  .spotlight::after {
+    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgb(198 160 82 / .18), transparent 60%);
+    opacity: 0; transition: opacity .35s;
+  }
+  .spotlight:hover::after { opacity: 1; }
+
+  /* Золотий відблиск, що повільно пробігає по виділених словах заголовків */
+  .display em {
+    background:
+      linear-gradient(100deg, transparent 40%, rgb(255 236 170 / .95) 50%, transparent 60%) 150% 0 / 250% 100% no-repeat,
+      linear-gradient(currentColor, currentColor);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    animation: shine 3.6s ease-in-out infinite;
+  }
+  .display em.gold-text {
+    background:
+      linear-gradient(100deg, transparent 40%, rgb(255 246 205 / .95) 50%, transparent 60%) 150% 0 / 250% 100% no-repeat,
+      linear-gradient(180deg, #f6e3a8 0%, #d4ad5c 45%, #9b7430 100%);
+    -webkit-background-clip: text; background-clip: text;
+  }
+  /* Золоті іскри (Embers) */
+  .ember {
+    position: absolute; bottom: -10px; border-radius: 999px;
+    background: radial-gradient(circle, #f6e3a8, #c6a052 60%, transparent 70%);
+    box-shadow: 0 0 10px 2px rgb(198 160 82 / .5); opacity: 0;
+    animation: ember-rise linear infinite;
+  }
+  @keyframes ember-rise {
+    0% { transform: translate3d(0, 0, 0); opacity: 0; }
+    10% { opacity: .9; }
+    100% { transform: translate3d(var(--drift, 0), -90vh, 0); opacity: 0; }
+  }
+
+  /* Паралакс зображень під час прокручування (де браузер підтримує) */
+  @supports (animation-timeline: view()) {
+    .parallax { scale: 1.16; animation: parallax linear both; animation-timeline: view(); }
+    @keyframes parallax { from { translate: 0 -7%; } to { translate: 0 7%; } }
+  }
+
+  /* Магнітні кнопки: зсув задає PageChrome */
+  .magnetic { translate: var(--tx, 0) var(--ty, 0); transition: translate .25s cubic-bezier(.2,.7,.2,1); }
+
+  /* М'яке золоте сяйво за курсором на всій сторінці */
+  .cursor-halo {
+    position: fixed; z-index: 55; top: 0; left: 0; width: 520px; height: 520px; margin: -260px 0 0 -260px;
+    pointer-events: none; border-radius: 999px; mix-blend-mode: soft-light;
+    background: radial-gradient(circle, rgb(198 160 82 / .55), transparent 65%);
+    transform: translate3d(var(--cx, -999px), var(--cy, -999px), 0); transition: opacity .4s;
+  }
+
+  @keyframes shine { 0%, 18% { background-position: 150% 0, 0 0; } 100% { background-position: -50% 0, 0 0; } }
+
+  .gold-text {
+    background: linear-gradient(180deg, #f6e3a8 0%, #d4ad5c 45%, #9b7430 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .glass-panel {
+    background: linear-gradient(135deg, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.04));
+    border: 1px solid rgb(255 255 255 / 0.16);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), 0 30px 60px -30px rgb(0 0 0 / 0.6);
+  }
+
+  .field {
+    width: 100%;
+    border-radius: 0.75rem;
+    border: 1px solid var(--input);
+    background: #fffdf8;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    color: var(--foreground);
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .field::placeholder { color: #9a8f80; }
+  .field:focus { outline: none; border-color: var(--color-gold); box-shadow: 0 0 0 4px rgb(198 160 82 / 0.18); }
+
+  .chip {
+    border-radius: 999px;
+    border: 1px solid var(--input);
+    padding: 0.55rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    transition: all .2s;
+  }
+  .chip:hover { border-color: var(--color-gold); color: var(--foreground); }
+  .chip[aria-pressed="true"], .chip[aria-selected="true"] {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .rich a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+
+  .video-frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: #000; }
+  .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+}
+
+/* ── Поява секцій під час прокручування (без JS, де браузер підтримує) ── */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+  .hero-zoom { animation: hero-zoom 2.4s cubic-bezier(.2,.7,.2,1) both, ken-burns 28s ease-in-out 2.4s infinite alternate; }
+  .rise { animation: rise 1s cubic-bezier(.2,.7,.2,1) both; animation-delay: var(--d, 0s); }
+  .rays { animation: rays-spin 90s linear infinite; }
+  @supports (animation-timeline: view()) {
+    .reveal:nth-child(2) { animation-range: entry 4% entry 39%; }
+    .reveal:nth-child(3) { animation-range: entry 8% entry 43%; }
+    .reveal:nth-child(4) { animation-range: entry 12% entry 47%; }
+    .reveal:nth-child(n+5) { animation-range: entry 16% entry 51%; }
+    /* Фото «розкривається» з рамки під час появи */
+    .reveal-clip {
+      animation: reveal linear both, clip-in linear both;
+      animation-timeline: view(), view();
+      animation-range: entry 0% entry 35%, entry 0% entry 60%;
+    }
+    /* Золота риска перед рубрикою «виростає» */
+    .eyebrow::before { transform-origin: left; animation: line-grow linear both; animation-timeline: view(); animation-range: entry 10% entry 70%; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .animate-marquee, .animate-flicker, .display em, .ember, .rise, .rays, .hero-zoom { animation: none; }
+  .cursor-halo { display: none; }
+  .parallax { animation: none; scale: 1; }
+}
+
+/* Церковний календар — модуль зі своїми стилями, лише підганяємо під сторінку */
+#church-calendar-widget { font-family: var(--font-sans); }
+#church-calendar-widget .cc-layout { align-items: start; }

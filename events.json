@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "id": "evt_1793649932572_487b3a",
+    "title": "Неділя, яка наповнює серце радістю",
+    "date": "2026-11-01T07:00:00.000Z",
+    "description": "Сьогодні, 1 листопада, у старовинній Петропавлівській церкві ми знову зібралися великою парафіяльною родиною на спільну молитву, щоб прославити Господа,...",
+    "link": "https://www.facebook.com/protoierej.oleksandr.cisar/posts/3749510548530280",
+    "createdAt": "2026-11-02T20:05:32.573Z",
+    "hasImage": true,
+    "imageUpdatedAt": "2026-11-02T20:05:32.576Z"
+  },
+  {
+    "id": "evt_seed_memorial_2026_10_24",
+    "title": "Поминальна субота",
+    "date": "2026-10-24T08:30:00+03:00",
+    "description": "Оголошення парафії: сповідь о 08:30, Служба Божа о 09:00. У дописі також вказано порядок подання поминань за упокій.",
+    "link": "https://www.facebook.com/permalink.php?story_fbid=pfbid0wr4Gq5GgukTM1AWhKbAwocCBJEUns2HS39yzNCEGE4MLFctjx4joBaM6xLEXwQP3l&id=100059029128700",
+    "createdAt": "2026-10-24T08:00:00+03:00",
+    "imageUrl": "images/church-exterior-old-town.jpg"
+  }
+]

@@ -9,19 +9,31 @@
     "build": "vite build",
     "preview": "vite preview",
     "serve": "vite build && node --env-file-if-exists=.env server.mjs",
-    "publish-data": "git add events.json streams.json && git commit -m \"Оновлення подій та ефірів\" && git push"
+    "publish-data": "git add events.json streams.json && git commit -m \"Оновлення подій та ефірів\" && git push",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@netlify/blobs": "^11.1.7",
+    "@radix-ui/react-slot": "^1.5.0",
     "@tailwindcss/vite": "^4.3.3",
     "@vercel/blob": "^2.8.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "express": "^5.3.0",
+    "framer-motion": "^14.9.0",
     "lucide-react": "^0.468.0",
+    "motion": "^14.9.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "tailwind-merge": "^3.7.0",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "typescript": "^7.0.2",
     "vite": "^8.3.4"
   }
 }

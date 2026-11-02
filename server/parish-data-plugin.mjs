@@ -1,6 +1,6 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { createParishApi } from './parish-api.mjs';
 
 function normalizeApiPath(pathname) {
@@ -8,32 +8,50 @@ function normalizeApiPath(pathname) {
   return stripped || '/';
 }
 
-export function parishDataPlugin(projectRoot) {
-  const eventsFile = resolve(projectRoot, 'events.json');
-  const streamsFile = resolve(projectRoot, 'streams.json');
-
-  const parishApi = createParishApi({
+/** Файлове сховище: події та ефіри поруч із проєктом, заявки — у прихованій папці поза git */
+export function createFileStore(projectRoot) {
+  const files = {
+    events: resolve(projectRoot, 'events.json'),
+    streams: resolve(projectRoot, 'streams.json'),
+    requests: resolve(projectRoot, '.private-data', 'requests.json'),
+    notes: resolve(projectRoot, '.private-data', 'notes.json')
+  };
+  // Фото подій: окремий файл на кожне, у закритій папці (віддаються лише через API)
+  const fileFor = (key) => (/^eventimg_[\w-]+$/.test(key) ? resolve(projectRoot, '.private-data', 'event-images', `${key}.json`) : files[key]);
+  return {
     async readList(key) {
-      const file = key === 'events' ? eventsFile : streamsFile;
-      if (!existsSync(file)) return [];
+      const file = fileFor(key);
+      if (!file || !existsSync(file)) return [];
       try {
-        const raw = await readFile(file, 'utf-8');
-        const parsed = JSON.parse(raw);
+        const parsed = JSON.parse(await readFile(file, 'utf-8'));
         return Array.isArray(parsed) ? parsed : [];
       } catch {
         return [];
       }
     },
     async writeList(key, list) {
-      const file = key === 'events' ? eventsFile : streamsFile;
+      const file = fileFor(key);
+      if (!file) throw new Error(`Unknown data key: ${key}`);
+      await mkdir(dirname(file), { recursive: true });
       await writeFile(file, JSON.stringify(list, null, 2), 'utf-8');
     }
-  });
+  };
+}
+
+export function parishDataPlugin(projectRoot) {
+  const eventsFile = resolve(projectRoot, 'events.json');
+  const streamsFile = resolve(projectRoot, 'streams.json');
+  const parishApi = createParishApi(createFileStore(projectRoot));
 
   function attach(server) {
     server.middlewares.use(async (request, response, next) => {
       const requestUrl = new URL(request.url || '/', `http://${request.headers.host || 'localhost'}`);
       const path = normalizeApiPath(requestUrl.pathname);
+      // Заявки з телефонами не можна віддавати як статичний файл
+      if (requestUrl.pathname.includes('/.private-data')) {
+        response.statusCode = 404;
+        return response.end();
+      }
       if (!path.startsWith('/api/')) return next();
 
       try {
@@ -64,8 +82,7 @@ export function parishDataPlugin(projectRoot) {
         for (const [k, v] of apiRes.headers.entries()) {
           response.setHeader(k, v);
         }
-        const text = await apiRes.text();
-        response.end(text);
+        response.end(Buffer.from(await apiRes.arrayBuffer()));
       } catch (err) {
         next(err);
       }

@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "id": "str_1793649668814_eb4aad",
+    "title": "21 неділя по Пʼятидесятниці. Божественна літургія (наживо)",
+    "videoUrl": "https://www.facebook.com/protoierej.oleksandr.cisar/videos/1484509433559852/",
+    "description": "25 жовтня 2026 року; 21 неділя по Пʼятидесятниці. Божественна літургія (наживо)\nСвято-Петропавлівська парафія ПЦУ м. Камʼянець-Подільський",
+    "dateLabel": "",
+    "date": "2026-10-25T06:00:00.000Z",
+    "isLive": false,
+    "isPrimary": false,
+    "createdAt": "2026-11-02T20:01:08.814Z"
+  },
+  {
+    "id": "str_seed_2026_11_01",
+    "title": "Божественна літургія (наживо)",
+    "description": "1 листопада 2026 року. Запис трансляції зі сторінки протоієрея Олександра Цісаря.",
+    "videoUrl": "https://www.facebook.com/protoierej.oleksandr.cisar/videos/1276998421266809/",
+    "dateLabel": "1 листопада 2026 р.",
+    "date": "",
+    "isLive": false,
+    "isPrimary": true,
+    "createdAt": "2026-11-01T09:00:00+02:00",
+    "updatedAt": "2026-11-02T19:57:55.361Z"
+  },
+  {
+    "id": "fb-2240800903146412",
+    "title": "Дмитрівська поминальна субота",
+    "description": "Божественна літургія та панахида у Петропавлівському храмі. Запис трансляції зі сторінки протоієрея Олександра Цісаря.",
+    "videoUrl": "https://www.facebook.com/protoierej.oleksandr.cisar/videos/2240800903146412/",
+    "dateLabel": "",
+    "date": "",
+    "isLive": false,
+    "isPrimary": false,
+    "createdAt": "2026-10-24T09:00:00+03:00",
+    "updatedAt": "2026-11-02T19:57:39.003Z"
+  }
+]

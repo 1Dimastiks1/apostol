@@ -8,6 +8,15 @@ const hasBlobCredentials = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN || pr
 let access = process.env.BLOB_ACCESS || null;
 const accessOrder = () => (access ? [access] : ['private', 'public']);
 
+// Заявки містять імена й телефони — зберігаємо їх лише в приватному сховищі
+async function withPrivateAccess(operation) {
+  try {
+    return await operation('private');
+  } catch {
+    throw new Error('Для збереження заявок потрібне приватне сховище Vercel Blob (access: private).');
+  }
+}
+
 async function withAccess(operation) {
   let lastError;
   for (const mode of accessOrder()) {
@@ -43,12 +52,14 @@ async function readBlob(key, mode) {
 const parishApi = createParishApi({
   async readList(key) {
     if (!hasBlobCredentials()) return null;
-    const text = await withAccess((mode) => readBlob(key, mode));
+    const run = (key === 'requests' || key === 'notes') ? withPrivateAccess : withAccess;
+    const text = await run((mode) => readBlob(key, mode));
     return text === null ? null : JSON.parse(text);
   },
   async writeList(key, list) {
     if (!hasBlobCredentials()) throw new Error('Vercel Blob store is not connected to this project');
-    await withAccess((mode) => put(pathname(key), JSON.stringify(list), {
+    const run = (key === 'requests' || key === 'notes') ? withPrivateAccess : withAccess;
+    await run((mode) => put(pathname(key), JSON.stringify(list), {
       access: mode,
       allowOverwrite: true,
       addRandomSuffix: false,
