@@ -2,7 +2,9 @@ import { BlobNotFoundError, get, head, put } from '@vercel/blob';
 import { createParishApi } from '../server/parish-api.mjs';
 
 const pathname = (key) => `parish-data/${key}.json`;
-const hasBlobCredentials = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
+// Vercel додає змінні сховища з префіксом, який ви обрали при підключенні (за замовчуванням BLOB_, але може бути й apostol_): шукаємо будь-який
+const blobToken = () => process.env.BLOB_READ_WRITE_TOKEN || Object.entries(process.env).find(([name, value]) => name.endsWith('_READ_WRITE_TOKEN') && value)?.[1];
+const hasBlobCredentials = () => Boolean(blobToken() || process.env.BLOB_STORE_ID || Object.keys(process.env).some((name) => name.endsWith('_STORE_ID')));
 
 // A Blob store is either private or public; the mode is remembered once a read finds data or a write succeeds.
 let access = process.env.BLOB_ACCESS || null;
@@ -12,8 +14,11 @@ const accessOrder = () => (access ? [access] : ['private', 'public']);
 async function withPrivateAccess(operation) {
   try {
     return await operation('private');
-  } catch {
-    throw new Error('Для збереження заявок потрібне приватне сховище Vercel Blob (access: private).');
+  } catch (error) {
+    console.error('Private Blob error:', error);
+    const failure = new Error('Заявки й записки зберігаються лише в приватному сховищі Vercel Blob, а підключене сховище публічне. У Vercel: Storage → створіть Blob зі стороною Private, підключіть до проєкту й зробіть Redeploy.');
+    failure.expose = true;
+    throw failure;
   }
 }
 
@@ -33,13 +38,13 @@ async function withAccess(operation) {
 
 async function readBlob(key, mode) {
   if (mode === 'private') {
-    const result = await get(pathname(key), { access: 'private', useCache: false });
+    const result = await get(pathname(key), { access: 'private', useCache: false, token: blobToken() });
     if (!result) return null;
     return new Response(result.stream).text();
   }
   let meta;
   try {
-    meta = await head(pathname(key));
+    meta = await head(pathname(key), { token: blobToken() });
   } catch (error) {
     if (error instanceof BlobNotFoundError) return null;
     throw error;
@@ -61,6 +66,7 @@ const parishApi = createParishApi({
     const run = (key === 'requests' || key === 'notes') ? withPrivateAccess : withAccess;
     await run((mode) => put(pathname(key), JSON.stringify(list), {
       access: mode,
+      token: blobToken(),
       allowOverwrite: true,
       addRandomSuffix: false,
       contentType: 'application/json',

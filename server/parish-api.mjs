@@ -534,6 +534,8 @@ export function createParishApi({ readList, writeList }) {
       return fail(404, 'Не знайдено');
     } catch (error) {
       console.error('API error:', error);
+      // Зрозумілі адміністратору помилки налаштування сховища показуємо як є
+      if (error?.expose) return fail(503, error.message);
       return fail(500, 'Внутрішня помилка сервера');
     }
   };
