@@ -5,6 +5,8 @@ import { Turnstile, turnstileOn } from '@/components/ui/turnstile'
 import { MetalButton } from '@/components/ui/liquid-glass-button'
 import { PHONE_LABEL, photo } from '@/lib/parish'
 import { cn } from '@/lib/utils'
+import { OfflineError, submitOrQueue } from '@/lib/outbox'
+import { OfflineNotice } from './offline-notice'
 import { SectionHeading } from './section-heading'
 
 type NoteType = 'health' | 'repose'
@@ -28,22 +30,22 @@ export function Memorial() {
     const list = names.map((n) => n.trim()).filter(Boolean)
     if (!list.length) return setError('Додайте принаймні одне хрещене ім’я.')
     if (!consent) return setError('Поставте галочку, щоб підтвердити передачу імен парафії.')
-    if (turnstileOn && !captcha) return setError('Зачекайте секунду, поки завершиться перевірка «я не робот», і спробуйте ще раз.')
+    if (turnstileOn && !captcha && navigator.onLine) return setError('Зачекайте секунду, поки завершиться перевірка «я не робот», і спробуйте ще раз.')
     setError('')
     setSending(true)
     try {
-      const res = await fetch(new URL('api/notes', document.baseURI), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind: type, names: list, consent, website: honeypot, turnstile: captcha }),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok || !data.success) throw new Error(data.fields?.names || data.error || 'Не вдалося надіслати записку')
-      setToast({ kind: 'success', title: 'Записку надіслано', text: 'Імена передано парафії для поминання. Нехай береже вас Господь!' })
+      const result = await submitOrQueue('notes', { kind: type, names: list, consent, website: honeypot, turnstile: captcha }, !turnstileOn)
+      setToast(result === 'sent'
+        ? { kind: 'success', title: 'Записку надіслано', text: 'Імена передано парафії для поминання. Нехай береже вас Господь!' }
+        : { kind: 'success', title: 'Записку збережено', text: 'Інтернету зараз немає. Записка збережена на вашому пристрої й автоматично надійде парафії, щойно зв’язок з’явиться. Адміністратор побачить її лише після цього.' })
       setNames([''])
       setConsent(false)
       setCaptchaReset((n) => n + 1)
     } catch (err) {
+      if (err instanceof OfflineError) {
+        setToast({ kind: 'error', title: 'Немає інтернету', text: 'Записку не надіслано, адміністратор її не бачить. Імена у формі збережені: натисніть «Надіслати», коли зв’язок з’явиться.' })
+        return
+      }
       setToast({ kind: 'error', title: 'Не вдалося надіслати', text: `${err instanceof Error ? err.message : 'Помилка мережі'}. Спробуйте ще раз або зателефонуйте: ${PHONE_LABEL}.` })
     } finally {
       setSending(false)
@@ -95,6 +97,7 @@ export function Memorial() {
               <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 size-4 accent-[#5a1418]" />
               Погоджуюся передати ці імена парафії для церковного поминання.
             </label>
+            <OfflineNotice what="записку" />
             <div className="mt-6"><Turnstile onToken={setCaptcha} resetKey={captchaReset} /></div>
             <div className="mt-8"><MetalButton variant={living ? 'bronze' : 'default'} type="submit" disabled={sending}><span className="inline-flex items-center gap-2">{sending && <Loader2 className="size-4 animate-spin" />}{sending ? 'Надсилаємо…' : 'Надіслати записку'}</span></MetalButton></div>
             {error && <p role="alert" className="mt-5 text-sm font-semibold text-red-700">{error}</p>}

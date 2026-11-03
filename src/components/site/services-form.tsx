@@ -6,6 +6,8 @@ import { Turnstile, turnstileOn } from '@/components/ui/turnstile'
 import { PHONE, PHONE_LABEL, photo } from '@/lib/parish'
 import { REQUEST_TYPES, type FieldErrors, type RequestForm, formatLocalPhone, fullPhone, validateRequest } from '@/lib/request-validation'
 import { cn } from '@/lib/utils'
+import { OfflineError, SubmitError, submitOrQueue } from '@/lib/outbox'
+import { OfflineNotice } from './offline-notice'
 import { SectionHeading } from './section-heading'
 
 const STEPS = [
@@ -55,30 +57,26 @@ export function ServicesForm() {
       return
     }
 
-    if (turnstileOn && !captcha) {
+    if (turnstileOn && !captcha && navigator.onLine) {
       setToast({ kind: 'error', title: 'Підтвердіть, що ви не робот', text: 'Зачекайте секунду, поки завершиться перевірка, і спробуйте ще раз.' })
       return
     }
 
     setSending(true)
     try {
-      const res = await fetch(new URL('api/requests', document.baseURI), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, phone: fullPhone(form.phone), website: honeypot, turnstile: captcha }),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (!res.ok || !data.success) {
-        if (data.fields) setErrors(data.fields)
-        throw new Error(data.error || 'Не вдалося надіслати заявку')
-      }
-      setToast({ kind: 'success', title: 'Заявку надіслано', text: `Дякуємо, ${form.name.trim().split(' ')[0]}! Ми передзвонимо вам найближчим часом, щоб усе узгодити.` })
+      const result = await submitOrQueue('requests', { ...form, phone: fullPhone(form.phone), website: honeypot, turnstile: captcha }, !turnstileOn)
+      setToast(result === 'sent'
+        ? { kind: 'success', title: 'Заявку надіслано', text: `Дякуємо, ${form.name.trim().split(' ')[0]}! Ми передзвонимо вам найближчим часом, щоб усе узгодити.` }
+        : { kind: 'success', title: 'Заявку збережено', text: 'Інтернету зараз немає. Заявка збережена на вашому пристрої й автоматично надійде адміністратору, щойно зв’язок з’явиться. Адміністратор побачить її лише після цього.' })
       setForm(EMPTY)
       setErrors({})
       setTouched(false)
       setCaptchaReset((n) => n + 1)
     } catch (error) {
-      setToast({ kind: 'error', title: 'Не вдалося надіслати', text: `${error instanceof Error ? error.message : 'Помилка мережі'}. Спробуйте ще раз або зателефонуйте: ${PHONE_LABEL}.` })
+      if (error instanceof SubmitError && error.fields) setErrors(error.fields)
+      setToast(error instanceof OfflineError
+        ? { kind: 'error', title: 'Немає інтернету', text: 'Заявку не надіслано, адміністратор її не бачить. Дані у формі збережені: натисніть «Надіслати», коли зв’язок з’явиться.' }
+        : { kind: 'error', title: 'Не вдалося надіслати', text: `${error instanceof Error ? error.message : 'Помилка мережі'}. Спробуйте ще раз або зателефонуйте: ${PHONE_LABEL}.` })
     } finally {
       setSending(false)
     }
@@ -176,6 +174,7 @@ export function ServicesForm() {
             </div>
           </div>
 
+          <OfflineNotice what="заявку" />
           <div className="mt-6"><Turnstile onToken={setCaptcha} resetKey={captchaReset} /></div>
           <div className="mt-9 flex flex-wrap items-center gap-5">
             <MetalButton variant="bronze" type="submit" disabled={sending}>

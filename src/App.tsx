@@ -18,6 +18,7 @@ import { Faq } from '@/components/site/faq'
 import { Donate } from '@/components/site/donate'
 import { Contacts } from '@/components/site/contacts'
 import { PageChrome, SiteFooter } from '@/components/site/site-footer'
+import { OutboxSync } from '@/components/site/outbox-sync'
 
 export default function App() {
   const { posts, current, archive, announcement, syncStatus } = useParishData()
@@ -48,6 +49,7 @@ export default function App() {
       </main>
       <SiteFooter />
       <PageChrome />
+      <OutboxSync />
     </>
   )
 }
