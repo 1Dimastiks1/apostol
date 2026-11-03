@@ -1,6 +1,11 @@
-// Малює іконки застосунку (бордовий фон, золотий силует Петропавлівського храму) без зовнішніх бібліотек: node scripts/make-icons.mjs
-import { deflateSync } from 'node:zlib';
-import { writeFileSync } from 'node:fs';
+// Малює іконки застосунку: фото нашого храму (як у першому екрані) в арці на бордовому тлі із золотими елементами.
+// Запуск: node scripts/make-icons.mjs (потрібен macOS: для читання фото використовується системна утиліта sips)
+import { deflateSync, inflateSync } from 'node:zlib';
+import { execFileSync } from 'node:child_process';
+import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const crcTable = Array.from({ length: 256 }, (_, n) => { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; return c >>> 0; });
 const crc = (buf) => { let c = 0xffffffff; for (const b of buf) c = crcTable[(c ^ b) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; };
@@ -12,65 +17,76 @@ const png = (w, h, rgb) => {
   return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw, { level: 9 })), chunk('IEND', Buffer.alloc(0))]);
 };
 
+/** Читає PNG (8 біт, RGB або RGBA, без перемежування) у масив пікселів */
+function decodePng(buf) {
+  let pos = 8, w = 0, h = 0, ct = 0; const idat = [];
+  while (pos < buf.length) {
+    const len = buf.readUInt32BE(pos), type = buf.toString('ascii', pos + 4, pos + 8), data = buf.subarray(pos + 8, pos + 8 + len);
+    if (type === 'IHDR') { w = data.readUInt32BE(0); h = data.readUInt32BE(4); ct = data[9]; }
+    if (type === 'IDAT') idat.push(data);
+    pos += 12 + len;
+  }
+  const bpp = ct === 6 ? 4 : 3, stride = w * bpp, raw = inflateSync(Buffer.concat(idat)), out = Buffer.alloc(h * stride);
+  for (let y = 0; y < h; y++) {
+    const f = raw[y * (stride + 1)], src = y * (stride + 1) + 1, dst = y * stride;
+    for (let x = 0; x < stride; x++) {
+      const a = x >= bpp ? out[dst + x - bpp] : 0, b = y ? out[dst - stride + x] : 0, c = x >= bpp && y ? out[dst - stride + x - bpp] : 0;
+      const p = a + b - c, pa = Math.abs(p - a), pb = Math.abs(p - b), pc = Math.abs(p - c);
+      const v = raw[src + x] + (f === 0 ? 0 : f === 1 ? a : f === 2 ? b : f === 3 ? (a + b) >> 1 : pa <= pb && pa <= pc ? a : pb <= pc ? b : c);
+      out[dst + x] = v & 255;
+    }
+  }
+  return { w, h, bpp, px: out };
+}
+
+const tmp = mkdtempSync(join(tmpdir(), 'icons-'));
+execFileSync('sips', ['-s', 'format', 'png', fileURLToPath(new URL('../public/images/church-exterior-old-town.jpg', import.meta.url)), '--out', join(tmp, 'hero.png')], { stdio: 'ignore' });
+const photo = decodePng(readFileSync(join(tmp, 'hero.png')));
+
 const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
-const WINE = [112, 24, 32], DEEP = [30, 6, 9];
+const WINE = [118, 26, 34], DEEP = [28, 5, 8];
 const G1 = [250, 232, 176], G2 = [214, 175, 94], G3 = [150, 110, 44];
 const goldAt = (t) => (t < 0.5 ? mix(G1, G2, clamp(t) * 2) : mix(G2, G3, clamp((t - 0.5) * 2)));
+const sample = (u, v) => { // білінійна вибірка фото, u і v в одиницях пікселів фото
+  const x = clamp(u, 0, photo.w - 1.001), y = clamp(v, 0, photo.h - 1.001), x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0;
+  const at = (xx, yy, k) => photo.px[(yy * photo.w + xx) * photo.bpp + k];
+  return [0, 1, 2].map((k) => (at(x0, y0, k) * (1 - fx) + at(x0 + 1, y0, k) * fx) * (1 - fy) + (at(x0, y0 + 1, k) * (1 - fx) + at(x0 + 1, y0 + 1, k) * fx) * fy);
+};
 
-/** frame — тонка золота рамка по краю (для maskable її немає); safe — частка, у яку вписано головний малюнок */
-function render(size, safe, frame, badge = false) {
-  const SS = 3, N = size * SS;
-  const px = new Float32Array(N * N * 3);
-  const s = N * safe, o = (N - s) / 2;
+/** safe — частка, у яку вписано малюнок (менша для maskable); badge — значок із замком для адмінки */
+function render(size, safe, badge) {
+  const SS = 2, N = size * SS, px = new Float32Array(N * N * 3);
+  const s = N * safe, o = (N - s) / 2, cx = N / 2;
   const X = (u) => o + u * s, Y = (v) => o + v * s;
-  const seg = (x, y, x1, y1, x2, y2) => { const dx = x2 - x1, dy = y2 - y1; const t = clamp(((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy)); return Math.hypot(x - (x1 + t * dx), y - (y1 + t * dy)); };
-  const cx = N / 2;
-  // Петропавлівський храм: дзвіниця з банею й шпилем, нижча нава ліворуч, кам'яний мур
-  const dx = 0.07; // зсув, щоб усе було по центру
-  const U = (u) => X(u + dx), V = (v) => Y(v);
-  const rect = (x, y, x1, y1, x2, y2) => x >= U(x1) && x <= U(x2) && y >= V(y1) && y <= V(y2);
-  const poly = (x, y, pts) => { let inside = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = [U(pts[i][0]), V(pts[i][1])], [xj, yj] = [U(pts[j][0]), V(pts[j][1])]; if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside; } return inside; };
-  const arch = (x, y, cx0, top, half, bottom) => { const r = half * s; const c = V(top) + r; return Math.abs(x - U(cx0)) <= r && y <= V(bottom) && (y >= c || Math.hypot(x - U(cx0), y - c) <= r); };
-  const dome = (x, y) => { const e = ((x - U(0.58)) / (0.105 * s)) ** 2 + ((y - V(0.36)) / (0.075 * s)) ** 2; return y <= V(0.36) && e <= 1; };
-  const spire = (x, y) => poly(x, y, [[0.5725, 0.3], [0.5875, 0.3], [0.5805, 0.165], [0.5795, 0.165]]);
-  const body = (x, y) =>
-    rect(x, y, 0.455, 0.52, 0.705, 0.8) || // нижній ярус дзвіниці
-    rect(x, y, 0.485, 0.36, 0.675, 0.52) || // дзвіниця
-    dome(x, y) || spire(x, y) ||
-    poly(x, y, [[0.17, 0.66], [0.265, 0.545], [0.455, 0.545], [0.455, 0.8], [0.17, 0.8]]); // нава
-  const holes = (x, y) =>
-    arch(x, y, 0.53, 0.395, 0.022, 0.5) || arch(x, y, 0.58, 0.395, 0.022, 0.5) || arch(x, y, 0.63, 0.395, 0.022, 0.5) || // отвори дзвіниці
-    arch(x, y, 0.58, 0.6, 0.04, 0.8) || // вхід
-    arch(x, y, 0.255, 0.64, 0.022, 0.73) || arch(x, y, 0.345, 0.64, 0.022, 0.73) || // вікна нави
-    arch(x, y, 0.655, 0.6, 0.014, 0.66) || arch(x, y, 0.505, 0.6, 0.014, 0.66);
-  const crossT = N * 0.0105, thin = N * 0.0045;
-  const cross = [
-    [U(0.58), V(0.045), U(0.58), V(0.175)],
-    [U(0.58) - s * 0.045, V(0.085), U(0.58) + s * 0.045, V(0.085)],
-    [U(0.58) - s * 0.028, V(0.155), U(0.58) + s * 0.028, V(0.135)],
-  ];
-  const wallLine = [U(0.12), V(0.835), U(0.88), V(0.835)];
-  const ringR = s * 0.5;
-  const fr = N * 0.07, frR = N * 0.16;
-  const frameSd = (x, y) => { const qx = Math.abs(x - N / 2) - (N / 2 - fr - frR), qy = Math.abs(y - N / 2) - (N / 2 - fr - frR); return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - frR; };
-
+  // арка (як у першому екрані сайту): півколо зверху, прямі боки
+  const aw = 0.31, top = 0.06, bottom = 0.94, ar = aw * s, ac = Y(top) + ar;
+  const archSd = (x, y, grow = 0) => { const r = ar + grow * s; return y <= ac - grow * 0 ? Math.hypot(x - cx, y - (ac)) - r : Math.abs(x - cx) - r; };
+  const inArch = (x, y, grow = 0) => y <= Y(bottom) + grow * s && archSd(x, y, grow) <= 0;
+  const edge = (x, y, grow, w) => Math.abs(archSd(x, y, grow)) < w && y <= Y(bottom) + grow * s;
+  const thin = N * 0.0055, thick = N * 0.011;
+  // фото вписуємо в арку з «cover»: церква по центру
+  const winW = 2 * ar, winH = Y(bottom) - Y(top);
+  const scale = Math.max(winW / (photo.w * 0.78), winH / photo.h);
+  const focusU = photo.w * 0.5, focusV = photo.h * 0.5;
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
     let c = mix(WINE, DEEP, clamp((x * 0.45 + y) / (N * 1.35)));
-    const glow = Math.max(0, 1 - Math.hypot(x - cx, y - Y(0.42)) / (s * 0.62));
-    c = mix(c, [214, 160, 90], glow * glow * 0.32);
-    if (frame && Math.abs(frameSd(x, y)) < thin) c = mix(c, goldAt(y / N), 0.55);
-    if (Math.abs(Math.hypot(x - cx, y - Y(0.5)) - ringR) < thin) c = mix(c, goldAt(y / N), 0.5);
-    if (body(x, y) && !holes(x, y)) {
-      const lit = clamp(1 - Math.hypot(x - U(0.4), y - V(0.45)) / (s * 0.5));
-      c = mix(goldAt((y - V(0.3)) / (s * 0.55)), [255, 244, 205], lit * 0.3);
-    } else if (body(x, y)) c = mix(c, [20, 3, 6], 0.55);
-    if (seg(x, y, ...wallLine) < thin * 1.8) c = mix(c, goldAt(0.7), 0.9);
-    if (Math.min(...cross.map((l) => seg(x, y, ...l))) < crossT) c = goldAt((y - V(0.04)) / (s * 0.15));
+    const glow = Math.max(0, 1 - Math.hypot(x - cx, y - Y(0.4)) / (s * 0.75));
+    c = mix(c, [214, 160, 90], glow * glow * 0.3);
+    if (edge(x, y, 0.045, thin)) c = mix(c, goldAt(y / N), 0.7); // зовнішня тонка арка
+    if (inArch(x, y)) {
+      const u = focusU + (x - cx) / scale, v = focusV + (y - (Y(top) + winH / 2)) / scale;
+      c = sample(u, v);
+      const fade = clamp((y - Y(0.62)) / (s * 0.32)); // м'яке бордове затемнення знизу
+      c = mix(c, DEEP, fade * 0.55);
+    }
+    if (edge(x, y, 0, thick)) c = goldAt((y - Y(top)) / (winH * 1.1)); // золота рамка арки
+    // золоті ромби по боках і лінія знизу
+    const dia = (px0, py0, r) => Math.abs(x - px0) + Math.abs(y - py0) < r;
+    if (dia(X(0.04), Y(0.5), s * 0.022) || dia(X(0.96), Y(0.5), s * 0.022) || dia(cx, Y(0.015), s * 0.022)) c = goldAt(0.3);
+    if (Math.abs(y - Y(0.985)) < thin * 1.2 && Math.abs(x - cx) < s * 0.22) c = goldAt(0.6);
     if (badge) {
-      // золотий значок із замком у правому нижньому куті: так адмінку не сплутати із сайтом
-      const bx = N * (0.5 + safe * 0.33), by = N * (0.5 + safe * 0.33), br = N * safe * 0.17;
-      const bd = Math.hypot(x - bx, y - by);
+      const bx = N * (0.5 + safe * 0.33), by = N * (0.5 + safe * 0.33), br = N * safe * 0.17, bd = Math.hypot(x - bx, y - by);
       if (bd < br + N * 0.012) c = DEEP;
       if (bd < br) {
         c = mix(goldAt((y - (by - br)) / (br * 2)), [255, 244, 205], clamp(1 - Math.hypot(x - (bx - br * 0.4), y - (by - br * 0.4)) / br) * 0.3);
@@ -93,6 +109,7 @@ function render(size, safe, frame, badge = false) {
 }
 
 const targets = [
-  ['admin-192.png', 192, 0.84, false, true], ['admin-512.png', 512, 0.84, false, true], ['admin-maskable-512.png', 512, 0.6, false, true], ['admin-apple-touch-icon.png', 180, 0.78, false, true],
- ['icon-192.png', 192, 0.84, false], ['icon-512.png', 512, 0.84, false], ['maskable-512.png', 512, 0.6, false], ['apple-touch-icon.png', 180, 0.78, false]];
-for (const [name, size, safe, frame, badge] of targets) { writeFileSync(new URL(`../public/icons/${name}`, import.meta.url), render(size, safe, frame, badge)); console.log('✓', name); }
+  ['icon-192.png', 192, 0.9, false], ['icon-512.png', 512, 0.9, false], ['maskable-512.png', 512, 0.62, false], ['apple-touch-icon.png', 180, 0.88, false],
+  ['admin-192.png', 192, 0.9, true], ['admin-512.png', 512, 0.9, true], ['admin-maskable-512.png', 512, 0.62, true], ['admin-apple-touch-icon.png', 180, 0.88, true],
+];
+for (const [name, size, safe, badge] of targets) { writeFileSync(new URL(`../public/icons/${name}`, import.meta.url), render(size, safe, badge)); console.log('✓', name); }
