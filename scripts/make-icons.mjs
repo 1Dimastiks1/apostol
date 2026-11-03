@@ -60,31 +60,45 @@ function render(size, safe, badge) {
   const s = N * safe, o = (N - s) / 2, cx = N / 2;
   const X = (u) => o + u * s, Y = (v) => o + v * s;
   // арка (як у першому екрані сайту): півколо зверху, прямі боки
-  const aw = 0.31, top = 0.06, bottom = 0.94, ar = aw * s, ac = Y(top) + ar;
-  const archSd = (x, y, grow = 0) => { const r = ar + grow * s; return y <= ac - grow * 0 ? Math.hypot(x - cx, y - (ac)) - r : Math.abs(x - cx) - r; };
-  const inArch = (x, y, grow = 0) => y <= Y(bottom) + grow * s && archSd(x, y, grow) <= 0;
-  const edge = (x, y, grow, w) => Math.abs(archSd(x, y, grow)) < w && y <= Y(bottom) + grow * s;
-  const thin = N * 0.0055, thick = N * 0.011;
-  // фото вписуємо в арку з «cover»: церква по центру
-  const winW = 2 * ar, winH = Y(bottom) - Y(top);
-  const scale = Math.max(winW / (photo.w * 0.78), winH / photo.h);
+  const aw = 0.345, top = 0.115, bottom = 0.945, ar = aw * s, ac = Y(top) + ar;
+  const archSd = (x, y, grow = 0) => { const r = ar + grow * s; return y <= ac ? Math.hypot(x - cx, y - ac) - r : Math.abs(x - cx) - r; };
+  const inArch = (x, y) => y <= Y(bottom) && archSd(x, y) <= 0;
+  const edge = (x, y, grow, w) => Math.abs(archSd(x, y, grow)) < w && y <= Y(bottom) + grow * s * 0.3;
+  const thin = N * 0.005, thick = N * 0.0125;
+  const winH = Y(bottom) - Y(top);
+  const scale = Math.max((2 * ar) / (photo.w * 0.76), winH / photo.h);
   const focusU = photo.w * 0.5, focusV = photo.h * 0.5;
+  const rayC = [cx, ac];
+  const cross = [[cx, Y(0.012), cx, Y(0.088)], [cx - s * 0.026, Y(0.036), cx + s * 0.026, Y(0.036)], [cx - s * 0.016, Y(0.07), cx + s * 0.016, Y(0.062)]];
+  const seg = (x, y, x1, y1, x2, y2) => { const dx = x2 - x1, dy = y2 - y1; const t = clamp(((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy)); return Math.hypot(x - (x1 + t * dx), y - (y1 + t * dy)); };
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-    let c = mix(WINE, DEEP, clamp((x * 0.45 + y) / (N * 1.35)));
-    const glow = Math.max(0, 1 - Math.hypot(x - cx, y - Y(0.4)) / (s * 0.75));
-    c = mix(c, [214, 160, 90], glow * glow * 0.3);
-    if (edge(x, y, 0.045, thin)) c = mix(c, goldAt(y / N), 0.7); // зовнішня тонка арка
+    let c = mix(WINE, DEEP, clamp((x * 0.4 + y) / (N * 1.3)));
+    const glow = Math.max(0, 1 - Math.hypot(x - cx, y - Y(0.45)) / (s * 0.78));
+    c = mix(c, [220, 165, 92], glow * glow * 0.34);
+    // золоті промені від арки
+    const ang = Math.atan2(y - rayC[1], x - rayC[0]), dist = Math.hypot(x - rayC[0], y - rayC[1]);
+    const ray = Math.max(0, Math.cos(ang * 14)) ** 6 * clamp(1 - Math.abs(dist - s * 0.62) / (s * 0.55)) * (dist > ar ? 1 : 0);
+    c = mix(c, [246, 220, 150], ray * 0.16);
+    if (edge(x, y, 0.05, thin)) c = mix(c, goldAt(y / N), 0.75); // зовнішня тонка арка
     if (inArch(x, y)) {
       const u = focusU + (x - cx) / scale, v = focusV + (y - (Y(top) + winH / 2)) / scale;
       c = sample(u, v);
-      const fade = clamp((y - Y(0.62)) / (s * 0.32)); // м'яке бордове затемнення знизу
-      c = mix(c, DEEP, fade * 0.55);
+      c = c.map((k) => clamp((k / 255 - 0.5) * 1.1 + 0.5 + 0.015) * 255); // трохи контрасту
+      c = mix(c, [255, 214, 140], 0.05); // тепла золотава нота
+      const fade = clamp((y - Y(0.66)) / (s * 0.3));
+      c = mix(c, DEEP, fade * 0.6); // бордове затемнення знизу
+      const vign = clamp(Math.hypot((x - cx) / (ar * 1.25), (y - (Y(top) + winH * 0.55)) / (winH * 0.7)) - 0.55);
+      c = mix(c, DEEP, vign * 0.35); // віньєтка
     }
-    if (edge(x, y, 0, thick)) c = goldAt((y - Y(top)) / (winH * 1.1)); // золота рамка арки
-    // золоті ромби по боках і лінія знизу
+    if (edge(x, y, 0, thick)) {
+      const sheen = clamp(1 - Math.abs((x - cx) * 0.8 + (y - Y(0.4)) * 0.6 + s * 0.1) / (s * 0.25));
+      c = mix(goldAt((y - Y(top)) / (winH * 1.1)), [255, 248, 215], sheen * 0.55); // золото з відблиском
+    }
+    // золотий хрестик над аркою, ромби по боках і орнамент знизу
+    if (Math.min(...cross.map((l) => seg(x, y, ...l))) < N * 0.0075) c = goldAt(0.2);
     const dia = (px0, py0, r) => Math.abs(x - px0) + Math.abs(y - py0) < r;
-    if (dia(X(0.04), Y(0.5), s * 0.022) || dia(X(0.96), Y(0.5), s * 0.022) || dia(cx, Y(0.015), s * 0.022)) c = goldAt(0.3);
-    if (Math.abs(y - Y(0.985)) < thin * 1.2 && Math.abs(x - cx) < s * 0.22) c = goldAt(0.6);
+    if (dia(X(0.03), Y(0.55), s * 0.02) || dia(X(0.97), Y(0.55), s * 0.02) || dia(cx, Y(0.985), s * 0.024)) c = goldAt(0.3);
+    if (Math.abs(y - Y(0.985)) < thin * 1.1 && Math.abs(x - cx) < s * 0.2 && Math.abs(x - cx) > s * 0.04) c = goldAt(0.55);
     if (badge) {
       const bx = N * (0.5 + safe * 0.33), by = N * (0.5 + safe * 0.33), br = N * safe * 0.17, bd = Math.hypot(x - bx, y - by);
       if (bd < br + N * 0.012) c = DEEP;
