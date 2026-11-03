@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { describeEvent, doneButton, isTelegramChat, notifyParish, tg, verifyTurnstile } from './protect.mjs';
+import { notifyParish, verifyTurnstile } from './protect.mjs';
 import seedEvents from '../events.json' with { type: 'json' };
 import seedStreams from '../streams.json' with { type: 'json' };
 import { createFacebookContentService } from './facebook-content.mjs';
@@ -515,71 +515,6 @@ export function createParishApi({ readList, writeList }) {
     return fail(405, 'Метод не підтримується');
   }
 
-  /** Керування заявками й записками з Telegram: меню, списки нових і кнопка «Опрацьовано». Лише для дозволених чатів і з секретним заголовком вебхука. */
-  async function handleTelegram(req) {
-    if (req.method !== 'POST') return fail(404, 'Не знайдено');
-    const secret = process.env.TELEGRAM_WEBHOOK_SECRET || '';
-    if (!secret || !safeEqual(req.headers.get('x-telegram-bot-api-secret-token') || '', secret)) return fail(401, 'Недійсний вебхук');
-    const update = await readBody(req);
-
-    const MENU = {
-      keyboard: [[{ text: '📋 Нові заявки' }, { text: '🕯 Нові записки' }], [{ text: '📊 Підсумок' }]],
-      resize_keyboard: true,
-      is_persistent: true,
-    };
-    const open = (items) => items.filter((x) => x.status !== 'done');
-
-    // Натиснули кнопку «Опрацьовано» під повідомленням
-    const cb = update.callback_query;
-    if (cb) {
-      const chat = cb.message?.chat?.id;
-      if (!isTelegramChat(chat)) return json({ ok: true });
-      const [action, kind, id] = String(cb.data || '').split(':');
-      const key = kind === 'note' ? 'notes' : kind === 'request' ? 'requests' : null;
-      if (action !== 'done' || !key || !id) return json({ ok: true });
-      const list = await loadList(key, []);
-      const index = list.findIndex((item) => item.id === id);
-      if (index === -1) {
-        await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Запис не знайдено (можливо, видалено)', show_alert: true });
-        return json({ ok: true });
-      }
-      list[index] = { ...list[index], status: 'done', updatedAt: new Date().toISOString() };
-      await writeList(key, list);
-      await tg('answerCallbackQuery', { callback_query_id: cb.id, text: 'Позначено як опрацьовану' });
-      await tg('editMessageText', { chat_id: chat, message_id: cb.message.message_id, text: `${cb.message.text || ''}\n\n✅ Опрацьовано` });
-      return json({ ok: true });
-    }
-
-    const msg = update.message;
-    if (!msg?.chat) return json({ ok: true });
-    const chat = msg.chat.id;
-    if (!isTelegramChat(chat)) {
-      // Номер чату показуємо, щоб власник міг скопіювати його в TELEGRAM_CHAT_ID (це лише номер вашого власного чату)
-      await tg('sendMessage', { chat_id: chat, text: `Цей бот приватний: доступ лише для адміністраторів парафії.\n\nНомер цього чату: ${chat}\nЯкщо ви власник, впишіть це число в Vercel як TELEGRAM_CHAT_ID і зробіть Redeploy.` });
-      return json({ ok: true });
-    }
-    const text = String(msg.text || '').trim();
-
-    const sendList = async (key, kind, title) => {
-      const items = open(await loadList(key, []));
-      if (!items.length) return tg('sendMessage', { chat_id: chat, text: `${title}: нових немає ✅`, reply_markup: MENU });
-      await tg('sendMessage', { chat_id: chat, text: `${title}: ${items.length}${items.length > 8 ? ' (показано 8 найновіших)' : ''}`, reply_markup: MENU });
-      for (const entry of items.slice(0, 8).reverse()) {
-        await tg('sendMessage', { chat_id: chat, text: describeEvent(kind, entry), disable_web_page_preview: true, reply_markup: doneButton(kind, entry.id) });
-      }
-    };
-
-    if (/^(\/requests|📋)/.test(text)) await sendList('requests', 'request', 'Нові заявки');
-    else if (/^(\/notes|🕯)/.test(text)) await sendList('notes', 'note', 'Нові записки');
-    else if (/^(\/stats|📊)/.test(text)) {
-      const [requests, notes] = await Promise.all([loadList('requests', []), loadList('notes', [])]);
-      await tg('sendMessage', { chat_id: chat, text: `Підсумок\n\nЗаявки: нових ${open(requests).length}, усього ${requests.length}\nЗаписки: нових ${open(notes).length}, усього ${notes.length}`, reply_markup: MENU });
-    } else {
-      await tg('sendMessage', { chat_id: chat, text: 'Вітаю! Тут надходять нові заявки й записки з сайту парафії. Натискайте «✅ Опрацьовано» під повідомленням, коли впораєтесь.\n\nОберіть дію внизу:', reply_markup: MENU });
-    }
-    return json({ ok: true });
-  }
-
   async function handleFacebook() {
     try {
       return json(await facebook.getSnapshot());
@@ -602,7 +537,6 @@ export function createParishApi({ readList, writeList }) {
       if (resource === 'admin') return await handleAdmin(req, id);
       if (resource === 'requests') return await handleRequests(req, id);
       if (resource === 'notes') return await handleNotes(req, id);
-      if (resource === 'telegram') return await handleTelegram(req);
       if (resource === 'facebook-content' && req.method === 'GET') return await handleFacebook();
       return fail(404, 'Не знайдено');
     } catch (error) {

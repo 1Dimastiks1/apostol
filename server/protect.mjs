@@ -1,5 +1,5 @@
 /**
- * Захист форм від ботів (Cloudflare Turnstile) і сповіщення про нові заявки/записки (Telegram, пошта через Resend).
+ * Захист форм від ботів (Cloudflare Turnstile) і сповіщення про нові заявки/записки на пошту (Resend).
  * Усе необов'язкове: без відповідних змінних середовища відповідна функція просто вимкнена.
  */
 const env = (name) => String(process.env[name] || '').trim();
@@ -40,37 +40,6 @@ export function describeEvent(kind, entry) {
   return [`Нова записка: ${KIND_LABEL[entry.kind] || clip(entry.kind, 20)}`, ...(entry.names || []).slice(0, 30).map((n, i) => `${i + 1}. ${clip(n, 80)}`)].join('\n');
 }
 
-/** Виклик Telegram Bot API; без токена нічого не робить */
-export async function tg(method, payload) {
-  const token = env('TELEGRAM_BOT_TOKEN');
-  if (!token) return null;
-  const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(5000),
-  });
-  return res.json().catch(() => null);
-}
-
-/** Чати, яким дозволено керувати ботом: TELEGRAM_CHAT_ID (можна кілька через кому) */
-export const telegramChats = () => env('TELEGRAM_CHAT_ID').split(',').map((v) => v.trim()).filter(Boolean);
-export const isTelegramChat = (id) => telegramChats().includes(String(id));
-
-/** Кнопка під повідомленням: позначити заявку чи записку опрацьованою */
-export const doneButton = (kind, id) => ({ inline_keyboard: [[{ text: '✅ Опрацьовано', callback_data: `done:${kind}:${id}` }]] });
-
-async function telegram(text, kind, entry) {
-  const chats = telegramChats();
-  if (!env('TELEGRAM_BOT_TOKEN') || !chats.length) return;
-  await Promise.allSettled(chats.map((chat) => tg('sendMessage', {
-    chat_id: chat,
-    text,
-    disable_web_page_preview: true,
-    ...(entry?.id ? { reply_markup: doneButton(kind, entry.id) } : {}),
-  })));
-}
-
 async function email(subject, text) {
   const key = env('RESEND_API_KEY');
   const to = env('NOTIFY_EMAIL_TO');
@@ -87,5 +56,5 @@ async function email(subject, text) {
 export async function notifyParish(kind, entry) {
   const text = describeEvent(kind, entry);
   const subject = kind === 'request' ? 'Нова заявка на сайті парафії' : 'Нова записка на сайті парафії';
-  await Promise.allSettled([telegram(text, kind, entry), email(subject, text)]);
+  await Promise.allSettled([email(subject, text)]);
 }
