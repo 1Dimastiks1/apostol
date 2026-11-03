@@ -75,7 +75,7 @@ export function NotesPanel({ role, notify, onError }: { role: Role; notify: Noti
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4">
+      <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-4">
         {items === null && <div className="grid place-items-center py-20 text-gold-deep"><Loader2 className="size-7 animate-spin" /></div>}
         {items && visible.length === 0 && <Empty icon={<Inbox className="size-6" />} title={items.length === 0 ? 'Записок ще немає' : 'Нічого не знайдено'} text={items.length === 0 ? 'Щойно хтось подасть записку на сайті, вона з’явиться тут.' : 'Змініть фільтр.'} />}
         {visible.map((n) => {

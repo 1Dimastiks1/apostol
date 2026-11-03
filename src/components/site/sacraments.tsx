@@ -22,8 +22,8 @@ function Card({ c, i, progress }: { c: CardData; i: number; progress: MotionValu
   const dim = useTransform(progress, [start, end], [0, i === n - 1 ? 0 : 0.6])
   return (
     <motion.article style={{ y, scale, zIndex: i }} className="absolute inset-x-0 top-0 mx-auto h-[64svh] w-[min(92vw,1080px)] origin-top overflow-hidden rounded-[2rem] border border-gold/25 bg-wine-deep shadow-[0_40px_120px_-40px_rgba(0,0,0,.8)]">
-      <div className="grid h-full lg:grid-cols-[1.05fr_.95fr]">
-        <div className="flex flex-col justify-between p-8 sm:p-12">
+      <div className="grid h-full grid-rows-[auto_1fr] lg:grid-cols-[1.05fr_.95fr] lg:grid-rows-1">
+        <div className="flex flex-col justify-between gap-6 p-6 sm:p-10 lg:p-12">
           <div>
             <p className="eyebrow on-dark">{c.tag}</p>
             <h3 className="display mt-5 text-[clamp(2rem,4.2vw,3.6rem)]">{c.title}</h3>
@@ -34,9 +34,9 @@ function Card({ c, i, progress }: { c: CardData; i: number; progress: MotionValu
             <span className="font-display text-5xl text-gold/40">{String(i + 1).padStart(2, '0')}</span>
           </div>
         </div>
-        <div className="relative hidden lg:block">
+        <div className="relative order-first h-36 sm:h-48 lg:order-none lg:h-auto">
           <img src={photo(c.img)} alt="" loading="lazy" className="absolute inset-0 size-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-wine-deep via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-wine-deep via-wine-deep/20 to-transparent lg:bg-gradient-to-r lg:from-wine-deep lg:via-transparent" />
         </div>
       </div>
       <motion.div style={{ opacity: dim }} className="pointer-events-none absolute inset-0 bg-night" />

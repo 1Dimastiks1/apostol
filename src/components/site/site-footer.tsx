@@ -13,7 +13,7 @@ const COLUMNS = [
 
 export function SiteFooter() {
   return (
-    <footer className="grain relative isolate overflow-hidden bg-night pb-28 pt-24 text-ivory xl:pb-12">
+    <footer className="grain relative isolate overflow-hidden bg-night pb-[calc(7rem+env(safe-area-inset-bottom))] pt-24 text-ivory xl:pb-12">
       <div className="shell">
         <div className="text-center">
           <Ornament />
@@ -108,7 +108,7 @@ export function PageChrome() {
     <>
       <div ref={halo} className="cursor-halo" aria-hidden="true" />
       <div className="fixed inset-x-0 top-0 z-[60] h-0.5 origin-left bg-gradient-to-r from-gold-deep via-gold to-gold-light" style={{ transform: `scaleX(${progress})` }} aria-hidden="true" />
-      <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Повернутися нагору" className={cn('magnetic fixed bottom-24 right-5 z-40 grid size-12 place-items-center rounded-full border border-gold/40 bg-night/90 text-gold-light shadow-xl backdrop-blur transition duration-300 hover:border-gold xl:bottom-8', progress > 0.06 ? 'opacity-100' : 'pointer-events-none translate-y-3 opacity-0')}>
+      <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Повернутися нагору" className={cn('magnetic fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-4 z-40 grid size-11 sm:right-5 sm:size-12 place-items-center rounded-full border border-gold/40 bg-night/90 text-gold-light shadow-xl backdrop-blur transition duration-300 hover:border-gold xl:bottom-8', progress > 0.06 ? 'opacity-100' : 'pointer-events-none translate-y-3 opacity-0')}>
         <ArrowUp className="size-5" />
       </button>
       <nav aria-label="Швидкі переходи" className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 grid grid-cols-5 rounded-2xl border border-white/10 bg-night/90 p-1.5 shadow-2xl backdrop-blur-xl xl:hidden">

@@ -3,10 +3,10 @@ import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export const btn = {
-  primary: 'inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:brightness-110 disabled:opacity-50',
-  ghost: 'inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-3.5 py-2 text-sm font-semibold text-ink transition hover:border-gold disabled:opacity-50',
-  danger: 'inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100 disabled:opacity-50',
-  live: 'inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 disabled:opacity-50',
+  primary: 'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:brightness-110 disabled:opacity-50',
+  ghost: 'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-3.5 py-2 text-sm font-semibold text-ink transition hover:border-gold disabled:opacity-50',
+  danger: 'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100 disabled:opacity-50',
+  live: 'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-red-600 px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 disabled:opacity-50',
 }
 
 export function Modal({ title, open, onClose, children, footer, wide }: { title: string; open: boolean; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean }) {
@@ -31,7 +31,7 @@ export function Modal({ title, open, onClose, children, footer, wide }: { title:
           <button type="button" onClick={onClose} aria-label="Закрити" className="grid size-9 place-items-center rounded-full text-muted-foreground hover:bg-muted"><X className="size-5" /></button>
         </div>
         <div className="overflow-y-auto px-6 py-6">{children}</div>
-        {footer && <div className="flex flex-wrap justify-end gap-3 border-t border-border bg-parchment/40 px-6 py-4">{footer}</div>}
+        {footer && <div className="flex flex-wrap justify-end gap-3 border-t border-border bg-parchment/40 px-6 pt-4 [&>*]:flex-1 sm:[&>*]:flex-none" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom, 0px))' }}>{footer}</div>}
       </div>
     </div>
   )
@@ -73,7 +73,7 @@ export function PanelHeader({ title, lead, actions }: { title: string; lead: str
   return (
     <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="display text-4xl text-ink sm:text-5xl">{title}</h1>
+        <h1 className="display sr-only text-4xl text-ink sm:text-5xl md:not-sr-only">{title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{lead}</p>
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}

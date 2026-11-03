@@ -94,7 +94,7 @@ export function Memorial() {
             </div>
             <button type="button" onClick={() => setNames([...names, ''])} className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary"><Plus className="size-4" />Додати ім’я</button>
             <label className="mt-8 flex items-start gap-3 text-sm text-ink/70">
-              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 size-4 accent-[#5a1418]" />
+              <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 size-5 shrink-0 accent-[#5a1418]" />
               Погоджуюся передати ці імена парафії для церковного поминання.
             </label>
             <OfflineNotice what="записку" />

@@ -87,7 +87,7 @@ export function Donate() {
             </label>
           </fieldset>
           <label className="mt-7 flex items-start gap-3 text-sm leading-relaxed text-ivory/65">
-            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-1 size-4 accent-[#c6a052]" />
+            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 size-5 shrink-0 accent-[#c6a052]" />
             Я перевірю одержувача, суму та призначення платежу перед підтвердженням у банку.
           </label>
           <div className="mt-8 flex flex-wrap items-center gap-4">

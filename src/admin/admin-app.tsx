@@ -109,41 +109,68 @@ export function AdminApp() {
   const tabs = TABS.filter((t) => t.roles.includes(role))
   const siteUrl = new URL('./', document.baseURI).href
 
+  const logo = (
+    <span className="grid size-10 shrink-0 place-items-center rounded-full border border-gold/50 bg-gradient-to-b from-wine to-wine-deep text-gold-light">
+      <svg width="14" height="20" viewBox="0 0 18 24" fill="none" aria-hidden="true"><path d="M9 0v24M3 6h12M5 17l8-3" stroke="currentColor" strokeWidth="1.8" /></svg>
+    </span>
+  )
+
   return (
-    <div className="min-h-svh bg-ivory lg:grid lg:grid-cols-[264px_1fr]">
+    <div className="min-h-svh bg-ivory md:grid md:grid-cols-[96px_1fr] lg:grid-cols-[264px_1fr]">
       <Toast message={toast} onClose={closeToast} />
-      <aside className="grain sticky top-0 z-40 flex flex-col bg-night text-ivory lg:h-svh">
-        <div className="flex items-center justify-between gap-3 px-5 py-4 lg:block lg:px-6 lg:py-8">
-          <div className="flex items-center gap-3">
-            <span className="grid size-10 shrink-0 place-items-center rounded-full border border-gold/50 bg-gradient-to-b from-wine to-wine-deep text-gold-light">
-              <svg width="14" height="20" viewBox="0 0 18 24" fill="none" aria-hidden="true"><path d="M9 0v24M3 6h12M5 17l8-3" stroke="currentColor" strokeWidth="1.8" /></svg>
-            </span>
-            <div className="leading-tight">
-              <p className="font-display text-lg">Адмін-панель</p>
-              <p className="text-[0.6rem] font-bold uppercase tracking-[0.2em] text-gold-light/70">{ROLE_LABEL[role]}</p>
-            </div>
+
+      {/* Телефон: верхня панель, як у програми */}
+      <header className="grain sticky top-0 z-40 flex items-center justify-between gap-3 bg-night/95 px-4 pb-3 text-ivory backdrop-blur-xl md:hidden" style={{ paddingTop: 'calc(0.75rem + env(safe-area-inset-top, 0px))' }}>
+        <div className="flex min-w-0 items-center gap-3">
+          {logo}
+          <div className="min-w-0 leading-tight">
+            <p className="truncate font-display text-lg">{tabs.find((t) => t.id === tab)?.label ?? 'Адмін-панель'}</p>
+            <p className="truncate text-[0.6rem] font-bold uppercase tracking-[0.2em] text-gold-light/70">{ROLE_LABEL[role]}</p>
           </div>
-          <button type="button" onClick={logout} className="grid size-10 place-items-center rounded-full border border-white/15 text-ivory/70 lg:hidden" aria-label="Вийти"><LogOut className="size-4" /></button>
         </div>
-        <nav className="flex gap-1 overflow-x-auto px-3 pb-3 lg:flex-1 lg:flex-col lg:px-4 lg:pb-0" aria-label="Розділи">
+        <div className="flex shrink-0 gap-2">
+          <a href={siteUrl} target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-full border border-white/15 text-ivory/70" aria-label="Відкрити сайт"><ExternalLink className="size-4" /></a>
+          <button type="button" onClick={logout} className="grid size-11 place-items-center rounded-full border border-white/15 text-ivory/70" aria-label="Вийти"><LogOut className="size-4" /></button>
+        </div>
+      </header>
+
+      {/* Планшет: вузька бічна панель; комп'ютер: повна */}
+      <aside className="grain sticky top-0 z-40 hidden h-svh flex-col bg-night text-ivory md:flex">
+        <div className="flex flex-col items-center gap-3 px-3 py-6 lg:flex-row lg:items-center lg:px-6 lg:py-8">
+          {logo}
+          <div className="hidden leading-tight lg:block">
+            <p className="font-display text-lg">Адмін-панель</p>
+            <p className="text-[0.6rem] font-bold uppercase tracking-[0.2em] text-gold-light/70">{ROLE_LABEL[role]}</p>
+          </div>
+        </div>
+        <nav className="flex flex-1 flex-col gap-1 px-2 lg:px-4" aria-label="Розділи">
           {tabs.map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" onClick={() => setTab(id)} aria-current={tab === id} className={cn('flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition', tab === id ? 'bg-white/10 text-ivory' : 'text-ivory/60 hover:bg-white/5 hover:text-ivory')}>
-              <Icon className={cn('size-4', tab === id ? 'text-gold-light' : '')} />{label}
+            <button key={id} type="button" onClick={() => setTab(id)} aria-current={tab === id} className={cn('flex flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-[0.68rem] font-semibold transition lg:flex-row lg:gap-3 lg:rounded-xl lg:px-4 lg:text-sm', tab === id ? 'bg-white/10 text-ivory' : 'text-ivory/60 hover:bg-white/5 hover:text-ivory')}>
+              <Icon className={cn('size-5 lg:size-4', tab === id ? 'text-gold-light' : '')} />{label}
             </button>
           ))}
         </nav>
-        <div className="hidden space-y-1 border-t border-white/10 p-4 lg:block">
-          <a href={siteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-ivory/60 hover:bg-white/5 hover:text-ivory"><ExternalLink className="size-4" />Відкрити сайт</a>
-          <button type="button" onClick={logout} className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-ivory/60 hover:bg-white/5 hover:text-ivory"><LogOut className="size-4" />Вийти</button>
+        <div className="space-y-1 border-t border-white/10 p-2 lg:p-4">
+          <a href={siteUrl} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-[0.68rem] font-semibold text-ivory/60 hover:bg-white/5 hover:text-ivory lg:flex-row lg:gap-3 lg:rounded-xl lg:px-4 lg:text-sm"><ExternalLink className="size-5 lg:size-4" />Сайт</a>
+          <button type="button" onClick={logout} className="flex w-full flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-[0.68rem] font-semibold text-ivory/60 hover:bg-white/5 hover:text-ivory lg:flex-row lg:gap-3 lg:rounded-xl lg:px-4 lg:text-sm"><LogOut className="size-5 lg:size-4" />Вийти</button>
         </div>
       </aside>
 
-      <main className="mx-auto w-full max-w-6xl px-5 py-8 sm:px-8 lg:py-12">
+      <main className="mx-auto w-full min-w-0 max-w-6xl px-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] pt-6 sm:px-8 md:pb-12 lg:py-12">
         {tab === 'streams' && role === 'admin' && <StreamsPanel notify={notify} onError={onError} />}
         {tab === 'events' && role === 'admin' && <EventsPanel notify={notify} onError={onError} />}
         {tab === 'requests' && <RequestsPanel role={role} notify={notify} onError={onError} />}
         {tab === 'notes' && <NotesPanel role={role} notify={notify} onError={onError} />}
       </main>
+
+      {/* Телефон: нижнє меню вкладок */}
+      <nav aria-label="Розділи" className="fixed inset-x-3 z-40 grid rounded-2xl border border-white/10 bg-night/92 p-1.5 shadow-2xl backdrop-blur-xl md:hidden" style={{ bottom: 'max(0.75rem, env(safe-area-inset-bottom))', gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
+        {tabs.map(({ id, label, icon: Icon }) => (
+          <button key={id} type="button" onClick={() => { setTab(id); window.scrollTo({ top: 0 }) }} aria-current={tab === id} className={cn('flex flex-col items-center gap-1 rounded-xl py-2 text-[0.66rem] font-semibold transition', tab === id ? 'bg-white/10 text-ivory' : 'text-ivory/60')}>
+            <Icon className={cn('size-5', tab === id ? 'text-gold-light' : '')} strokeWidth={1.7} />{label}
+          </button>
+        ))}
+      </nav>
     </div>
   )
 }

@@ -121,7 +121,7 @@ export function EventsPanel({ notify, onError }: { notify: Notify; onError: (e: 
         </>}
       />
 
-      <div className="mt-8 grid gap-4">
+      <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-4">
         {events === null && <div className="grid place-items-center py-20 text-gold-deep"><Loader2 className="size-7 animate-spin" /></div>}
         {events?.length === 0 && <Empty icon={<CalendarDays className="size-6" />} title="Подій ще немає" text="Додайте оголошення про богослужіння чи подію парафії." action={<button type="button" className={btn.primary} onClick={() => setDraft(blank())}><Plus className="size-4" />Додати подію</button>} />}
         {sorted.map((e) => (

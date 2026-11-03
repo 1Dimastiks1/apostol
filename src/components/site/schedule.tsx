@@ -23,10 +23,10 @@ export function Schedule() {
 
         <ol className="self-center">
           {SUNDAY_SCHEDULE.map((item) => (
-            <li key={item.time} className="reveal group grid grid-cols-[5rem_1fr] gap-6 border-b border-border py-9 first:pt-0 last:border-0 sm:grid-cols-[8rem_1fr] sm:gap-10">
-              <span className="font-display text-[2.4rem] leading-none text-ink transition-colors group-hover:text-primary sm:text-[3.2rem]">{item.time}</span>
-              <div className="border-l border-gold/40 pl-6 transition-colors group-hover:border-gold sm:pl-10">
-                <h3 className="flex flex-wrap items-center gap-3 font-display text-[1.75rem] leading-tight text-ink">
+            <li key={item.time} className="reveal group grid grid-cols-[4.4rem_1fr] gap-4 border-b border-border py-7 first:pt-0 last:border-0 sm:grid-cols-[8rem_1fr] sm:gap-10 sm:py-9">
+              <span className="font-display text-[1.9rem] leading-none text-ink transition-colors group-hover:text-primary sm:text-[3.2rem]">{item.time}</span>
+              <div className="min-w-0 border-l border-gold/40 pl-4 transition-colors group-hover:border-gold sm:pl-10">
+                <h3 className="flex flex-wrap items-center gap-3 font-display text-[1.5rem] leading-tight text-ink sm:text-[1.75rem]">
                   {item.title}
                   {item.live && <span className="inline-flex items-center gap-1.5 rounded-full bg-red-600/10 px-2.5 py-1 font-sans text-[0.62rem] font-bold uppercase tracking-widest text-red-700"><Radio className="size-3" />Наживо</span>}
                 </h3>

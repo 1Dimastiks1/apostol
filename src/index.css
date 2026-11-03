@@ -109,6 +109,11 @@
 html { font-size: 100%; scroll-behavior: smooth; scroll-padding-top: calc(88px + env(safe-area-inset-top, 0px)); -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
 body { overscroll-behavior-y: none; }
 /* Коли сайт відкрито як встановлену програму: без виділення тексту кнопок і з відступом під нижню смужку */
+/* На телефонах поля не менші за 16px, інакше iPhone збільшує сторінку під час введення */
+@media (max-width: 639px) {
+  .field, input, select, textarea { font-size: 16px !important; }
+}
+
 @media (display-mode: standalone) {
   button, nav a { -webkit-user-select: none; user-select: none; }
   body { padding-bottom: env(safe-area-inset-bottom, 0px); }

@@ -36,13 +36,13 @@ export function Gallery() {
           aside={<ExternalLink href={PARISH_ALBUMS} className="text-primary">Усі фотоальбоми</ExternalLink>}
         />
 
-        <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 md:auto-rows-[220px] md:grid-flow-dense md:grid-cols-4">
+        <div className="mt-10 grid grid-cols-2 gap-2.5 sm:mt-14 sm:gap-4 md:auto-rows-[220px] md:grid-flow-dense md:grid-cols-4">
           {PARISH.map((p, i) => (
-            <button key={p.src} type="button" onClick={() => setIndex(i)} className={cn('reveal-clip group relative isolate overflow-hidden rounded-2xl bg-wine-deep text-left [transform:translateZ(0)] md:aspect-auto', p.span.includes('row-span-2') && !p.span.includes('col-span-2') ? 'aspect-[3/4]' : 'aspect-[4/3]', p.span)} aria-label={`Відкрити фото: ${p.title}`}>
+            <button key={p.src} type="button" onClick={() => setIndex(i)} className={cn('reveal-clip group relative isolate overflow-hidden rounded-2xl bg-wine-deep text-left [transform:translateZ(0)] md:aspect-auto', p.span.includes('col-span-2') ? 'col-span-2 aspect-[16/10] md:col-span-1' : 'aspect-[3/4]', p.span)} aria-label={`Відкрити фото: ${p.title}`}>
               <img src={p.src} alt={p.title} loading="lazy" className="size-full transform-gpu object-cover object-[50%_25%] transition-transform duration-700 ease-out will-change-transform group-hover:scale-105" />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-night/75 via-night/0 to-transparent opacity-80 transition-opacity group-hover:opacity-100" />
-              <span className="pointer-events-none absolute bottom-5 left-5 right-14 font-display text-xl leading-tight text-ivory">{p.title}</span>
-              <Expand className="pointer-events-none absolute bottom-5 right-5 size-5 text-gold-light opacity-0 transition-opacity group-hover:opacity-100" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-night/85 via-night/10 to-transparent opacity-90 transition-opacity group-hover:opacity-100" />
+              <span className="pointer-events-none absolute inset-x-3 bottom-3 font-display text-[0.95rem] leading-tight text-ivory sm:bottom-5 sm:left-5 sm:right-14 sm:text-xl">{p.title}</span>
+              <Expand className="pointer-events-none absolute bottom-5 right-5 hidden size-5 sm:block text-gold-light opacity-0 transition-opacity group-hover:opacity-100" />
             </button>
           ))}
         </div>

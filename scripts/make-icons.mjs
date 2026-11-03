@@ -19,7 +19,7 @@ const G1 = [250, 232, 176], G2 = [214, 175, 94], G3 = [150, 110, 44];
 const goldAt = (t) => (t < 0.5 ? mix(G1, G2, clamp(t) * 2) : mix(G2, G3, clamp((t - 0.5) * 2)));
 
 /** frame — тонка золота рамка по краю (для maskable її немає); safe — частка, у яку вписано головний малюнок */
-function render(size, safe, frame) {
+function render(size, safe, frame, badge = false) {
   const SS = 3, N = size * SS;
   const px = new Float32Array(N * N * 3);
   const s = N * safe, o = (N - s) / 2;
@@ -67,6 +67,20 @@ function render(size, safe, frame) {
     } else if (body(x, y)) c = mix(c, [20, 3, 6], 0.55);
     if (seg(x, y, ...wallLine) < thin * 1.8) c = mix(c, goldAt(0.7), 0.9);
     if (Math.min(...cross.map((l) => seg(x, y, ...l))) < crossT) c = goldAt((y - V(0.04)) / (s * 0.15));
+    if (badge) {
+      // золотий значок із замком у правому нижньому куті: так адмінку не сплутати із сайтом
+      const bx = N * (0.5 + safe * 0.33), by = N * (0.5 + safe * 0.33), br = N * safe * 0.17;
+      const bd = Math.hypot(x - bx, y - by);
+      if (bd < br + N * 0.012) c = DEEP;
+      if (bd < br) {
+        c = mix(goldAt((y - (by - br)) / (br * 2)), [255, 244, 205], clamp(1 - Math.hypot(x - (bx - br * 0.4), y - (by - br * 0.4)) / br) * 0.3);
+        const lw2 = br * 0.62, lh = br * 0.48, ly = by - br * 0.05;
+        const inBody = Math.abs(x - bx) <= lw2 / 2 && y >= ly && y <= ly + lh;
+        const shackle = Math.abs(Math.hypot(x - bx, y - ly) - br * 0.24) < br * 0.07 && y <= ly;
+        const hole = Math.hypot(x - bx, y - (ly + lh * 0.42)) < br * 0.07;
+        if ((inBody && !hole) || shackle) c = [44, 9, 12];
+      }
+    }
     const i = (y * N + x) * 3; px[i] = c[0]; px[i + 1] = c[1]; px[i + 2] = c[2];
   }
   const out = Buffer.alloc(size * size * 3);
@@ -78,5 +92,7 @@ function render(size, safe, frame) {
   return png(size, size, out);
 }
 
-const targets = [['icon-192.png', 192, 0.84, false], ['icon-512.png', 512, 0.84, false], ['maskable-512.png', 512, 0.6, false], ['apple-touch-icon.png', 180, 0.78, false]];
-for (const [name, size, safe, frame] of targets) { writeFileSync(new URL(`../public/icons/${name}`, import.meta.url), render(size, safe, frame)); console.log('✓', name); }
+const targets = [
+  ['admin-192.png', 192, 0.84, false, true], ['admin-512.png', 512, 0.84, false, true], ['admin-maskable-512.png', 512, 0.6, false, true], ['admin-apple-touch-icon.png', 180, 0.78, false, true],
+ ['icon-192.png', 192, 0.84, false], ['icon-512.png', 512, 0.84, false], ['maskable-512.png', 512, 0.6, false], ['apple-touch-icon.png', 180, 0.78, false]];
+for (const [name, size, safe, frame, badge] of targets) { writeFileSync(new URL(`../public/icons/${name}`, import.meta.url), render(size, safe, frame, badge)); console.log('✓', name); }

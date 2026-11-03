@@ -43,7 +43,7 @@ export function Ornament({ className }: { className?: string }) {
 
 export function ExternalLink({ href, children, className }: { href: string; children: ReactNode; className?: string }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={cn('group inline-flex items-center gap-2 text-sm font-semibold underline-offset-[6px] hover:underline', className)}>
+    <a href={href} target="_blank" rel="noopener noreferrer" className={cn('group inline-flex min-h-11 items-center gap-2 text-sm font-semibold underline-offset-[6px] hover:underline', className)}>
       {children}
       <span aria-hidden="true" className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5">↗</span>
     </a>

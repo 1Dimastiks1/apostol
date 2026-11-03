@@ -108,7 +108,7 @@ export function RequestsPanel({ role, notify, onError }: { role: Role; notify: N
         </label>
       </div>
 
-      <div className="mt-6 grid gap-4">
+      <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-4">
         {items === null && <div className="grid place-items-center py-20 text-gold-deep"><Loader2 className="size-7 animate-spin" /></div>}
         {items && visible.length === 0 && (
           items.length === 0
@@ -128,7 +128,7 @@ export function RequestsPanel({ role, notify, onError }: { role: Role; notify: N
 
               <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_auto] sm:items-start">
                 <div className="min-w-0">
-                  <h3 className="font-display text-[1.75rem] leading-tight text-ink">{r.name}</h3>
+                  <h3 className="font-display text-[1.75rem] leading-tight text-ink break-words">{r.name}</h3>
                   <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
                     <a href={`tel:${r.phone}`} className="inline-flex items-center gap-2 font-semibold text-primary hover:underline"><Phone className="size-4" />{formatPhone(r.phone)}</a>
                     <button type="button" onClick={async () => notify((await copyText(r.phone)) ? { kind: 'success', title: 'Номер скопійовано' } : { kind: 'error', title: 'Не вдалося скопіювати' })} className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-ink"><Copy className="size-3.5" />Копіювати</button>

@@ -45,11 +45,11 @@ export function Hero({ announcement }: { announcement: Announcement | null }) {
           <p style={{ ['--d' as string]: '.45s' }} className="rise mt-8 max-w-xl text-lg leading-relaxed text-ivory/70">
             Шестисотлітня святиня на вулиці Татарській. Тут громада щонеділі молиться за Україну, захисників і кожного, хто потребує підтримки. Двері храму відчинені для всіх.
           </p>
-          <div style={{ ['--d' as string]: '.65s' }} className="rise mt-11 flex flex-wrap items-center gap-5">
-            <LiquidButton size="xl" className="magnetic rounded-full font-semibold text-ivory" onClick={() => scrollToId('schedule')}>
+          <div style={{ ['--d' as string]: '.65s' }} className="rise mt-11 grid gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-5">
+            <LiquidButton size="xl" className="magnetic w-full rounded-full font-semibold text-ivory sm:w-auto" onClick={() => scrollToId('schedule')}>
               Розклад богослужінь
             </LiquidButton>
-            <MetalButton variant="gold" className="magnetic" onClick={() => scrollToId('donate')}>Підтримати храм</MetalButton>
+            <MetalButton variant="gold" className="magnetic w-full sm:w-auto" onClick={() => scrollToId('donate')}>Підтримати храм</MetalButton>
             <button type="button" onClick={() => scrollToId('online')} className="inline-flex items-center gap-2.5 text-sm font-semibold text-ivory/80 transition hover:text-ivory">
               <span className="relative flex size-2.5"><span className="absolute inline-flex size-full animate-ping rounded-full bg-red-500 opacity-70" /><span className="relative inline-flex size-2.5 rounded-full bg-red-500" /></span>
               Дивитися онлайн

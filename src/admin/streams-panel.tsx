@@ -119,22 +119,22 @@ export function StreamsPanel({ notify, onError }: { notify: Notify; onError: (e:
         {live && <button type="button" disabled={busyId === live.id} onClick={() => patch(live, { isLive: false }, 'Ефір завершено')} className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50 disabled:opacity-60">Завершити LIVE</button>}
       </div>
 
-      <div className="mt-8 grid gap-4">
+      <div className="mt-8 grid grid-cols-[minmax(0,1fr)] gap-4">
         {streams === null && <div className="grid place-items-center py-20 text-gold-deep"><Loader2 className="size-7 animate-spin" /></div>}
         {streams?.length === 0 && <Empty icon={<Radio className="size-6" />} title="Ефірів ще немає" text="Додайте посилання на трансляцію з Facebook або YouTube — вона з’явиться на сайті." action={<button type="button" className={btn.primary} onClick={() => setDraft(blank())}><Plus className="size-4" />Додати ефір</button>} />}
         {streams?.map((s) => (
-          <article key={s.id} className={cn('flex flex-col gap-5 rounded-3xl border bg-card p-5 transition sm:flex-row sm:items-center sm:p-6', s.isLive ? 'border-red-300 shadow-[0_20px_50px_-30px_rgba(220,38,38,.5)]' : 'border-border')}>
+          <article key={s.id} className={cn('flex flex-col gap-5 rounded-3xl border bg-card p-5 transition sm:p-6 lg:flex-row lg:items-center', s.isLive ? 'border-red-300 shadow-[0_20px_50px_-30px_rgba(220,38,38,.5)]' : 'border-border')}>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 {s.isLive && <span className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-widest text-white"><span className="size-1.5 animate-flicker rounded-full bg-white" />LIVE</span>}
                 {s.isPrimary && <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-widest text-gold-deep"><Star className="size-3" />Головний</span>}
                 <span className="text-xs text-muted-foreground">{formatDateTime(s.date || s.createdAt)}</span>
               </div>
-              <h3 className="mt-2 font-display text-2xl leading-tight text-ink">{s.title}</h3>
+              <h3 className="mt-2 font-display text-2xl leading-tight text-ink break-words">{s.title}</h3>
               {s.description && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{s.description}</p>}
               <a href={s.videoUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex max-w-full items-center gap-1.5 truncate text-xs font-semibold text-primary hover:underline"><ExternalLink className="size-3.5 shrink-0" /><span className="truncate">{s.videoUrl}</span></a>
             </div>
-            <div className="flex flex-wrap gap-2 sm:justify-end">
+            <div className="flex flex-wrap gap-2 lg:justify-end">
               {s.isLive
                 ? <button type="button" disabled={busyId === s.id} className={btn.ghost} onClick={() => patch(s, { isLive: false }, 'Ефір завершено')}>Завершити LIVE</button>
                 : <button type="button" disabled={busyId === s.id} className={btn.live} onClick={() => patch(s, { isLive: true, isPrimary: true }, 'Ефір у LIVE')}><Radio className="size-4" />Увімкнути LIVE</button>}
