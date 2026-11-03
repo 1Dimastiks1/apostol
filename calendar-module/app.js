@@ -628,7 +628,7 @@
           <div class="cc-parish-schedule-box">
             <div class="cc-parish-schedule-title">✠ Розклад у Петропавлівському храмі:</div>
             <ul class="cc-parish-schedule-list">
-              <li><strong>08:00</strong> — Сповідь для парафіян та прочан</li>
+              <li><strong>08:30</strong> — Сповідь для парафіян та прочан</li>
               <li><strong>09:00</strong> — Святкова Божественна Літургія</li>
               <li><strong>11:00</strong> — Молебень за Україну, воїнів-захисників та мир</li>
               <li><strong>16:00</strong> — Катехитична зустріч, недільна школа для дітей</li>

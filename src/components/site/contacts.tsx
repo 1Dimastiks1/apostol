@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Bus, Car, Copy, Footprints, MapPin, Phone } from 'lucide-react'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
-import { ADDRESS, MAPS_EMBED, MAPS_URL, PARISH_PAGE, PHONE, PHONE_LABEL, RECTOR_PAGE, copyText } from '@/lib/parish'
+import { ADDRESS, MAPS_EMBED, MAPS_URL, PARISH_PAGE, PHONE, PHONE_LABEL, RECTOR_PAGE, RECTOR_PHONE, RECTOR_PHONE_LABEL, copyText } from '@/lib/parish'
 import { ExternalLink, SectionHeading } from './section-heading'
 
 const ROUTES = [
@@ -25,8 +25,10 @@ export function Contacts() {
                 <p className="mt-1 text-muted-foreground">Кам’янець-Подільський, Старе місто</p>
               </div>
               <div>
-                <p className="flex items-center gap-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-gold-deep"><Phone className="size-4" />Настоятель о. Олександр</p>
+                <p className="flex items-center gap-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-gold-deep"><Phone className="size-4" />Парафія</p>
                 <a href={`tel:${PHONE}`} className="mt-3 block font-display text-3xl leading-tight text-ink hover:text-primary">{PHONE_LABEL}</a>
+                <p className="mt-5 flex items-center gap-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-gold-deep"><Phone className="size-4" />Настоятель о. Олександр</p>
+                <a href={`tel:${RECTOR_PHONE}`} className="mt-3 block font-display text-3xl leading-tight text-ink hover:text-primary">{RECTOR_PHONE_LABEL}</a>
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-4 rounded-2xl bg-night p-3 pl-5">

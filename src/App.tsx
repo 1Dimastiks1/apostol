@@ -18,12 +18,14 @@ import { Faq } from '@/components/site/faq'
 import { Donate } from '@/components/site/donate'
 import { Contacts } from '@/components/site/contacts'
 import { PageChrome, SiteFooter } from '@/components/site/site-footer'
+import { Ambient } from '@/components/site/ambient'
 import { OutboxSync } from '@/components/site/outbox-sync'
 
 export default function App() {
   const { posts, current, archive, announcement, syncStatus } = useParishData()
   return (
     <>
+      <Ambient />
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-ivory focus:px-4 focus:py-2">Перейти до вмісту</a>
       <SiteHeader />
       <main id="main">

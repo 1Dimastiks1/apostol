@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowUp, CalendarDays, HandCoins, ListOrdered, PenLine, Radio } from 'lucide-react'
-import { ADDRESS, PARISH_PAGE, PHONE, PHONE_LABEL, RECTOR_PAGE } from '@/lib/parish'
+import { ADDRESS, PARISH_PAGE, PHONE, PHONE_LABEL, RECTOR_PAGE, RECTOR_PHONE, RECTOR_PHONE_LABEL } from '@/lib/parish'
 import { cn } from '@/lib/utils'
 import { Ornament } from './section-heading'
 import { InstallApp } from './install-app'
@@ -24,7 +24,10 @@ export function SiteFooter() {
           <div>
             <p className="font-display text-2xl">Завітайте</p>
             <p className="mt-4 text-ivory/60">{ADDRESS}</p>
-            <a href={`tel:${PHONE}`} className="mt-2 block text-gold-light hover:underline">{PHONE_LABEL}</a>
+            <p className="mt-4 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-gold-light/60">Парафія</p>
+            <a href={`tel:${PHONE}`} className="block py-1 text-gold-light hover:underline">{PHONE_LABEL}</a>
+            <p className="mt-2 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-gold-light/60">Настоятель</p>
+            <a href={`tel:${RECTOR_PHONE}`} className="block py-1 text-gold-light hover:underline">{RECTOR_PHONE_LABEL}</a>
             <div className="mt-6 flex gap-4 text-sm">
               <a href={PARISH_PAGE} target="_blank" rel="noopener noreferrer" className="text-ivory/70 hover:text-ivory">Facebook парафії ↗</a>
               <a href={RECTOR_PAGE} target="_blank" rel="noopener noreferrer" className="text-ivory/70 hover:text-ivory">Настоятеля ↗</a>

@@ -5,6 +5,8 @@ export const RECTOR_VIDEOS = 'https://www.facebook.com/protoierej.oleksandr.cisa
 export const SCHEDULE_POST = 'https://www.facebook.com/permalink.php?story_fbid=pfbid0wr4Gq5GgukTM1AWhKbAwocCBJEUns2HS39yzNCEGE4MLFctjx4joBaM6xLEXwQP3l&id=100059029128700'
 export const PHONE = '+380971312886'
 export const PHONE_LABEL = '+38 (097) 131-28-86'
+export const RECTOR_PHONE = '+380982670062'
+export const RECTOR_PHONE_LABEL = '+38 (098) 267-00-62'
 export const ADDRESS = 'м. Кам’янець-Подільський, вул. Татарська, 9'
 export const MAPS_URL = "https://maps.google.com/?q=Татарська+9,+Кам'янець-Подільський"
 export const MAPS_EMBED = 'https://maps.google.com/maps?q=%D0%A5%D1%80%D0%B0%D0%BC%20%D1%81%D0%B2%D1%8F%D1%82%D0%B8%D1%85%20%D0%B0%D0%BF%D0%BE%D1%81%D1%82%D0%BE%D0%BB%D1%96%D0%B2%20%D0%9F%D0%B5%D1%82%D1%80%D0%B0%20%D1%96%20%D0%9F%D0%B0%D0%B2%D0%BB%D0%B0%2C%20%D0%A2%D0%B0%D1%82%D0%B0%D1%80%D1%81%D1%8C%D0%BA%D0%B0%209%2C%20%D0%9A%D0%B0%D0%BC%E2%80%99%D1%8F%D0%BD%D0%B5%D1%86%D1%8C-%D0%9F%D0%BE%D0%B4%D1%96%D0%BB%D1%8C%D1%81%D1%8C%D0%BA%D0%B8%D0%B9&z=16&output=embed'
@@ -95,7 +97,7 @@ export const FALLBACK_POSTS: ParishPost[] = []
 export const FALLBACK_STREAMS: Stream[] = []
 
 export const SUNDAY_SCHEDULE = [
-  { time: '08:00', title: 'Сповідь', text: 'Таїнство сповіді для тих, хто готується до Святого Причастя в неділю чи свято.' },
+  { time: '08:30', title: 'Сповідь', text: 'Таїнство сповіді для тих, хто готується до Святого Причастя в неділю чи свято.' },
   { time: '09:00', title: 'Божественна Літургія', text: 'Урочиста Літургія за участю парафіяльного хору. Транслюється наживо на сторінці настоятеля.', live: true },
   { time: '11:00', title: 'Молебень за Україну', text: 'Молитва за здоров’я воїнів-захисників, мир на рідній землі, окроплення освяченою водою.' },
 ]
