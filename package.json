@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "serve": "vite build && node --env-file-if-exists=.env server.mjs",
     "publish-data": "git add events.json streams.json && git commit -m \"Оновлення подій та ефірів\" && git push",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "telegram:webhook": "node --env-file=.env scripts/telegram-webhook.mjs"
   },
   "dependencies": {
     "@netlify/blobs": "^11.1.7",
