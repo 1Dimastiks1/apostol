@@ -324,90 +324,138 @@ html[data-text-size="2"] { font-size: 125%; }
 #church-calendar-widget { font-family: var(--font-sans); }
 #church-calendar-widget .cc-layout { align-items: start; }
 
-/* ══ Церковний календар у стилі сайту ══
+/* ══ Церковний календар: темне «скло» в палітрі сайту (бордовий, золото) ══
    Селектор з #id сильніший за стилі модуля календаря, тому порядок підключення не важливий. */
 #church-calendar-widget .cc-calendar-host {
-  --cc-ink: #16100c;
-  --cc-muted: #6b6258;
-  --cc-paper: #fffdf8;
-  --cc-warm: #f6efe2;
-  --cc-line: #e6dac4;
-  --cc-gold: #8a6a2a;
-  --cc-gold-pale: #f3e8cd;
-  --cc-wine: #4a0f12;
-  --cc-wine-pale: #f7ebe7;
+  --cc-ink: #f6efe3;
+  --cc-muted: rgb(246 239 227 / .62);
+  --cc-paper: transparent;
+  --cc-warm: rgb(255 255 255 / .05);
+  --cc-line: rgb(255 255 255 / .12);
+  --cc-gold: #e8cf8d;
+  --cc-gold-pale: rgb(198 160 82 / .16);
+  --cc-wine: #7a1c22;
+  --cc-wine-pale: rgb(122 28 34 / .28);
+  --cc-blue: #9fc3dc;
+  --cc-blue-pale: rgb(120 160 190 / .16);
   font-family: var(--font-sans);
   color: var(--cc-ink);
 }
 #church-calendar-widget .cc-calendar {
-  border: 1px solid rgb(198 160 82 / .35);
+  position: relative;
+  border: 1px solid rgb(198 160 82 / .28);
   border-radius: 2rem;
-  background: linear-gradient(180deg, #fffdf8, #fbf6ea);
-  box-shadow: 0 40px 100px -60px rgba(74, 15, 18, .55), 0 1px 0 rgb(255 255 255 / .8) inset;
+  background: linear-gradient(160deg, rgb(255 255 255 / .07), rgb(255 255 255 / .02) 55%, rgb(122 28 34 / .12));
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 50px 120px -60px rgba(0, 0, 0, .9), inset 0 1px 0 rgb(255 255 255 / .1);
 }
+#church-calendar-widget .cc-calendar::before {
+  content: "";
+  position: absolute; inset: 0 12% auto; height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(232 207 141 / .8), transparent);
+}
+#church-calendar-widget .cc-header { border-bottom-color: rgb(255 255 255 / .1); }
 #church-calendar-widget .cc-title,
 #church-calendar-widget .cc-month-label,
-#church-calendar-widget .cc-detail-title { font-family: var(--font-display); color: var(--color-ink); letter-spacing: -0.01em; }
+#church-calendar-widget .cc-detail-title,
+#church-calendar-widget .cc-detail-date { font-family: var(--font-display); color: var(--color-ivory); letter-spacing: -0.01em; text-shadow: none; }
 #church-calendar-widget .cc-title { font-weight: 500; line-height: .98; }
+#church-calendar-widget .cc-intro,
+#church-calendar-widget .cc-detail-description,
+#church-calendar-widget .cc-detail-saints { color: rgb(246 239 227 / .75); font-family: var(--font-sans); }
 #church-calendar-widget .cc-kicker,
 #church-calendar-widget .cc-detail-kicker,
 #church-calendar-widget .cc-filter-label,
+#church-calendar-widget .cc-search-label,
+#church-calendar-widget .cc-year-label,
 #church-calendar-widget .cc-quick-feasts-label,
-#church-calendar-widget .cc-weekdays span { font-family: var(--font-sans); color: var(--color-gold-deep); font-weight: 700; letter-spacing: .22em; }
+#church-calendar-widget .cc-weekdays span { font-family: var(--font-sans); color: var(--color-gold-light); font-weight: 700; letter-spacing: .22em; }
 #church-calendar-widget .cc-icon-button,
-#church-calendar-widget .cc-today-button {
-  border-radius: 999px;
-  font-family: var(--font-sans);
-  transition: border-color .25s, background .25s, transform .25s, box-shadow .25s;
-}
-#church-calendar-widget .cc-icon-button { border-color: rgb(198 160 82 / .5); background: #fffdf8; color: var(--color-gold-deep); }
-#church-calendar-widget .cc-icon-button:hover { border-color: var(--color-gold); background: var(--cc-gold-pale); transform: translateY(-1px); }
-#church-calendar-widget .cc-today-button { border: 0; background: linear-gradient(180deg, #6a1b1f, #4a0f12); color: #f8f3ea; box-shadow: 0 8px 20px -10px rgba(74, 15, 18, .7); }
-#church-calendar-widget .cc-today-button:hover { transform: translateY(-1px); box-shadow: 0 12px 26px -10px rgba(74, 15, 18, .8); }
+#church-calendar-widget .cc-today-button { border-radius: 999px; font-family: var(--font-sans); transition: border-color .25s, background .25s, transform .25s, box-shadow .25s; }
+#church-calendar-widget .cc-icon-button { border: 1px solid rgb(232 207 141 / .35); background: rgb(255 255 255 / .05); color: var(--color-gold-light); }
+#church-calendar-widget .cc-icon-button:hover { border-color: var(--color-gold-light); background: rgb(198 160 82 / .18); transform: translateY(-1px); }
+#church-calendar-widget .cc-today-button { border: 0; background: linear-gradient(180deg, #f3dfa0, #a8853c); color: #1b0607; font-weight: 700; box-shadow: 0 10px 26px -12px rgb(198 160 82 / .8); }
+#church-calendar-widget .cc-today-button:hover { transform: translateY(-1px); box-shadow: 0 14px 30px -12px rgb(198 160 82 / .9); }
 #church-calendar-widget .cc-search-box,
 #church-calendar-widget .cc-filter,
 #church-calendar-widget .cc-year-input {
-  border: 1px solid var(--color-input);
+  border: 1px solid rgb(255 255 255 / .16);
   border-radius: .75rem;
-  background: #fffdf8;
+  background: rgb(255 255 255 / .06);
+  color: var(--color-ivory);
   font-family: var(--font-sans);
-  transition: border-color .2s, box-shadow .2s;
+  transition: border-color .2s, box-shadow .2s, background .2s;
 }
+#church-calendar-widget .cc-search-box input { background: transparent; color: var(--color-ivory); }
+#church-calendar-widget .cc-search-box input::placeholder { color: rgb(246 239 227 / .4); }
+#church-calendar-widget .cc-search-icon { color: var(--color-gold-light); }
+#church-calendar-widget .cc-filter option { background: #1b0607; color: var(--color-ivory); }
 #church-calendar-widget .cc-search-box:focus-within,
-#church-calendar-widget .cc-filter:focus-visible { border-color: var(--color-gold); box-shadow: 0 0 0 4px rgb(198 160 82 / .18); }
+#church-calendar-widget .cc-filter:focus-visible,
+#church-calendar-widget .cc-year-input:focus-visible { border-color: var(--color-gold-light); box-shadow: 0 0 0 4px rgb(198 160 82 / .2); background: rgb(255 255 255 / .09); }
+#church-calendar-widget .cc-search-results { border: 1px solid rgb(255 255 255 / .14); background: #1b0607; color: var(--color-ivory); border-radius: 1rem; box-shadow: 0 30px 60px -30px #000; }
+#church-calendar-widget .cc-search-result { color: var(--color-ivory); }
+#church-calendar-widget .cc-search-result:hover { background: rgb(198 160 82 / .16); }
 #church-calendar-widget .cc-day {
   border-radius: 14px;
   font-family: var(--font-sans);
-  color: var(--color-ink);
+  color: rgb(246 239 227 / .85);
   transition: background .25s, border-color .25s, transform .25s, box-shadow .25s;
 }
-#church-calendar-widget .cc-day:hover { border-color: rgb(198 160 82 / .55); background: #fffaf0; transform: translateY(-2px); box-shadow: 0 10px 22px -14px rgba(74, 15, 18, .5); }
-#church-calendar-widget .cc-day.is-selected { border-color: var(--color-gold); background: linear-gradient(180deg, #fbf3df, #f6e9c9); }
-#church-calendar-widget .cc-day.is-selected .cc-day-number { background: linear-gradient(180deg, #6a1b1f, #4a0f12); color: #f8f3ea; box-shadow: 0 6px 14px -6px rgba(74, 15, 18, .8); }
-#church-calendar-widget .cc-day.is-today .cc-day-number { box-shadow: 0 0 0 2px var(--color-gold) inset; }
+#church-calendar-widget .cc-day-number { color: inherit; }
+#church-calendar-widget .cc-day:hover { border-color: rgb(232 207 141 / .5); background: rgb(255 255 255 / .06); transform: translateY(-2px); box-shadow: 0 14px 28px -16px #000; }
+#church-calendar-widget .cc-day.is-muted { opacity: .35; }
+#church-calendar-widget .cc-day.is-selected { border-color: var(--color-gold-light); background: rgb(198 160 82 / .14); }
+#church-calendar-widget .cc-day.is-selected .cc-day-number { background: linear-gradient(180deg, #f3dfa0, #a8853c); color: #1b0607; box-shadow: 0 8px 18px -8px rgb(198 160 82 / .9); }
+#church-calendar-widget .cc-day.is-today .cc-day-number { box-shadow: 0 0 0 2px var(--color-gold-light) inset; color: var(--color-gold-light); }
 #church-calendar-widget .cc-day.has-great .cc-day-number,
-#church-calendar-widget .cc-day.is-pascha .cc-day-number { color: #4a0f12; font-weight: 700; }
+#church-calendar-widget .cc-day.has-major .cc-day-number,
+#church-calendar-widget .cc-day.is-pascha .cc-day-number { background: rgb(122 28 34 / .55); color: #ffe9b8; font-weight: 700; }
+#church-calendar-widget .cc-day.is-selected.has-great .cc-day-number,
+#church-calendar-widget .cc-day.is-selected.has-major .cc-day-number { background: linear-gradient(180deg, #f3dfa0, #a8853c); color: #1b0607; }
+#church-calendar-widget .cc-day.has-fast .cc-day-number { color: rgb(246 239 227 / .9); }
+#church-calendar-widget .cc-day.has-fast { background: rgb(159 195 220 / .06); }
+#church-calendar-widget .cc-mark-great { background: var(--color-gold-light); }
+#church-calendar-widget .cc-mark-fast { background: var(--cc-blue); }
+#church-calendar-widget .cc-legend, #church-calendar-widget .cc-legend span { color: rgb(246 239 227 / .6); }
 #church-calendar-widget .cc-feast-chip {
-  border: 1px solid rgb(198 160 82 / .45);
+  border: 1px solid rgb(232 207 141 / .3);
   border-radius: 999px;
-  background: #fffdf8;
-  color: var(--color-ink);
+  background: rgb(255 255 255 / .05);
+  color: var(--color-ivory);
   font-family: var(--font-sans);
   font-weight: 600;
   transition: border-color .25s, background .25s, transform .25s;
 }
-#church-calendar-widget .cc-feast-chip:hover { border-color: var(--color-gold); background: var(--cc-gold-pale); transform: translateY(-1px); }
-#church-calendar-widget .cc-feast-chip.is-patronal { border-color: #4a0f12; background: linear-gradient(180deg, #6a1b1f, #4a0f12); color: #f8f3ea; }
+#church-calendar-widget .cc-feast-chip:hover { border-color: var(--color-gold-light); background: rgb(198 160 82 / .18); transform: translateY(-1px); }
+#church-calendar-widget .cc-feast-chip.is-patronal { border-color: rgb(232 207 141 / .6); background: linear-gradient(180deg, #7a1c22, #4a0f12); color: #ffe9b8; }
 #church-calendar-widget .cc-detail {
-  border: 1px solid rgb(198 160 82 / .35);
+  position: relative;
+  border: 1px solid rgb(198 160 82 / .3);
   border-radius: 1.5rem;
-  background: linear-gradient(150deg, #fbf3df, #fffdf8 70%);
-  box-shadow: 0 24px 60px -40px rgba(74, 15, 18, .5);
+  background: linear-gradient(155deg, rgb(198 160 82 / .1), rgb(255 255 255 / .03) 60%, rgb(122 28 34 / .14));
+  box-shadow: 0 30px 70px -45px #000, inset 0 1px 0 rgb(255 255 255 / .08);
 }
 #church-calendar-widget .cc-detail-title { font-weight: 500; }
-#church-calendar-widget .cc-detail--great { border-color: rgb(74 15 18 / .45); background: linear-gradient(150deg, #f7ebe7, #fffdf8 70%); }
-#church-calendar-widget .cc-parish-schedule-box { border-radius: 1.25rem; border-color: rgb(198 160 82 / .4); background: #fffdf8; }
-#church-calendar-widget a { color: #4a0f12; }
+#church-calendar-widget .cc-detail--great { border-color: rgb(232 207 141 / .55); background: linear-gradient(155deg, rgb(122 28 34 / .38), rgb(255 255 255 / .03) 70%); }
+#church-calendar-widget .cc-calendar-panel { border: 1px solid rgb(255 255 255 / .1); border-radius: 1.5rem; background: rgb(255 255 255 / .04); box-shadow: inset 0 1px 0 rgb(255 255 255 / .06); }
+#church-calendar-widget .cc-fast-status { border-radius: 999px; }
+#church-calendar-widget .cc-fast-status *, #church-calendar-widget .cc-parish-schedule-list, #church-calendar-widget .cc-parish-schedule-list li, #church-calendar-widget .cc-parish-schedule-list strong { color: inherit; }
+#church-calendar-widget .cc-parish-schedule-list strong { color: var(--color-gold-light); }
+#church-calendar-widget .cc-legend-today { border-color: var(--color-gold-light); }
+#church-calendar-widget .cc-day-empty { background: transparent; }
+#church-calendar-widget .cc-fast-status.is-fast { background: var(--cc-blue-pale); color: var(--cc-blue); border-color: rgb(159 195 220 / .35); }
+#church-calendar-widget .cc-fast-status.is-clear { background: rgb(198 160 82 / .14); color: var(--color-gold-light); border-color: rgb(232 207 141 / .3); }
+#church-calendar-widget .cc-parish-schedule-box { border: 1px solid rgb(198 160 82 / .3); border-radius: 1.25rem; background: rgb(255 255 255 / .04); color: rgb(246 239 227 / .8); }
+#church-calendar-widget .cc-parish-schedule-title { color: var(--color-gold-light); font-family: var(--font-display); }
+#church-calendar-widget .cc-btn-export, #church-calendar-widget .cc-btn-apple, #church-calendar-widget .cc-btn-google, #church-calendar-widget .cc-btn-order-prayer {
+  border: 1px solid rgb(232 207 141 / .35); border-radius: 999px; background: rgb(255 255 255 / .05); color: var(--color-ivory); transition: border-color .25s, background .25s, transform .25s;
+}
+#church-calendar-widget .cc-btn-export:hover, #church-calendar-widget .cc-btn-apple:hover, #church-calendar-widget .cc-btn-google:hover, #church-calendar-widget .cc-btn-order-prayer:hover { border-color: var(--color-gold-light); background: rgb(198 160 82 / .18); transform: translateY(-1px); }
+#church-calendar-widget .cc-footer, #church-calendar-widget .cc-source-link { color: rgb(246 239 227 / .55); }
+#church-calendar-widget a { color: var(--color-gold-light); }
+#church-calendar-widget .cc-calendar-fallback { border-color: rgb(255 255 255 / .14); background: rgb(255 255 255 / .05); color: rgb(246 239 227 / .75); border-radius: 1rem; }
 
 /* ══ Фон і візуальні ефекти всього сайту ══ */
 .ambient { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: var(--color-ivory); }
