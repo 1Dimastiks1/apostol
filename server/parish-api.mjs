@@ -554,7 +554,8 @@ export function createParishApi({ readList, writeList }) {
     if (!msg?.chat) return json({ ok: true });
     const chat = msg.chat.id;
     if (!isTelegramChat(chat)) {
-      await tg('sendMessage', { chat_id: chat, text: 'Цей бот приватний: доступ лише для адміністраторів парафії.' });
+      // Номер чату показуємо, щоб власник міг скопіювати його в TELEGRAM_CHAT_ID (це лише номер вашого власного чату)
+      await tg('sendMessage', { chat_id: chat, text: `Цей бот приватний: доступ лише для адміністраторів парафії.\n\nНомер цього чату: ${chat}\nЯкщо ви власник, впишіть це число в Vercel як TELEGRAM_CHAT_ID і зробіть Redeploy.` });
       return json({ ok: true });
     }
     const text = String(msg.text || '').trim();
