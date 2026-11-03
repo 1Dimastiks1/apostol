@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Check, Copy, Inbox, Loader2, RefreshCw, RotateCcw, Trash2 } from 'lucide-react'
+import { Check, Copy, Download, Inbox, Loader2, RefreshCw, RotateCcw, Trash2 } from 'lucide-react'
 import { copyText } from '@/lib/parish'
 import { cn } from '@/lib/utils'
 import { api, formatDateTime, type ParishNote, type Role } from './api'
 import type { Notify } from './admin-app'
 import { Empty, Modal, PanelHeader, btn } from './ui'
+import { downloadCsv, stamp } from './export'
 
 const POLL_MS = 30_000
 const DELETE_WORD = 'видалити'
@@ -59,7 +60,7 @@ export function NotesPanel({ role, notify, onError }: { role: Role; notify: Noti
 
   return (
     <div>
-      <PanelHeader title="Записки" lead="Імена для поминання «за здоров’я» та «за упокій», подані через сайт. Оновлюється автоматично." actions={<button type="button" className={btn.ghost} onClick={load}><RefreshCw className="size-4" />Оновити</button>} />
+      <PanelHeader title="Записки" lead="Імена для поминання «за здоров’я» та «за упокій», подані через сайт. Оновлюється автоматично." actions={<div className="flex gap-2"><button type="button" className={btn.ghost} disabled={!items?.length} onClick={() => items && downloadCsv(`zapysky-${stamp()}.csv`, ['Дата надходження', 'Тип', 'Імена', 'Статус'], items.map((n) => [n.createdAt, kindLabel(n.kind), n.names.join(', '), n.status === 'done' ? 'Опрацьовано' : 'Нова']))}><Download className="size-4" />Завантажити копію</button><button type="button" className={btn.ghost} onClick={load}><RefreshCw className="size-4" />Оновити</button></div>} />
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex gap-1 rounded-xl border border-border bg-card p-1" role="group" aria-label="Статус">

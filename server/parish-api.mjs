@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { notifyParish, verifyTurnstile } from './protect.mjs';
 import seedEvents from '../events.json' with { type: 'json' };
 import seedStreams from '../streams.json' with { type: 'json' };
 import { createFacebookContentService } from './facebook-content.mjs';
@@ -430,12 +431,15 @@ export function createParishApi({ readList, writeList }) {
       if (limited(req, 'request', 5, 10 * 60 * 1000)) return fail(429, 'Забагато заявок поспіль. Спробуйте трохи пізніше або зателефонуйте до храму.');
       const body = await readBody(req);
       if (text(body.website)) return json({ success: true, message: 'Заявку прийнято' }, 201); // пастка для ботів
+      const captcha = await verifyTurnstile(body.turnstile, clientIp(req));
+      if (!captcha.ok) return fail(captcha.reason === 'unavailable' ? 503 : 400, 'Не вдалося підтвердити, що ви не робот. Оновіть сторінку й спробуйте ще раз.');
       const { errors, value } = validateRequest(body);
       if (errors) return json({ success: false, error: 'Перевірте правильність заповнення форми', fields: errors }, 400);
       const list = await loadList('requests', []);
       const entry = { id: newId('req'), ...value, status: 'new', createdAt: new Date().toISOString() };
       list.unshift(entry);
       await writeList('requests', list.slice(0, MAX_REQUESTS));
+      await notifyParish('request', entry);
       return json({ success: true, message: 'Заявку надіслано', id: entry.id }, 201);
     }
 
@@ -472,12 +476,15 @@ export function createParishApi({ readList, writeList }) {
       if (limited(req, 'note', 10, 10 * 60 * 1000)) return fail(429, 'Забагато записок поспіль. Спробуйте трохи пізніше.');
       const body = await readBody(req);
       if (text(body.website)) return json({ success: true, message: 'Записку прийнято' }, 201);
+      const captcha = await verifyTurnstile(body.turnstile, clientIp(req));
+      if (!captcha.ok) return fail(captcha.reason === 'unavailable' ? 503 : 400, 'Не вдалося підтвердити, що ви не робот. Оновіть сторінку й спробуйте ще раз.');
       const { errors, value } = validateNote(body);
       if (errors) return json({ success: false, error: 'Перевірте правильність заповнення', fields: errors }, 400);
       const list = await loadList('notes', []);
       const entry = { id: newId('note'), ...value, status: 'new', createdAt: new Date().toISOString() };
       list.unshift(entry);
       await writeList('notes', list.slice(0, MAX_NOTES));
+      await notifyParish('note', entry);
       return json({ success: true, message: 'Записку надіслано', id: entry.id }, 201);
     }
 

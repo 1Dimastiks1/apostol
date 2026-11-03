@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { Check, Loader2, Phone } from 'lucide-react'
 import { MetalButton } from '@/components/ui/liquid-glass-button'
 import { Toast, type ToastMessage } from '@/components/ui/toast'
+import { Turnstile, turnstileOn } from '@/components/ui/turnstile'
 import { PHONE, PHONE_LABEL, photo } from '@/lib/parish'
 import { REQUEST_TYPES, type FieldErrors, type RequestForm, formatLocalPhone, fullPhone, validateRequest } from '@/lib/request-validation'
 import { cn } from '@/lib/utils'
@@ -29,6 +30,8 @@ export function ServicesForm() {
   const [sending, setSending] = useState(false)
   const [toast, setToast] = useState<ToastMessage | null>(null)
   const [honeypot, setHoneypot] = useState('')
+  const [captcha, setCaptcha] = useState<string | null>(null)
+  const [captchaReset, setCaptchaReset] = useState(0)
   const closeToast = useCallback(() => setToast(null), [])
 
   const update = <K extends keyof RequestForm>(key: K, value: RequestForm[K]) => {
@@ -52,12 +55,17 @@ export function ServicesForm() {
       return
     }
 
+    if (turnstileOn && !captcha) {
+      setToast({ kind: 'error', title: 'Підтвердіть, що ви не робот', text: 'Зачекайте секунду, поки завершиться перевірка, і спробуйте ще раз.' })
+      return
+    }
+
     setSending(true)
     try {
       const res = await fetch(new URL('api/requests', document.baseURI), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, phone: fullPhone(form.phone), website: honeypot }),
+        body: JSON.stringify({ ...form, phone: fullPhone(form.phone), website: honeypot, turnstile: captcha }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok || !data.success) {
@@ -68,6 +76,7 @@ export function ServicesForm() {
       setForm(EMPTY)
       setErrors({})
       setTouched(false)
+      setCaptchaReset((n) => n + 1)
     } catch (error) {
       setToast({ kind: 'error', title: 'Не вдалося надіслати', text: `${error instanceof Error ? error.message : 'Помилка мережі'}. Спробуйте ще раз або зателефонуйте: ${PHONE_LABEL}.` })
     } finally {
@@ -167,6 +176,7 @@ export function ServicesForm() {
             </div>
           </div>
 
+          <div className="mt-6"><Turnstile onToken={setCaptcha} resetKey={captchaReset} /></div>
           <div className="mt-9 flex flex-wrap items-center gap-5">
             <MetalButton variant="bronze" type="submit" disabled={sending}>
               <span className="inline-flex items-center gap-2">{sending && <Loader2 className="size-4 animate-spin" />}{sending ? 'Надсилаємо…' : 'Надіслати заявку'}</span>

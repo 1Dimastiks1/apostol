@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { CalendarDays, Check, ClipboardList, Copy, Inbox, Loader2, Phone, RefreshCw, RotateCcw, Search, Trash2 } from 'lucide-react'
+import { CalendarDays, Check, ClipboardList, Copy, Download, Inbox, Loader2, Phone, RefreshCw, RotateCcw, Search, Trash2 } from 'lucide-react'
 import { REQUEST_TYPES, formatPhone, requestTypeLabel } from '@/lib/request-validation'
 import { copyText } from '@/lib/parish'
 import { cn } from '@/lib/utils'
 import { api, formatDateTime, formatDay, type ParishRequest, type Role } from './api'
 import type { Notify } from './admin-app'
 import { Empty, Modal, PanelHeader, btn } from './ui'
+import { downloadCsv, stamp } from './export'
 
 const POLL_MS = 30_000
 const DELETE_WORD = 'видалити'
@@ -82,7 +83,7 @@ export function RequestsPanel({ role, notify, onError }: { role: Role; notify: N
       <PanelHeader
         title="Заявки"
         lead="Хрещення та вінчання — з форми на сайті. Оновлюється автоматично."
-        actions={<button type="button" className={btn.ghost} onClick={load}><RefreshCw className="size-4" />Оновити</button>}
+        actions={<div className="flex gap-2"><button type="button" className={btn.ghost} disabled={!items?.length} onClick={() => items && downloadCsv(`zayavky-${stamp()}.csv`, ['Дата надходження', 'Тип', 'Ім’я', 'Телефон', 'Бажана дата', 'Коментар', 'Статус'], items.map((r) => [r.createdAt, requestTypeLabel(r.type), r.name, r.phone, r.date || '', r.intention || '', r.status === 'done' ? 'Опрацьовано' : 'Нова']))}><Download className="size-4" />Завантажити копію</button><button type="button" className={btn.ghost} onClick={load}><RefreshCw className="size-4" />Оновити</button></div>}
       />
 
       <div className="mt-8 grid grid-cols-2 gap-3">

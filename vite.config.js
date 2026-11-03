@@ -13,7 +13,7 @@ const projectRoot = fileURLToPath(new URL('.', import.meta.url))
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   // Серверний API читає паролі адмінки з process.env — передаємо їх із .env у dev-режимі
-  for (const key of ['ADMIN_PASSWORD', 'FORMS_PASSWORD', 'SESSION_SECRET', 'ADMIN_PATH', 'FORMS_PATH']) {
+  for (const key of ['ADMIN_PASSWORD', 'FORMS_PASSWORD', 'SESSION_SECRET', 'ADMIN_PATH', 'FORMS_PATH', 'TURNSTILE_SECRET_KEY', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID', 'RESEND_API_KEY', 'NOTIFY_EMAIL_TO', 'NOTIFY_EMAIL_FROM']) {
     if (env[key] && !process.env[key]) process.env[key] = env[key];
   }
 
