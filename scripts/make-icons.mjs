@@ -1,4 +1,4 @@
-// Малює іконки застосунку (бордовий фон, золота арка з хрестом) без зовнішніх бібліотек: node scripts/make-icons.mjs
+// Малює іконки застосунку (бордовий фон, золотий силует Петропавлівського храму) без зовнішніх бібліотек: node scripts/make-icons.mjs
 import { deflateSync } from 'node:zlib';
 import { writeFileSync } from 'node:fs';
 
@@ -26,19 +26,31 @@ function render(size, safe, frame) {
   const X = (u) => o + u * s, Y = (v) => o + v * s;
   const seg = (x, y, x1, y1, x2, y2) => { const dx = x2 - x1, dy = y2 - y1; const t = clamp(((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy)); return Math.hypot(x - (x1 + t * dx), y - (y1 + t * dy)); };
   const cx = N / 2;
-  // купол-цибулина з хрестом: коло + конус до вершини
-  const R = s * 0.225, domeC = Y(0.66), tipY = Y(0.40), d = domeC - tipY;
-  const alpha = Math.asin(R / d), tanA = Math.tan(alpha), tangY = tipY + d * Math.cos(alpha) ** 2;
-  const inDome = (x, y) => Math.hypot(x - cx, y - domeC) < R || (y >= tipY && y <= tangY && Math.abs(x - cx) <= (y - tipY) * tanA);
-  const drum = [cx - s * 0.12, domeC + R * 0.82, cx + s * 0.12, domeC + R * 0.82 + s * 0.07];
-  const inDrum = (x, y) => x >= drum[0] && x <= drum[2] && y >= drum[1] && y <= drum[3];
-  const crossT = N * 0.0155, thin = N * 0.0045;
+  // Петропавлівський храм: дзвіниця з банею й шпилем, нижча нава ліворуч, кам'яний мур
+  const dx = 0.07; // зсув, щоб усе було по центру
+  const U = (u) => X(u + dx), V = (v) => Y(v);
+  const rect = (x, y, x1, y1, x2, y2) => x >= U(x1) && x <= U(x2) && y >= V(y1) && y <= V(y2);
+  const poly = (x, y, pts) => { let inside = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = [U(pts[i][0]), V(pts[i][1])], [xj, yj] = [U(pts[j][0]), V(pts[j][1])]; if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside; } return inside; };
+  const arch = (x, y, cx0, top, half, bottom) => { const r = half * s; const c = V(top) + r; return Math.abs(x - U(cx0)) <= r && y <= V(bottom) && (y >= c || Math.hypot(x - U(cx0), y - c) <= r); };
+  const dome = (x, y) => { const e = ((x - U(0.58)) / (0.105 * s)) ** 2 + ((y - V(0.36)) / (0.075 * s)) ** 2; return y <= V(0.36) && e <= 1; };
+  const spire = (x, y) => poly(x, y, [[0.5725, 0.3], [0.5875, 0.3], [0.5805, 0.165], [0.5795, 0.165]]);
+  const body = (x, y) =>
+    rect(x, y, 0.455, 0.52, 0.705, 0.8) || // нижній ярус дзвіниці
+    rect(x, y, 0.485, 0.36, 0.675, 0.52) || // дзвіниця
+    dome(x, y) || spire(x, y) ||
+    poly(x, y, [[0.17, 0.66], [0.265, 0.545], [0.455, 0.545], [0.455, 0.8], [0.17, 0.8]]); // нава
+  const holes = (x, y) =>
+    arch(x, y, 0.53, 0.395, 0.022, 0.5) || arch(x, y, 0.58, 0.395, 0.022, 0.5) || arch(x, y, 0.63, 0.395, 0.022, 0.5) || // отвори дзвіниці
+    arch(x, y, 0.58, 0.6, 0.04, 0.8) || // вхід
+    arch(x, y, 0.255, 0.64, 0.022, 0.73) || arch(x, y, 0.345, 0.64, 0.022, 0.73) || // вікна нави
+    arch(x, y, 0.655, 0.6, 0.014, 0.66) || arch(x, y, 0.505, 0.6, 0.014, 0.66);
+  const crossT = N * 0.0105, thin = N * 0.0045;
   const cross = [
-    [cx, Y(0.1), cx, Y(0.405)],
-    [cx - s * 0.085, Y(0.185), cx + s * 0.085, Y(0.185)],
-    [cx - s * 0.055, Y(0.335), cx + s * 0.055, Y(0.29)],
+    [U(0.58), V(0.045), U(0.58), V(0.175)],
+    [U(0.58) - s * 0.045, V(0.085), U(0.58) + s * 0.045, V(0.085)],
+    [U(0.58) - s * 0.028, V(0.155), U(0.58) + s * 0.028, V(0.135)],
   ];
-  const baseLine = [cx - s * 0.3, drum[3] + s * 0.03, cx + s * 0.3, drum[3] + s * 0.03];
+  const wallLine = [U(0.12), V(0.835), U(0.88), V(0.835)];
   const ringR = s * 0.5;
   const fr = N * 0.07, frR = N * 0.16;
   const frameSd = (x, y) => { const qx = Math.abs(x - N / 2) - (N / 2 - fr - frR), qy = Math.abs(y - N / 2) - (N / 2 - fr - frR); return Math.hypot(Math.max(qx, 0), Math.max(qy, 0)) + Math.min(Math.max(qx, qy), 0) - frR; };
@@ -49,13 +61,12 @@ function render(size, safe, frame) {
     c = mix(c, [214, 160, 90], glow * glow * 0.32);
     if (frame && Math.abs(frameSd(x, y)) < thin) c = mix(c, goldAt(y / N), 0.55);
     if (Math.abs(Math.hypot(x - cx, y - Y(0.5)) - ringR) < thin) c = mix(c, goldAt(y / N), 0.5);
-    if (inDome(x, y)) {
-      // золото з м'яким світлом зліва зверху
-      const lit = clamp(1 - Math.hypot(x - (cx - R * 0.45), y - (domeC - R * 0.5)) / (R * 1.5));
-      c = mix(goldAt((y - tipY) / (R * 2.3)), [255, 244, 205], lit * 0.35);
-    } else if (inDrum(x, y)) c = goldAt(0.78);
-    if (seg(x, y, ...baseLine) < thin * 1.7) c = mix(c, goldAt(0.7), 0.9);
-    if (Math.min(...cross.map((l) => seg(x, y, ...l))) < crossT) c = goldAt((y - Y(0.1)) / (s * 0.3));
+    if (body(x, y) && !holes(x, y)) {
+      const lit = clamp(1 - Math.hypot(x - U(0.4), y - V(0.45)) / (s * 0.5));
+      c = mix(goldAt((y - V(0.3)) / (s * 0.55)), [255, 244, 205], lit * 0.3);
+    } else if (body(x, y)) c = mix(c, [20, 3, 6], 0.55);
+    if (seg(x, y, ...wallLine) < thin * 1.8) c = mix(c, goldAt(0.7), 0.9);
+    if (Math.min(...cross.map((l) => seg(x, y, ...l))) < crossT) c = goldAt((y - V(0.04)) / (s * 0.15));
     const i = (y * N + x) * 3; px[i] = c[0]; px[i + 1] = c[1]; px[i + 2] = c[2];
   }
   const out = Buffer.alloc(size * size * 3);
