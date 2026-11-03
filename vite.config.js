@@ -6,13 +6,14 @@ import { fileURLToPath } from 'node:url'
 import { facebookContentPlugin } from './server/facebook-content.mjs'
 import { parishDataPlugin } from './server/parish-data-plugin.mjs'
 import { seoPlugin } from './server/seo-plugin.mjs'
+import { adminPathPlugin } from './server/admin-path-plugin.mjs'
 
 const projectRoot = fileURLToPath(new URL('.', import.meta.url))
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   // Серверний API читає паролі адмінки з process.env — передаємо їх із .env у dev-режимі
-  for (const key of ['ADMIN_PASSWORD', 'FORMS_PASSWORD', 'SESSION_SECRET']) {
+  for (const key of ['ADMIN_PASSWORD', 'FORMS_PASSWORD', 'SESSION_SECRET', 'ADMIN_PATH', 'FORMS_PATH']) {
     if (env[key] && !process.env[key]) process.env[key] = env[key];
   }
 
@@ -22,7 +23,8 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       facebookContentPlugin({ ...process.env, ...env }),
       parishDataPlugin(projectRoot),
-      seoPlugin()
+      seoPlugin(),
+      adminPathPlugin()
     ],
     server: {
       // Дані адмінки змінюються під час роботи — це не привід перезапускати dev-сервер

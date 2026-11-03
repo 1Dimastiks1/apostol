@@ -5,6 +5,7 @@ import { Readable } from 'node:stream';
 import { createFacebookContentService } from './server/facebook-content.mjs';
 import { createParishApi } from './server/parish-api.mjs';
 import { createFileStore } from './server/parish-data-plugin.mjs';
+import { adminPaths } from './server/admin-path-plugin.mjs';
 
 const app = express();
 const port = Number(process.env.PORT) || 4173;
@@ -65,7 +66,19 @@ const sendAdminHtml = (req, res) => {
   }
   res.status(404).send('Файл admin.html не знайдено.');
 };
-app.get(['/admin', '/admin.html', '/apostol/admin', '/apostol/admin.html'], sendAdminHtml);
+// Якщо задано ADMIN_PATH / FORMS_PATH, адмінка доступна лише за цими адресами, а /admin не існує
+const secretPaths = adminPaths();
+if (secretPaths.length) {
+  for (const name of secretPaths) {
+    app.get([`/${name}`, `/apostol/${name}`], (req, res) => {
+      const file = join(DIST_DIR, `${name}.html`);
+      return existsSync(file) ? res.sendFile(file) : res.status(404).send('Не знайдено');
+    });
+  }
+  app.get(['/admin', '/admin.html', '/apostol/admin', '/apostol/admin.html'], (req, res) => res.status(404).sendFile(join(DIST_DIR, '404.html')));
+} else {
+  app.get(['/admin', '/admin.html', '/apostol/admin', '/apostol/admin.html'], sendAdminHtml);
+}
 
 // Статичні файли: dist (після npm run build), потім public
 for (const dir of [DIST_DIR, PUBLIC_DIR]) {
@@ -81,13 +94,20 @@ app.get(['/', '/apostol', '/apostol/'], (req, res) => {
   res.status(404).send('Спершу зберіть сайт: npm run build');
 });
 
+// Усе інше: гарна сторінка 404
+app.use((req, res) => {
+  const page = join(DIST_DIR, '404.html');
+  if (existsSync(page)) return res.status(404).sendFile(page);
+  res.status(404).send('Не знайдено');
+});
+
 service.start();
 
 const server = app.listen(port, host, () => {
   console.log('\n======================================================');
   console.log(' Петропавлівський храм — сервер запущено успішно!');
   console.log(` Головний сайт:   http://${host}:${port}/ (або /apostol/)`);
-  console.log(` Адмін-панель:    http://${host}:${port}/admin`);
+  console.log(` Адмін-панель:    http://${host}:${port}/${secretPaths[0] || 'admin'}`);
   console.log(` Паролі адмінки:  ${process.env.ADMIN_PASSWORD ? 'ADMIN_PASSWORD задано' : 'ADMIN_PASSWORD не задано'} · ${process.env.FORMS_PASSWORD ? 'FORMS_PASSWORD задано' : 'FORMS_PASSWORD не задано'} (.env)`);
   console.log('======================================================\n');
   console.log(service.configured ? 'Автоматична синхронізація Facebook увімкнена.' : 'Facebook API: токени відсутні у .env (працює у резервному режимі).');

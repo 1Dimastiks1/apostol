@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0f0706">
+  <title>Сторінку не знайдено · Петропавлівський храм</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0}
+    html,body{height:100%}
+    body{display:grid;place-items:center;padding:24px;color:#f6efe3;background:#0f0706;font-family:Manrope,system-ui,sans-serif;overflow:hidden;
+      background-image:radial-gradient(ellipse at 50% 30%,rgba(90,20,24,.55),transparent 62%),radial-gradient(circle at 15% 90%,rgba(198,160,82,.12),transparent 40%)}
+    .rays{position:fixed;left:50%;top:-70%;width:170vmax;height:170vmax;transform:translateX(-50%);opacity:.12;pointer-events:none;
+      background:repeating-conic-gradient(from 0deg,transparent 0 14deg,rgba(246,227,168,.9) 16deg,transparent 19deg);
+      -webkit-mask-image:radial-gradient(circle,#000,transparent 60%);mask-image:radial-gradient(circle,#000,transparent 60%);animation:spin 120s linear infinite}
+    @keyframes spin{to{transform:translateX(-50%) rotate(360deg)}}
+    main{position:relative;max-width:560px;text-align:center;animation:in .9s cubic-bezier(.2,.7,.2,1) both}
+    @keyframes in{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+    .mark{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 28px;border:1px solid rgba(198,160,82,.5);border-radius:50%;color:#e8cf8d;background:linear-gradient(#4a0f12,#1b0607)}
+    .code{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(6rem,24vw,10rem);line-height:.9;letter-spacing:-.02em;
+      background:linear-gradient(180deg,#f6e3a8,#d4ad5c 50%,#9b7430);-webkit-background-clip:text;background-clip:text;color:transparent}
+    h1{margin-top:14px;font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.8rem,5vw,2.6rem)}
+    h1 em{color:#e8cf8d}
+    p{margin:18px auto 0;max-width:430px;line-height:1.7;color:rgba(246,239,227,.68)}
+    nav{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:34px}
+    a{display:inline-block;padding:13px 24px;border-radius:999px;font-weight:700;font-size:.9rem;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s}
+    .primary{color:#1b0607;background:linear-gradient(#f3dfa0,#a8853c);box-shadow:0 10px 30px -12px rgba(198,160,82,.6)}
+    .primary:hover{transform:translateY(-2px)}
+    .ghost{color:#f6efe3;border:1px solid rgba(255,255,255,.2)}
+    .ghost:hover{border-color:#c6a052;background:rgba(198,160,82,.1)}
+    @media (prefers-reduced-motion:reduce){.rays,main{animation:none}}
+  </style>
+</head>
+<body>
+  <div class="rays" aria-hidden="true"></div>
+  <main>
+    <div class="mark" aria-hidden="true"><svg width="18" height="24" viewBox="0 0 18 24" fill="none"><path d="M9 0v24M3 6h12M5 17l8-3" stroke="currentColor" stroke-width="1.6"/></svg></div>
+    <div class="code">404</div>
+    <h1>Тут нічого немає, <em>але двері храму відчинені</em></h1>
+    <p>Сторінку, яку ви шукаєте, не знайдено. Можливо, адресу введено з помилкою або посилання застаріло.</p>
+    <nav>
+      <a class="primary" href="/">На головну</a>
+      <a class="ghost" href="/#schedule">Розклад богослужінь</a>
+      <a class="ghost" href="/#contacts">Контакти</a>
+    </nav>
+  </main>
+</body>
+</html>
