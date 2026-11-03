@@ -3,6 +3,7 @@ import { ArrowUp, CalendarDays, HandCoins, ListOrdered, PenLine, Radio } from 'l
 import { ADDRESS, PARISH_PAGE, PHONE, PHONE_LABEL, RECTOR_PAGE } from '@/lib/parish'
 import { cn } from '@/lib/utils'
 import { Ornament } from './section-heading'
+import { InstallApp } from './install-app'
 
 const COLUMNS = [
   { title: 'Богослужіння', links: [['Розклад', '#schedule'], ['Онлайн-трансляції', '#online'], ['Церковний календар', '#calendar'], ['Дванадесяті свята', '#feasts'], ['Молитви парафії', '#prayers']] },
@@ -39,7 +40,7 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-16 flex flex-col justify-between gap-3 border-t border-white/10 pt-8 text-xs text-ivory/40 sm:flex-row">
-          <span>© {new Date().getFullYear()} Петропавлівська парафія ПЦУ · Кам’янець-Подільський</span>
+          <span className="flex flex-wrap items-center gap-4"><span>© {new Date().getFullYear()} Петропавлівська парафія ПЦУ · Кам’янець-Подільський</span><InstallApp /></span>
           <span>Ікони свят — Wikimedia Commons (дві ікони Скваряви Нової: Mykola Swarnyk, CC BY-SA 3.0).</span>
         </div>
       </div>
@@ -110,7 +111,7 @@ export function PageChrome() {
       <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Повернутися нагору" className={cn('magnetic fixed bottom-24 right-5 z-40 grid size-12 place-items-center rounded-full border border-gold/40 bg-night/90 text-gold-light shadow-xl backdrop-blur transition duration-300 hover:border-gold xl:bottom-8', progress > 0.06 ? 'opacity-100' : 'pointer-events-none translate-y-3 opacity-0')}>
         <ArrowUp className="size-5" />
       </button>
-      <nav aria-label="Швидкі переходи" className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-5 rounded-2xl border border-white/10 bg-night/90 p-1.5 shadow-2xl backdrop-blur-xl xl:hidden">
+      <nav aria-label="Швидкі переходи" className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 grid grid-cols-5 rounded-2xl border border-white/10 bg-night/90 p-1.5 shadow-2xl backdrop-blur-xl xl:hidden">
         {DOCK.map(({ icon: Icon, label, href }) => (
           <a key={href} href={href} className="flex flex-col items-center gap-1 rounded-xl py-2 text-[0.62rem] font-semibold text-ivory/70 active:bg-white/10">
             <Icon className="size-5 text-gold-light" strokeWidth={1.6} />{label}

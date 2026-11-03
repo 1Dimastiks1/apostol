@@ -44,7 +44,7 @@ export function SiteHeader() {
   }, [open])
 
   return (
-    <header className={cn('fixed inset-x-0 top-0 z-50 transition-all duration-500', scrolled || open ? 'bg-night/85 py-3 shadow-[0_10px_40px_-20px_rgba(0,0,0,.8)] backdrop-blur-xl' : 'bg-transparent py-5')}>
+    <header style={{ paddingTop: `calc(${scrolled || open ? '0.75rem' : '1.25rem'} + env(safe-area-inset-top, 0px))` }} className={cn('fixed inset-x-0 top-0 z-50 transition-all duration-500', scrolled || open ? 'bg-night/85 pb-3 shadow-[0_10px_40px_-20px_rgba(0,0,0,.8)] backdrop-blur-xl' : 'bg-transparent pb-5')}>
       <div className="shell flex items-center justify-between gap-6">
         <a href="#home" className="group flex items-center gap-3.5 text-ivory" aria-label="На головну">
           <span className="relative grid size-10 shrink-0 sm:size-11 place-items-center rounded-full border border-gold/50 bg-gradient-to-b from-wine to-wine-deep text-gold-light shadow-[inset_0_1px_0_rgba(255,255,255,.15)] transition group-hover:border-gold">

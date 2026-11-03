@@ -106,7 +106,13 @@
 }
 
 /* ── Розмір шрифту для старших парафіян: масштабує всі rem ── */
-html { font-size: 100%; scroll-behavior: smooth; scroll-padding-top: 88px; }
+html { font-size: 100%; scroll-behavior: smooth; scroll-padding-top: calc(88px + env(safe-area-inset-top, 0px)); -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+body { overscroll-behavior-y: none; }
+/* Коли сайт відкрито як встановлену програму: без виділення тексту кнопок і з відступом під нижню смужку */
+@media (display-mode: standalone) {
+  button, nav a { -webkit-user-select: none; user-select: none; }
+  body { padding-bottom: env(safe-area-inset-bottom, 0px); }
+}
 html[data-text-size="1"] { font-size: 112.5%; }
 html[data-text-size="2"] { font-size: 125%; }
 

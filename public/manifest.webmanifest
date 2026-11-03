@@ -1,0 +1,26 @@
+{
+  "name": "Петропавлівський храм · Кам’янець-Подільський",
+  "short_name": "Петропавлівський храм",
+  "description": "Розклад богослужінь, трансляції, записки, заявки та контакти парафії.",
+  "lang": "uk",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "./?source=app",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f0706",
+  "theme_color": "#0f0706",
+  "categories": ["lifestyle", "education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Розклад богослужінь", "short_name": "Розклад", "url": "./#schedule", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Подати записку", "short_name": "Записка", "url": "./#prayer-notes", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Залишити заявку", "short_name": "Заявка", "url": "./#services", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Підтримати храм", "short_name": "Пожертва", "url": "./#donate", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
