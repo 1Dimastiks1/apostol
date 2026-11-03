@@ -457,6 +457,51 @@ html[data-text-size="2"] { font-size: 125%; }
 #church-calendar-widget a { color: var(--color-gold-light); }
 #church-calendar-widget .cc-calendar-fallback { border-color: rgb(255 255 255 / .14); background: rgb(255 255 255 / .05); color: rgb(246 239 227 / .75); border-radius: 1rem; }
 
+/* Календар: просторі відступи, щоб блоки не тулилися один до одного */
+#church-calendar-widget .cc-calendar { padding: clamp(22px, 4vw, 52px); }
+#church-calendar-widget .cc-header { gap: clamp(20px, 3vw, 40px); padding-bottom: clamp(24px, 3vw, 36px); }
+#church-calendar-widget .cc-heading { display: grid; gap: 10px; }
+#church-calendar-widget .cc-title { margin: 4px 0 0; }
+#church-calendar-widget .cc-intro { margin: 0; max-width: 52ch; line-height: 1.65; }
+#church-calendar-widget .cc-controls { gap: 18px; }
+#church-calendar-widget .cc-month-controls { gap: 16px; }
+#church-calendar-widget .cc-month-year { display: grid; gap: 8px; text-align: center; }
+#church-calendar-widget .cc-tools { gap: 24px; padding: clamp(24px, 3vw, 34px) 0 clamp(20px, 2.5vw, 28px); }
+#church-calendar-widget .cc-search-wrap,
+#church-calendar-widget .cc-tools > div { display: grid; gap: 10px; }
+#church-calendar-widget .cc-search-box { min-height: 52px; padding: 0 18px; gap: 12px; }
+#church-calendar-widget .cc-filter { min-height: 52px; padding: 0 44px 0 18px; }
+#church-calendar-widget .cc-quick-feasts-wrap { margin: 0 0 clamp(26px, 3vw, 36px); gap: 14px; }
+#church-calendar-widget .cc-quick-feasts { gap: 10px; padding: 4px 2px 14px; }
+#church-calendar-widget .cc-feast-chip { padding: 10px 18px; gap: 8px; }
+#church-calendar-widget .cc-layout { gap: clamp(22px, 3vw, 40px); }
+#church-calendar-widget .cc-calendar-panel { padding: clamp(18px, 2.6vw, 32px); }
+#church-calendar-widget .cc-weekdays { margin-bottom: 14px; }
+#church-calendar-widget .cc-days { gap: clamp(6px, 1vw, 10px); grid-auto-rows: minmax(clamp(52px, 6vw, 68px), 1fr); }
+#church-calendar-widget .cc-day { padding: 10px 4px 8px; gap: 5px; }
+#church-calendar-widget .cc-legend { gap: 12px 26px; margin-top: 26px; padding-top: 20px; }
+#church-calendar-widget .cc-legend span { display: inline-flex; align-items: center; gap: 8px; }
+#church-calendar-widget .cc-detail { padding: clamp(24px, 3vw, 38px); gap: 0; }
+#church-calendar-widget .cc-detail-title { margin: 16px 0 0; line-height: 1.12; }
+#church-calendar-widget .cc-detail-saints { margin: 18px 0 0; line-height: 1.7; }
+#church-calendar-widget .cc-detail-description { margin: 16px 0 0; line-height: 1.7; }
+#church-calendar-widget .cc-fast-status { margin-top: 28px; padding: 16px 18px; gap: 14px; }
+#church-calendar-widget .cc-parish-schedule-box { margin-top: 22px; padding: 18px 20px; line-height: 1.75; }
+#church-calendar-widget .cc-parish-schedule-list { margin: 12px 0 0; padding: 0; display: grid; gap: 8px; list-style: none; }
+#church-calendar-widget .cc-export-actions { gap: 12px; margin-top: 26px; padding-top: 22px; border-top: 1px dashed rgb(255 255 255 / .16); }
+#church-calendar-widget .cc-export-actions > * { padding: 11px 18px; }
+#church-calendar-widget .cc-footer { margin-top: 30px; padding-top: 22px; border-top: 1px solid rgb(255 255 255 / .1); gap: 18px; line-height: 1.6; }
+@media (max-width: 640px) {
+  #church-calendar-widget .cc-calendar { padding: 20px 16px 24px; border-radius: 1.5rem; }
+  #church-calendar-widget .cc-header { flex-direction: column; align-items: stretch; gap: 20px; }
+  #church-calendar-widget .cc-controls { justify-content: space-between; }
+  #church-calendar-widget .cc-tools { flex-direction: column; align-items: stretch; }
+  #church-calendar-widget .cc-calendar-panel { padding: 16px 10px 20px; border-radius: 1.25rem; }
+  #church-calendar-widget .cc-days { gap: 4px; }
+  #church-calendar-widget .cc-detail { padding: 22px 20px; border-radius: 1.25rem; }
+  #church-calendar-widget .cc-footer { flex-direction: column; gap: 10px; }
+}
+
 /* ══ Фон і візуальні ефекти всього сайту ══ */
 .ambient { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: var(--color-ivory); }
 .ambient-grid {

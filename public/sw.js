@@ -6,7 +6,13 @@ const PAGES = `parish-pages-${VERSION}`;
 const BASE = new URL('./', self.location).pathname; // '/' або '/apostol/'
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(PAGES).then((cache) => cache.addAll([BASE, `${BASE}offline.html`])).then(() => self.skipWaiting()));
+  // Копії зберігаємо «чистими» (без позначки про переадресацію): на Vercel /offline.html перенаправляє на /offline,
+  // а відповідь із такою позначкою браузер не дозволяє віддавати на відкриття сторінки.
+  const store = async (cache, url) => {
+    const res = await fetch(url);
+    if (res.ok) await cache.put(url, new Response(await res.blob(), { status: 200, headers: res.headers }));
+  };
+  event.waitUntil(caches.open(PAGES).then((cache) => Promise.all([store(cache, BASE), store(cache, `${BASE}offline.html`)])).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {

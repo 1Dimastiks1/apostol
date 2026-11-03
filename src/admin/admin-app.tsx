@@ -7,6 +7,7 @@ import { StreamsPanel } from './streams-panel'
 import { EventsPanel } from './events-panel'
 import { RequestsPanel } from './requests-panel'
 import { NotesPanel } from './notes-panel'
+import { InstallApp } from '@/components/site/install-app'
 
 type Tab = 'streams' | 'events' | 'requests' | 'notes'
 
@@ -129,6 +130,7 @@ export function AdminApp() {
           </div>
         </div>
         <div className="flex shrink-0 gap-2">
+          <InstallApp compact icon={`${import.meta.env.BASE_URL}icons/admin-192.png`} title="Встановіть адмінку" />
           <a href={siteUrl} target="_blank" rel="noopener noreferrer" className="grid size-11 place-items-center rounded-full border border-white/15 text-ivory/70" aria-label="Відкрити сайт"><ExternalLink className="size-4" /></a>
           <button type="button" onClick={logout} className="grid size-11 place-items-center rounded-full border border-white/15 text-ivory/70" aria-label="Вийти"><LogOut className="size-4" /></button>
         </div>
@@ -151,6 +153,8 @@ export function AdminApp() {
           ))}
         </nav>
         <div className="space-y-1 border-t border-white/10 p-2 lg:p-4">
+          <div className="flex justify-center lg:hidden"><InstallApp compact icon={`${import.meta.env.BASE_URL}icons/admin-192.png`} title="Встановіть адмінку" /></div>
+          <div className="hidden px-2 pb-1 lg:block"><InstallApp icon={`${import.meta.env.BASE_URL}icons/admin-192.png`} title="Встановіть адмінку" /></div>
           <a href={siteUrl} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-[0.68rem] font-semibold text-ivory/60 hover:bg-white/5 hover:text-ivory lg:flex-row lg:gap-3 lg:rounded-xl lg:px-4 lg:text-sm"><ExternalLink className="size-5 lg:size-4" />Сайт</a>
           <button type="button" onClick={logout} className="flex w-full flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-[0.68rem] font-semibold text-ivory/60 hover:bg-white/5 hover:text-ivory lg:flex-row lg:gap-3 lg:rounded-xl lg:px-4 lg:text-sm"><LogOut className="size-5 lg:size-4" />Вийти</button>
         </div>

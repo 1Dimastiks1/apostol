@@ -43,7 +43,7 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-16 flex flex-col justify-between gap-3 border-t border-white/10 pt-8 text-xs text-ivory/40 sm:flex-row">
-          <span className="flex flex-wrap items-center gap-4"><span>© {new Date().getFullYear()} Петропавлівська парафія ПЦУ · Кам’янець-Подільський</span><InstallApp /></span>
+          <span className="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center"><span>© {new Date().getFullYear()} Петропавлівська парафія ПЦУ · Кам’янець-Подільський</span><InstallApp /></span>
           <span>Ікони свят — Wikimedia Commons (дві ікони Скваряви Нової: Mykola Swarnyk, CC BY-SA 3.0).</span>
         </div>
       </div>
