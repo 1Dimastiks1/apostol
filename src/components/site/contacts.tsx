@@ -50,7 +50,7 @@ export function Contacts() {
               <ExternalLink href={RECTOR_PAGE} className="text-primary">Facebook настоятеля</ExternalLink>
             </div>
           </div>
-          <div className="reveal overflow-hidden rounded-[2rem] border border-gold/30 shadow-[0_40px_100px_-60px_rgba(74,15,18,.6)]">
+          <div className="spotlight reveal overflow-hidden rounded-[2rem] border border-gold/30 shadow-[0_40px_100px_-60px_rgba(74,15,18,.6)]">
             <EmbedGate provider="Google Maps" dark={false} className="min-h-[460px]"><iframe title="Карта до храму на вулиці Татарській, 9 у Кам’янці-Подільському" loading="lazy" src={MAPS_EMBED} className="h-full min-h-[460px] w-full grayscale-[35%] sepia-[15%]" referrerPolicy="no-referrer-when-downgrade" /></EmbedGate>
           </div>
         </div>

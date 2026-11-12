@@ -17,12 +17,12 @@ export function Lightbox({ items, index, onChange }: Props) {
     document.body.style.overflow = 'hidden'
     closeRef.current?.focus()
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onChange(null)
+      if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); onChange(null) }
       if (e.key === 'ArrowLeft') go(-1)
       if (e.key === 'ArrowRight') go(1)
     }
-    window.addEventListener('keydown', onKey)
-    return () => { window.removeEventListener('keydown', onKey); document.body.style.overflow = overflow; prev?.focus?.() }
+    window.addEventListener('keydown', onKey, true)
+    return () => { window.removeEventListener('keydown', onKey, true); document.body.style.overflow = overflow; prev?.focus?.() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, index])
 

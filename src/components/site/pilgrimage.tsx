@@ -20,7 +20,7 @@ function Slide({ s, i, progress }: { s: (typeof SLIDES)[number]; i: number; prog
   const center = (i + 0.5) / SLIDES.length
   const shift = useTransform(progress, [center - 0.35, center + 0.35], ['-9%', '9%'])
   return (
-    <article className="relative h-[46svh] w-[62vw] shrink-0 overflow-hidden rounded-[1.5rem] border border-gold/25 bg-wine-deep sm:w-[34vw] lg:w-[24vw]">
+    <article className="spotlight relative h-[46svh] w-[62vw] shrink-0 overflow-hidden rounded-[1.5rem] border border-gold/25 bg-wine-deep sm:w-[34vw] lg:w-[24vw]">
       <motion.img style={{ x: shift, scale: 1.2 }} src={photo(s.file)} alt={s.title} loading="lazy" className="absolute inset-0 size-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-t from-night/90 via-night/10 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">

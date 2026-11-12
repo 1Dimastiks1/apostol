@@ -67,7 +67,7 @@ export function Hero({ announcement }: { announcement: Announcement | null }) {
           </figure>
 
           {announcement && (
-            <div className="glass-panel relative mt-8 rounded-2xl p-5 sm:absolute sm:-bottom-10 sm:-left-14 sm:mt-0 sm:max-w-[340px]">
+            <div className="spotlight glass-panel relative mt-8 rounded-2xl p-5 sm:absolute sm:-bottom-10 sm:-left-14 sm:mt-0 sm:max-w-[340px]">
               <p className="text-[0.62rem] font-bold uppercase tracking-[0.24em] text-gold-light">{announcement.eyebrow}</p>
               <p className="mt-2 font-display text-2xl leading-tight">{announcement.title}</p>
               {announcement.rich

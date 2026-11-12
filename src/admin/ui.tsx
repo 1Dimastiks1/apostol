@@ -9,6 +9,9 @@ export const btn = {
   live: 'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-red-600 px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 disabled:opacity-50',
 }
 
+// Стек відкритих вікон: Esc закриває лише верхнє, а не всі одразу
+const openModals: symbol[] = []
+
 export function Modal({ title, open, onClose, children, footer, wide }: { title: string; open: boolean; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
   // onClose зазвичай нова функція на кожен рендер: тримаємо її в ref, щоб ефект (і фокус) не спрацьовував при кожному символі
@@ -16,11 +19,22 @@ export function Modal({ title, open, onClose, children, footer, wide }: { title:
   closeRef.current = onClose
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeRef.current()
+    const me = Symbol('modal')
+    openModals.push(me)
+    const prevFocus = document.activeElement as HTMLElement | null
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || e.defaultPrevented || openModals[openModals.length - 1] !== me) return
+      e.preventDefault()
+      closeRef.current()
+    }
     window.addEventListener('keydown', onKey)
     const body = ref.current?.querySelector<HTMLElement>('.overflow-y-auto')
     ;(body?.querySelector<HTMLElement>('input, textarea, select') ?? ref.current?.querySelector<HTMLElement>('button'))?.focus()
-    return () => window.removeEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      openModals.splice(openModals.indexOf(me), 1)
+      prevFocus?.focus?.()
+    }
   }, [open])
   if (!open) return null
   return (

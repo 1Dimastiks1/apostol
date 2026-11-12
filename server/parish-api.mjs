@@ -191,6 +191,7 @@ export async function resolveFacebookVideo(rawUrl) {
   return { kind: 'video', videoUrl, title, description: lines.join('\n'), date };
 }
 
+const EVENT_CATEGORIES = ['schedule', 'service', 'feast', 'volunteer', 'community'];
 const MAX_IMAGE_BYTES = 1_500_000;
 const imageKey = (id) => `eventimg_${String(id).replace(/[^\w-]/g, '')}`;
 
@@ -284,6 +285,17 @@ export function createParishApi({ readList, writeList }) {
       });
     }
 
+    // Ручний порядок карток: адмінка надсилає повний список id у новому порядку
+    if (req.method === 'POST' && id === 'reorder') {
+      const body = await readBody(req);
+      const ids = Array.isArray(body.ids) ? body.ids.map(String) : [];
+      const byId = new Map(events.map((event) => [event.id, event]));
+      const ordered = [...new Set(ids)].filter((x) => byId.has(x)).map((x) => byId.get(x));
+      const rest = events.filter((event) => !ordered.includes(event));
+      await writeList('events', [...ordered, ...rest]);
+      return json({ success: true, message: 'Порядок збережено' });
+    }
+
     const index = id ? events.findIndex((event) => event.id === id) : -1;
     if (id && index === -1) return fail(404, 'Подію з таким ID не знайдено');
 
@@ -296,7 +308,7 @@ export function createParishApi({ readList, writeList }) {
 
     if ((req.method === 'POST' && !id) || (req.method === 'PUT' && id)) {
       const body = await readBody(req);
-      const fields = { title: text(body.title), date: text(body.date), description: text(body.description), link: text(body.link) };
+      const fields = { title: text(body.title), date: text(body.date), description: text(body.description), link: text(body.link), category: EVENT_CATEGORIES.includes(text(body.category)) ? text(body.category) : 'schedule' };
       if (!fields.title) return fail(400, 'Заголовок події є обов’язковим');
       if (!fields.date) return fail(400, 'Дата та час події є обов’язковими');
       if (fields.link && !isHttpUrl(fields.link)) return fail(400, 'Посилання має починатися з https://');
@@ -554,7 +566,7 @@ export function createParishApi({ readList, writeList }) {
     // не отримує запит від кожного з них. Запити адмінки (з токеном) завжди йдуть повз кеш.
     const cdn = (res) => {
       if (req.method === 'GET' && !sub && !req.headers.get('authorization') && res.status === 200) {
-        res.headers.set('Cache-Control', 'public, max-age=0, s-maxage=30, stale-while-revalidate=120');
+        res.headers.set('Cache-Control', 'public, max-age=0, s-maxage=10, stale-while-revalidate=30');
       }
       return res;
     };

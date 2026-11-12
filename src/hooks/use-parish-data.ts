@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   type AdminEvent, type FacebookSnapshot, type ParishPost, type Stream,
-  FALLBACK_POSTS, FALLBACK_STREAMS, RETENTION_DAYS,
+  FALLBACK_POSTS, FALLBACK_STREAMS, RETENTION_DAYS, categoryLabel,
   embedUrl, formatDateTime, isRecent, timeOf,
 } from '@/lib/parish'
 
-const POLL_MS = 60_000
+const POLL_MS = 30_000
 
 async function fetchFirstArray<T>(paths: string[]): Promise<T[] | null> {
   for (const path of paths) {
@@ -90,8 +90,8 @@ export function useParishData(): ParishData {
       text: item.description || '',
       href: item.link || '',
       imageUrl: eventImage(item),
-      category: 'schedule',
-      type: 'Подія парафії',
+      category: item.category || 'schedule',
+      type: categoryLabel(item.category || 'schedule'),
       createdAt: item.date || item.createdAt,
       rich: true,
     }))
@@ -116,7 +116,9 @@ export function useParishData(): ParishData {
     }
     if (!streams.length) streams = FALLBACK_STREAMS.filter((s) => isRecent(s, retention))
 
-    const sorted = [...streams].sort((a, b) => timeOf(b) - timeOf(a))
+    // Ефіри впорядковуємо за датою служби (а не за тим, коли їх додали в адмінку)
+    const when = (s: Stream) => { const t = Date.parse(s.date || ''); return Number.isFinite(t) ? t : timeOf(s) }
+    const sorted = [...streams].sort((a, b) => when(b) - when(a))
     const current = sorted.find((s) => s.isLive) || sorted.find((s) => s.isPrimary) || sorted[0] || null
     const archive = sorted.filter((s) => s !== current).slice(0, 9)
 

@@ -41,7 +41,7 @@ export function Prayers() {
         />
         <div className="mt-16 grid gap-6 lg:grid-cols-[1fr_1fr_.9fr]">
           {PRAYERS.map((p) => (
-            <article key={p.title} className="reveal flex flex-col rounded-3xl border border-border bg-card p-8 sm:p-10">
+            <article key={p.title} className="spotlight reveal flex flex-col rounded-3xl border border-border bg-card p-8 sm:p-10">
               <p className="text-[0.62rem] font-bold uppercase tracking-[0.22em] text-gold-deep">{p.tag}</p>
               <h3 className="mt-4 font-display text-[2rem] leading-tight text-ink">{p.title}</h3>
               <div className="mt-6 flex-1 space-y-4 font-display text-[1.25rem] italic leading-relaxed text-ink/80">
@@ -50,7 +50,7 @@ export function Prayers() {
               <p className="mt-8 border-t border-border pt-5 text-sm text-muted-foreground">{p.note}</p>
             </article>
           ))}
-          <article className="reveal relative flex min-h-[520px] flex-col justify-end overflow-hidden rounded-3xl text-ivory">
+          <article className="spotlight reveal relative flex min-h-[520px] flex-col justify-end overflow-hidden rounded-3xl text-ivory">
             <img src={photo('parish/analoy-gospel.jpg')} alt="Євангеліє, хрест і образ Богородиці на аналої в храмі" className="absolute inset-0 size-full object-cover" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-night via-night/70 to-night/10" />
             <div className="relative p-8 sm:p-10">

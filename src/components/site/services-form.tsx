@@ -114,7 +114,7 @@ export function ServicesForm() {
           </div>
         </div>
 
-        <form onSubmit={onSubmit} noValidate className="reveal self-start rounded-[2rem] border border-gold/30 bg-card p-7 shadow-[0_40px_100px_-60px_rgba(74,15,18,.6)] sm:p-11">
+        <form onSubmit={onSubmit} noValidate className="spotlight reveal self-start rounded-[2rem] border border-gold/30 bg-card p-7 shadow-[0_40px_100px_-60px_rgba(74,15,18,.6)] sm:p-11">
           <div className="flex items-center justify-between border-b border-border pb-6">
             <h3 className="font-display text-3xl text-ink">Заява на богослужіння</h3>
             <span className="hidden text-[0.62rem] font-bold uppercase tracking-[0.2em] text-gold-deep sm:block">Петропавлівський храм</span>

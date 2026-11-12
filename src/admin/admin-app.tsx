@@ -71,6 +71,8 @@ function Login({ onLogin }: { onLogin: (role: Role) => void }) {
   )
 }
 
+const IS_LOCAL = /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0|.+\.local|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)$/.test(window.location.hostname)
+
 export function AdminApp() {
   const [role, setRole] = useState<Role | null>(null)
   const [checking, setChecking] = useState(true)
@@ -161,6 +163,11 @@ export function AdminApp() {
       </aside>
 
       <main className="mx-auto w-full min-w-0 max-w-6xl px-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] pt-6 sm:px-8 md:pb-12 lg:py-12">
+        {IS_LOCAL && (
+          <div role="alert" className="mb-6 rounded-2xl border border-amber-400/70 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
+            <b>Це локальна копія адмінки на вашому комп’ютері ({window.location.host}).</b> Події, ефіри й фото, додані тут, зберігаються лише у файлах на комп’ютері і <b>не з’являться на справжньому сайті</b>. Щоб опублікувати, відкрийте адмінку на адресі сайту в інтернеті.
+          </div>
+        )}
         {tab === 'streams' && role === 'admin' && <StreamsPanel notify={notify} onError={onError} />}
         {tab === 'events' && role === 'admin' && <EventsPanel notify={notify} onError={onError} />}
         {tab === 'requests' && <RequestsPanel role={role} notify={notify} onError={onError} />}

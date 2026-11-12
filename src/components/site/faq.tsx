@@ -74,7 +74,7 @@ export function Faq() {
           <p className="eyebrow">Важливі миті у храмі</p>
           <div className="mt-8 space-y-5">
             {MOMENTS.map(([title, text]) => (
-              <figure key={title} className="reveal rounded-3xl bg-wine-deep p-8 text-ivory">
+              <figure key={title} className="spotlight reveal rounded-3xl bg-wine-deep p-8 text-ivory">
                 <p className="font-display text-5xl leading-none text-gold" aria-hidden="true">“</p>
                 <blockquote className="-mt-2 leading-relaxed text-ivory/80"><span className="font-display text-2xl text-gold-light">{title}</span> — {text.charAt(0).toLowerCase() + text.slice(1)}</blockquote>
                 <figcaption className="mt-5 text-[0.62rem] font-bold uppercase tracking-[0.22em] text-ivory/45">Петропавлівська парафія</figcaption>

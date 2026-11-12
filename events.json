@@ -1,5 +1,17 @@
 [
   {
+    "id": "evt_1794510377865_b35a73",
+    "title": "8 листопада — собор архистратига божого михаїла та всіх небесних сил безтілесних. 23-тя неділя після п’ятидесятниці",
+    "date": "2026-11-08T07:00:00.000Z",
+    "description": "Сьогодні Петропавлівська церква наповнилася особливою молитвою, духовною...",
+    "link": "https://www.facebook.com/protoierej.oleksandr.cisar/posts/3758780237603311",
+    "createdAt": "2026-11-12T19:06:17.865Z",
+    "hasImage": true,
+    "imageUpdatedAt": "2026-11-12T20:04:59.505Z",
+    "updatedAt": "2026-11-12T20:22:10.210Z",
+    "category": "service"
+  },
+  {
     "id": "evt_1793649932572_487b3a",
     "title": "Неділя, яка наповнює серце радістю",
     "date": "2026-11-01T07:00:00.000Z",
@@ -7,15 +19,17 @@
     "link": "https://www.facebook.com/protoierej.oleksandr.cisar/posts/3749510548530280",
     "createdAt": "2026-11-02T20:05:32.573Z",
     "hasImage": true,
-    "imageUpdatedAt": "2026-11-02T20:05:32.576Z"
+    "imageUpdatedAt": "2026-11-02T20:05:32.576Z",
+    "updatedAt": "2026-11-12T20:16:10.309Z"
   },
   {
     "id": "evt_seed_memorial_2026_10_24",
     "title": "Поминальна субота",
-    "date": "2026-10-24T08:30:00+03:00",
+    "date": "2026-10-24T05:30:00.000Z",
     "description": "Оголошення парафії: сповідь о 08:30, Служба Божа о 09:00. У дописі також вказано порядок подання поминань за упокій.",
     "link": "https://www.facebook.com/permalink.php?story_fbid=pfbid0wr4Gq5GgukTM1AWhKbAwocCBJEUns2HS39yzNCEGE4MLFctjx4joBaM6xLEXwQP3l&id=100059029128700",
     "createdAt": "2026-10-24T08:00:00+03:00",
-    "imageUrl": "images/church-exterior-old-town.jpg"
+    "imageUrl": "images/church-exterior-old-town.jpg",
+    "updatedAt": "2026-11-12T20:16:18.405Z"
   }
 ]

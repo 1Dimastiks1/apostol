@@ -55,6 +55,7 @@ export type ParishEvent = {
   date: string
   description?: string
   link?: string
+  category?: string
   hasImage?: boolean
   imageUpdatedAt?: string
   imageUrl?: string

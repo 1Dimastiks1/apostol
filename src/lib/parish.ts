@@ -39,6 +39,16 @@ export const STOCK = {
   gospel: '1504052434569-70ad5836ab65',
 } as const
 
+/** Позначки подій: ключ → підпис (використовується в адмінці, на картці та у фільтрі) */
+export const EVENT_CATEGORIES = [
+  ['schedule', 'Розклад служб'],
+  ['service', 'Літургія'],
+  ['feast', 'Свято'],
+  ['volunteer', 'Волонтерство'],
+  ['community', 'Життя громади'],
+] as const
+export const categoryLabel = (key?: string) => EVENT_CATEGORIES.find(([k]) => k === key)?.[1] || 'Подія парафії'
+
 export type ParishPost = {
   id: string
   date: string
@@ -71,6 +81,7 @@ export type AdminEvent = {
   description?: string
   date?: string
   link?: string
+  category?: string
   hasImage?: boolean
   imageUpdatedAt?: string
   /** Статичне фото з початкових даних (шлях відносно сайту) */

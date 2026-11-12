@@ -19,7 +19,7 @@ function VideoFrame({ stream, className }: { stream: Stream; className?: string 
   )
 }
 
-export function Worship({ current, archive, syncStatus }: { current: Stream | null; archive: Stream[]; syncStatus: string }) {
+export function Worship({ current, archive }: { current: Stream | null; archive: Stream[] }) {
   const live = Boolean(current?.isLive)
   return (
     <section id="online" className="grain relative isolate overflow-hidden bg-night py-28 text-ivory sm:py-36">
@@ -31,12 +31,12 @@ export function Worship({ current, archive, syncStatus }: { current: Stream | nu
           index="02"
           eyebrow="Прямі трансляції"
           title={<>Богослужіння <em className="gold-text">онлайн</em></>}
-          lead={<>Моліться разом із громадою, де б ви не були. <span className="text-ivory/50">{syncStatus}</span></>}
+          lead="Моліться разом із громадою, де б ви не були."
           aside={<ExternalLink href={RECTOR_VIDEOS} className="text-gold-light">Усі відео на Facebook</ExternalLink>}
         />
 
         {current ? (
-          <div className="reveal mt-16 grid overflow-hidden rounded-3xl border border-white/10 bg-white/[.03] lg:grid-cols-[1.45fr_1fr]">
+          <div className="spotlight reveal mt-16 grid overflow-hidden rounded-3xl border border-white/10 bg-white/[.03] lg:grid-cols-[1.45fr_1fr]">
             <VideoFrame stream={current} />
             <div className="flex flex-col justify-between gap-8 p-8 sm:p-10">
               <div>

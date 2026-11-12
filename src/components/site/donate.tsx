@@ -66,7 +66,7 @@ export function Donate() {
           </div>
         </div>
 
-        <form onSubmit={onSubmit} noValidate className="reveal glass-panel self-start rounded-[2rem] p-7 sm:p-10">
+        <form onSubmit={onSubmit} noValidate className="spotlight reveal glass-panel self-start rounded-[2rem] p-7 sm:p-10">
           <fieldset>
             <legend className="text-sm font-semibold text-ivory/80">Напрям підтримки</legend>
             <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">

@@ -23,7 +23,7 @@ import { ConsentBanner } from '@/components/site/consent'
 import { OutboxSync } from '@/components/site/outbox-sync'
 
 export default function App() {
-  const { posts, current, archive, announcement, syncStatus } = useParishData()
+  const { posts, current, archive, announcement } = useParishData()
   return (
     <>
       <Ambient />
@@ -33,7 +33,7 @@ export default function App() {
         <Hero announcement={announcement} />
         <Marquee />
         <Schedule />
-        <Worship current={current} archive={archive} syncStatus={syncStatus} />
+        <Worship current={current} archive={archive} />
         <CalendarSection />
         <ScriptureBanner />
         <Feasts />

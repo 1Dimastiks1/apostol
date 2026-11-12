@@ -1,10 +1,10 @@
 const MAX_SIDE = 1400
 
-/** Зменшує фото до 1400 px і перекодовує в JPEG, щоб воно важило ~150–400 КБ */
-export async function compressImage(file: File): Promise<string> {
+/** Зменшує фото до 1400 px (або до вказаного розміру) і перекодовує в JPEG, щоб воно важило ~150–400 КБ */
+export async function compressImage(file: File, maxSide = MAX_SIDE, quality = 0.82): Promise<string> {
   if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error('Оберіть фото у форматі JPG, PNG або WebP')
-  const bitmap = await createImageBitmap(file)
-  const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height))
+  const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height))
   const canvas = document.createElement('canvas')
   canvas.width = Math.round(bitmap.width * scale)
   canvas.height = Math.round(bitmap.height * scale)
@@ -14,7 +14,7 @@ export async function compressImage(file: File): Promise<string> {
   ctx.fillRect(0, 0, canvas.width, canvas.height)
   ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
   bitmap.close()
-  return canvas.toDataURL('image/jpeg', 0.82)
+  return canvas.toDataURL('image/jpeg', quality)
 }
 
 /** Адреса фото події: власне (із сервера) або статичне з початкових даних */

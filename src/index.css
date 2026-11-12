@@ -180,14 +180,25 @@ html[data-text-size="2"] { font-size: 125%; }
 
   .arch { border-radius: 999px 999px 1.25rem 1.25rem; }
 
-  /* Світло, що йде за курсором по картці (координати задає PageChrome) */
+  /* Ефект «spotlight-card»: золота рамка й м'яке світло йдуть за курсором (координати задає PageChrome) */
   .spotlight { position: relative; isolation: isolate; }
+  .spotlight::before,
   .spotlight::after {
-    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit;
-    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgb(198 160 82 / .18), transparent 60%);
-    opacity: 0; transition: opacity .35s;
+    content: ''; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
   }
-  .spotlight:hover::after { opacity: 1; }
+  /* світна рамка: радіальний градієнт видно лише в смужці рамки (маска) */
+  .spotlight::before {
+    z-index: 2; padding: 2px;
+    background: radial-gradient(240px circle at var(--mx, -999px) var(--my, -999px), rgb(255 232 160 / 1), rgb(198 160 82 / .55) 45%, transparent 75%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  }
+  /* м'яке світло всередині картки */
+  .spotlight::after {
+    z-index: 1;
+    background: radial-gradient(380px circle at var(--mx, -999px) var(--my, -999px), rgb(198 160 82 / .16), transparent 65%);
+  }
 
   /* Золотий відблиск, що повільно пробігає по виділених словах заголовків */
   .display em {

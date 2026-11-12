@@ -84,17 +84,29 @@ export function PageChrome() {
   useEffect(() => {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
     let magnet: HTMLElement | null = null
+    let pointer = { x: 0, y: 0 }
+    let glowFrame = 0
+    const updateGlow = () => {
+      glowFrame = 0
+      document.querySelectorAll<HTMLElement>('.spotlight').forEach((el) => {
+        const r = el.getBoundingClientRect()
+        const near = pointer.x > r.left - 260 && pointer.x < r.right + 260 && pointer.y > r.top - 260 && pointer.y < r.bottom + 260
+        if (near) {
+          el.style.setProperty('--mx', `${pointer.x - r.left}px`)
+          el.style.setProperty('--my', `${pointer.y - r.top}px`)
+        } else if (el.style.getPropertyValue('--mx')) {
+          el.style.removeProperty('--mx'); el.style.removeProperty('--my')
+        }
+      })
+    }
     const release = () => { magnet?.style.removeProperty('--tx'); magnet?.style.removeProperty('--ty'); magnet = null }
     const move = (e: PointerEvent) => {
       halo.current?.style.setProperty('--cx', `${e.clientX}px`)
       halo.current?.style.setProperty('--cy', `${e.clientY}px`)
       const target = e.target as HTMLElement | null
-      const el = target?.closest<HTMLElement>('.spotlight')
-      if (el) {
-        const r = el.getBoundingClientRect()
-        el.style.setProperty('--mx', `${e.clientX - r.left}px`)
-        el.style.setProperty('--my', `${e.clientY - r.top}px`)
-      }
+      // Рамка світиться й у сусідніх карток, тож оновлюємо всі, що біля курсора (раз на кадр)
+      pointer = { x: e.clientX, y: e.clientY }
+      if (!glowFrame) glowFrame = requestAnimationFrame(updateGlow)
       const m = target?.closest<HTMLElement>('.magnetic') ?? null
       if (m !== magnet) release()
       if (m) {
