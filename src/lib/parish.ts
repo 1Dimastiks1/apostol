@@ -18,7 +18,8 @@ export const REVIEWS_URL = 'https://list.in.ua/94606/%D0%A5%D1%80%D0%B0%D0%BC-%D
 export const RETENTION_DAYS = 14
 
 /** Власні світлини парафії з public/images */
-export const photo = (file: string) => `${import.meta.env.BASE_URL}images/${file}`
+// Фото віддаємо стислими WebP-копіями (їх створює npm run images); оригінали JPG/PNG лишаються для соцмереж
+export const photo = (file: string) => `${import.meta.env.BASE_URL}images/${file.replace(/\.(jpe?g|png)$/i, '.webp')}`
 
 /** Атмосферні світлини з Unsplash (вільна ліцензія). Це НЕ фото нашого храму. */
 export const stock = (id: string, w = 1600) =>

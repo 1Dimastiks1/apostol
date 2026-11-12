@@ -515,6 +515,25 @@ export function createParishApi({ readList, writeList }) {
     return fail(405, 'Метод не підтримується');
   }
 
+  /** Щотижнева резервна копія (Vercel Cron) і видалення заявок та записок, старших за рік */
+  async function handleBackup(req) {
+    const secret = process.env.CRON_SECRET || '';
+    if (!secret || !safeEqual(req.headers.get('authorization') || '', `Bearer ${secret}`)) return fail(401, 'Недоступно');
+    const now = Date.now();
+    const fresh = (item) => { const t = Date.parse(item?.createdAt || ''); return !Number.isFinite(t) || now - t < 365 * 86_400_000; };
+    const [requests, notes, events, streams] = await Promise.all([loadList('requests', []), loadList('notes', []), loadList('events', seedEvents), loadList('streams', seedStreams)]);
+    const keptRequests = requests.filter(fresh), keptNotes = notes.filter(fresh);
+    if (keptRequests.length !== requests.length) await writeList('requests', keptRequests);
+    if (keptNotes.length !== notes.length) await writeList('notes', keptNotes);
+    // Номер тижня за ISO: одна копія на тиждень, стара копія того ж тижня перезаписується
+    const d = new Date(Date.UTC(new Date(now).getUTCFullYear(), new Date(now).getUTCMonth(), new Date(now).getUTCDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    const week = Math.ceil(((d - Date.UTC(d.getUTCFullYear(), 0, 1)) / 86_400_000 + 1) / 7);
+    const key = `backup-${d.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
+    await writeList(key, [{ createdAt: new Date(now).toISOString(), requests: keptRequests, notes: keptNotes, events, streams }]);
+    return json({ success: true, key, requests: keptRequests.length, notes: keptNotes.length, removed: requests.length - keptRequests.length + notes.length - keptNotes.length });
+  }
+
   async function handleFacebook() {
     try {
       return json(await facebook.getSnapshot());
@@ -531,13 +550,23 @@ export function createParishApi({ readList, writeList }) {
       .filter(Boolean)
       .map(decodeURIComponent);
 
+    // Публічні списки (події, ефіри, Facebook) кешуються CDN на 30 с: під час напливу відвідувачів сховище
+    // не отримує запит від кожного з них. Запити адмінки (з токеном) завжди йдуть повз кеш.
+    const cdn = (res) => {
+      if (req.method === 'GET' && !sub && !req.headers.get('authorization') && res.status === 200) {
+        res.headers.set('Cache-Control', 'public, max-age=0, s-maxage=30, stale-while-revalidate=120');
+      }
+      return res;
+    };
+
     try {
-      if (resource === 'events') return await handleEvents(req, id, sub);
-      if (resource === 'streams') return await handleStreams(req, id);
+      if (resource === 'events') return cdn(await handleEvents(req, id, sub));
+      if (resource === 'streams') return cdn(await handleStreams(req, id));
       if (resource === 'admin') return await handleAdmin(req, id);
       if (resource === 'requests') return await handleRequests(req, id);
       if (resource === 'notes') return await handleNotes(req, id);
-      if (resource === 'facebook-content' && req.method === 'GET') return await handleFacebook();
+      if (resource === 'facebook-content' && req.method === 'GET') return cdn(await handleFacebook());
+      if (resource === 'backup') return await handleBackup(req);
       return fail(404, 'Не знайдено');
     } catch (error) {
       console.error('API error:', error);

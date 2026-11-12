@@ -1,4 +1,5 @@
 import { useCallback, useState, type FormEvent } from 'react'
+import { Embers } from '@/components/ui/embers'
 import { Loader2, Plus, X } from 'lucide-react'
 import { Toast, type ToastMessage } from '@/components/ui/toast'
 import { Turnstile, turnstileOn } from '@/components/ui/turnstile'
@@ -54,6 +55,7 @@ export function Memorial() {
 
   return (
     <section id="prayer-notes" className="grain relative isolate overflow-hidden bg-night py-28 text-ivory sm:py-36">
+      <Embers className="-z-[5]" />
       <Toast message={toast} onClose={closeToast} />
       <img src={photo('parish/analoy-gospel.jpg')} alt="" className="absolute inset-0 -z-10 size-full object-cover opacity-25" loading="lazy" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-night via-night/90 to-night/60" />
@@ -95,7 +97,7 @@ export function Memorial() {
             <button type="button" onClick={() => setNames([...names, ''])} className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary"><Plus className="size-4" />Додати ім’я</button>
             <label className="mt-8 flex items-start gap-3 text-sm text-ink/70">
               <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 size-5 shrink-0 accent-[#5a1418]" />
-              Погоджуюся передати ці імена парафії для церковного поминання.
+              Погоджуюся передати ці імена парафії для церковного поминання (<a href={`${import.meta.env.BASE_URL}privacy`} target="_blank" rel="noopener" className="underline underline-offset-2">політика конфіденційності</a>).
             </label>
             <OfflineNotice what="записку" />
             <div className="mt-6"><Turnstile onToken={setCaptcha} resetKey={captchaReset} /></div>

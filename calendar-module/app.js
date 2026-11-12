@@ -634,15 +634,31 @@
             </ul>
           </div>`;
       } else {
-        scheduleNote = `
+        // Будній день: служб немає, окрім вечірньої напередодні великого свята
+        const eve = addDays(selectedDate, 1);
+        const eveRecord = dayRecord(eve) || buildYearData(eve.getFullYear()).find((item) => item.date === isoDate(eve));
+        const eveOfGreatHoliday = Boolean(eveRecord && (eveRecord.isPascha || eveRecord.isGreat12 || eveRecord.isMajor));
+        if (eveOfGreatHoliday) {
+          scheduleNote = `
           <div class="cc-parish-schedule-box">
-            <div class="cc-parish-schedule-title">✠ Богослужіння дня:</div>
+            <div class="cc-parish-schedule-title">✠ Напередодні свята (${escapeHtml(eveRecord.title)}):</div>
             <ul class="cc-parish-schedule-list">
-              <li><strong>08:30</strong> — Ранкова сповідь</li>
-              <li><strong>09:00</strong> — Божественна Літургія, поминання за здоров’я та упокій</li>
-              <li><strong>17:00</strong> — Вечірнє богослужіння, читання акафісту</li>
+              <li><strong>17:00</strong> — Вечірнє богослужіння</li>
             </ul>
           </div>`;
+        } else if (selectedDate.getDay() === 6) {
+          scheduleNote = `
+          <div class="cc-parish-schedule-box">
+            <div class="cc-parish-schedule-title">✠ Богослужіння у храмі:</div>
+            <p class="cc-parish-schedule-text">Час служб у суботу уточнюйте за телефоном: +38 (097) 131-28-86.</p>
+          </div>`;
+        } else {
+          scheduleNote = `
+          <div class="cc-parish-schedule-box">
+            <div class="cc-parish-schedule-title">✠ Богослужіння у храмі:</div>
+            <p class="cc-parish-schedule-text">У будні дні богослужінь немає.</p>
+          </div>`;
+        }
       }
 
       const gcalUrl = makeGoogleCalendarUrl(record.title, record.date, record.description || record.saints);
@@ -844,6 +860,10 @@
         root.innerHTML = '';
         root.className = originalClass;
       },
+      selectDate(value) {
+        selectDate(value);
+        root.querySelector('.cc-day.is-selected')?.focus({ preventScroll: true });
+      },
       goToToday() {
         root.querySelector('[data-action="today"]')?.click();
       },
@@ -862,9 +882,12 @@
       }
     };
     mountedCalendars.add(calendarApi);
+    // Сайт міг попросити показати конкретне свято ще до завантаження календаря
+    if (window.__churchCalendarPendingDate) { selectDate(window.__churchCalendarPendingDate); window.__churchCalendarPendingDate = undefined; }
     return calendarApi;
   }
 
   window.mountChurchCalendar = mountChurchCalendar;
+  window.churchCalendarGoTo = (iso) => mountedCalendars.forEach((calendar) => calendar.selectDate(iso));
   window.getChurchCalendarYearData = (year = new Date().getFullYear()) => buildYearData(Math.min(2100, Math.max(1900, Number(year) || new Date().getFullYear())));
 })();

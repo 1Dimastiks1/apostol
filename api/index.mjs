@@ -57,7 +57,7 @@ async function readBlob(key, mode) {
 const parishApi = createParishApi({
   async readList(key) {
     if (!hasBlobCredentials()) return null;
-    const run = (key === 'requests' || key === 'notes') ? withPrivateAccess : withAccess;
+    const run = (key === 'requests' || key === 'notes' || key.startsWith('backup-')) ? withPrivateAccess : withAccess;
     const text = await run((mode) => readBlob(key, mode));
     return text === null ? null : JSON.parse(text);
   },

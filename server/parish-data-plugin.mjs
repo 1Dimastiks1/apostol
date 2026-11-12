@@ -17,7 +17,11 @@ export function createFileStore(projectRoot) {
     notes: resolve(projectRoot, '.private-data', 'notes.json')
   };
   // Фото подій: окремий файл на кожне, у закритій папці (віддаються лише через API)
-  const fileFor = (key) => (/^eventimg_[\w-]+$/.test(key) ? resolve(projectRoot, '.private-data', 'event-images', `${key}.json`) : files[key]);
+  const fileFor = (key) => {
+    if (/^eventimg_[\w-]+$/.test(key)) return resolve(projectRoot, '.private-data', 'event-images', `${key}.json`);
+    if (/^backup-\d{4}-W\d{2}$/.test(key)) return resolve(projectRoot, '.private-data', 'backups', `${key}.json`);
+    return files[key];
+  };
   return {
     async readList(key) {
       const file = fileFor(key);

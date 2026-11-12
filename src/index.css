@@ -228,7 +228,7 @@ html[data-text-size="2"] { font-size: 125%; }
   /* М'яке золоте сяйво за курсором на всій сторінці */
   .cursor-halo {
     position: fixed; z-index: 55; top: 0; left: 0; width: 520px; height: 520px; margin: -260px 0 0 -260px;
-    pointer-events: none; border-radius: 999px; mix-blend-mode: soft-light;
+    pointer-events: none; border-radius: 999px; opacity: .5;
     background: radial-gradient(circle, rgb(198 160 82 / .55), transparent 65%);
     transform: translate3d(var(--cx, -999px), var(--cy, -999px), 0); transition: opacity .4s;
   }
@@ -487,6 +487,7 @@ html[data-text-size="2"] { font-size: 125%; }
 #church-calendar-widget .cc-detail-description { margin: 16px 0 0; line-height: 1.7; }
 #church-calendar-widget .cc-fast-status { margin-top: 28px; padding: 16px 18px; gap: 14px; }
 #church-calendar-widget .cc-parish-schedule-box { margin-top: 22px; padding: 18px 20px; line-height: 1.75; }
+#church-calendar-widget .cc-parish-schedule-text { margin: 10px 0 0; color: rgb(246 239 227 / .78); line-height: 1.6; }
 #church-calendar-widget .cc-parish-schedule-list { margin: 12px 0 0; padding: 0; display: grid; gap: 8px; list-style: none; }
 #church-calendar-widget .cc-export-actions { gap: 12px; margin-top: 26px; padding-top: 22px; border-top: 1px dashed rgb(255 255 255 / .16); }
 #church-calendar-widget .cc-export-actions > * { padding: 11px 18px; }
@@ -511,7 +512,7 @@ html[data-text-size="2"] { font-size: 125%; }
   -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 78%);
   mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 78%);
 }
-.ambient-orb { position: absolute; border-radius: 999px; filter: blur(90px); will-change: transform; }
+.ambient-orb { position: absolute; border-radius: 999px; will-change: transform; } /* градієнти й так м'які: без filter: blur, який дуже гальмує Safari */
 .ambient-orb--wine { width: 62vmax; height: 62vmax; left: -22vmax; top: -18vmax; background: radial-gradient(circle, rgb(122 28 34 / .34), transparent 68%); animation: drift-a 26s ease-in-out infinite alternate; }
 .ambient-orb--gold { width: 56vmax; height: 56vmax; right: -20vmax; top: 18vh; background: radial-gradient(circle, rgb(210 168 82 / .42), transparent 68%); animation: drift-b 32s ease-in-out infinite alternate; }
 .ambient-orb--rose { width: 46vmax; height: 46vmax; left: 18vw; bottom: -22vmax; background: radial-gradient(circle, rgb(170 70 62 / .24), transparent 68%); animation: drift-c 38s ease-in-out infinite alternate; }
@@ -546,3 +547,46 @@ main > section.grain { box-shadow: 0 1px 0 rgb(198 160 82 / .28) inset; }
 @media (prefers-reduced-motion: reduce) {
   .ambient-orb, .grain::before { animation: none !important; }
 }
+
+/* ══ Safari та всі браузери на iPhone/iPad (рушій WebKit) ══
+   Важкі безперервні ефекти (розмиття під склом, анімації на всю сторінку, анімації від прокрутки) WebKit
+   перемальовує повільно, і сторінка «смикається». Тут їх вимкнено або спрощено; вигляд лишається тим самим. */
+.is-webkit .ambient-orb,
+.is-webkit .grain::before,
+.is-webkit .display em,
+.is-webkit .rays,
+.is-webkit .hero-zoom { animation: none !important; }
+.is-webkit .rays,
+.is-webkit .cursor-halo { display: none !important; }
+/* Світлячки й іскри в Safari лишаються, але без тіні (вона дорога), світіння дає сам градієнт */
+.is-webkit .ember, .is-webkit .firefly { box-shadow: none !important; }
+.is-webkit .reveal,
+.is-webkit .reveal-clip,
+.is-webkit .eyebrow::before,
+.is-webkit .parallax { animation: none !important; opacity: 1 !important; transform: none !important; clip-path: none !important; scale: 1 !important; translate: none !important; }
+.is-webkit .rise { animation-name: rise-lite; }
+@keyframes rise-lite { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+.is-webkit .backdrop-blur, .is-webkit .backdrop-blur-sm, .is-webkit .backdrop-blur-md, .is-webkit .backdrop-blur-xl,
+.is-webkit .glass-panel,
+.is-webkit #church-calendar-widget .cc-calendar { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.is-webkit .glass-panel { background: rgb(27 6 7 / .92); }
+.is-webkit #church-calendar-widget .cc-calendar { background: linear-gradient(160deg, #2a0d10, #170506 60%, #2a0b0e); }
+.is-webkit .ambient-orb, .is-webkit img { will-change: auto !important; }
+
+/* ══ Світлячки на фоні всього сайту ══ */
+.firefly {
+  position: absolute; left: var(--x); top: var(--y);
+  width: var(--s, 6px); height: var(--s, 6px); border-radius: 999px;
+  background: radial-gradient(circle, #fff3c4 0%, #e8cf8d 35%, rgb(198 160 82 / .35) 60%, transparent 72%);
+  box-shadow: 0 0 12px 3px rgb(232 207 141 / .45);
+  opacity: 0; will-change: transform, opacity;
+  animation: firefly-float var(--d, 18s) ease-in-out var(--delay, 0s) infinite alternate, firefly-glow var(--g, 4s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes firefly-float {
+  0% { transform: translate3d(0, 0, 0); }
+  33% { transform: translate3d(var(--dx1, 30px), var(--dy1, -40px), 0); }
+  66% { transform: translate3d(var(--dx2, -25px), var(--dy2, -80px), 0); }
+  100% { transform: translate3d(var(--dx3, 15px), var(--dy3, -120px), 0); }
+}
+@keyframes firefly-glow { 0%, 100% { opacity: 0; } 30% { opacity: .95; } 55% { opacity: .35; } 75% { opacity: .85; } }
+@media (prefers-reduced-motion: reduce) { .firefly { animation: none; opacity: .5; } }

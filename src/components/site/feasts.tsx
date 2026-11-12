@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useScroll, useTransform } from 'framer-motion'
-import { X } from 'lucide-react'
+import { CalendarDays, CalendarPlus, Download, X } from 'lucide-react'
 import IntroAnimation, { MORPH_MAX_SCROLL, type MorphItem } from '@/components/ui/scroll-morph-hero'
-import { FEASTS } from '@/lib/feasts'
+import { FEASTS, downloadIcs, googleCalendarUrl, nextFeastDate, showInSiteCalendar } from '@/lib/feasts'
 import { photo } from '@/lib/parish'
 import { cn } from '@/lib/utils'
 
@@ -19,6 +19,8 @@ export function Feasts() {
   })), [])
 
   const feast = selected === null ? null : FEASTS[selected]
+  const when = feast ? nextFeastDate(feast.id) : null
+  const whenLabel = when ? new Intl.DateTimeFormat('uk-UA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(when) : ''
 
   useEffect(() => {
     if (selected === null) return
@@ -75,6 +77,18 @@ export function Feasts() {
               <h3 className="display mt-5 text-[clamp(2.2rem,4.6vw,4rem)]">{feast.title}</h3>
               <p className="mt-5 inline-block rounded-full border border-gold/40 px-4 py-1.5 text-sm font-semibold text-gold-light">{feast.date}</p>
               <p className="mt-7 max-w-xl text-lg leading-relaxed text-ivory/75">{feast.text}</p>
+
+              {when && (
+                <div className="mt-8 max-w-xl rounded-3xl border border-gold/25 bg-white/[.04] p-5 sm:p-6">
+                  <p className="text-[0.62rem] font-bold uppercase tracking-[0.24em] text-gold-light/80">Найближче свято</p>
+                  <p className="mt-2 font-display text-2xl text-ivory first-letter:uppercase">{whenLabel}</p>
+                  <div className="mt-5 grid gap-2 sm:grid-cols-3">
+                    <button type="button" onClick={() => { setSelected(null); window.setTimeout(() => showInSiteCalendar(when), 60) }} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#f3dfa0] to-[#a8853c] px-4 text-sm font-bold text-night"><CalendarDays className="size-4" />У календарі</button>
+                    <a href={googleCalendarUrl(feast.title, when, feast.text)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-gold/40 px-4 text-sm font-semibold text-ivory hover:border-gold hover:bg-gold/10"><CalendarPlus className="size-4" />Google Календар</a>
+                    <button type="button" onClick={() => downloadIcs(feast.title, when, feast.text)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-gold/40 px-4 text-sm font-semibold text-ivory hover:border-gold hover:bg-gold/10"><Download className="size-4" />iPhone / .ics</button>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-10 flex gap-3">
                 <button type="button" onClick={() => setSelected((selected + FEASTS.length - 1) % FEASTS.length)} className={cn('chip !text-ivory/80 !border-white/20 hover:!border-gold')}>← {FEASTS[(selected + FEASTS.length - 1) % FEASTS.length].short}</button>

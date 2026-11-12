@@ -10,6 +10,12 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   })
 }
 
+// Safari та браузери на iPhone/iPad (WebKit) отримують полегшені ефекти, інакше сторінка смикається
+const ua = navigator.userAgent
+if (/iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) || (/Safari\//.test(ua) && !/(Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS|Android)/.test(ua))) {
+  document.documentElement.classList.add('is-webkit')
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AdminApp />

@@ -55,27 +55,21 @@ function FlipCard({
                 position: "absolute",
                 width: IMG_WIDTH,
                 height: IMG_HEIGHT,
-                transformStyle: "preserve-3d", // Essential for the 3D hover effect
-                perspective: "1000px",
             }}
             className="cursor-pointer group"
         >
+            {/* Без перевертання: при наведенні картка трохи піднімається, світиться золотом і показує назву свята */}
             <motion.button
                 type="button"
                 onClick={() => onSelect?.(index)}
                 aria-label={item.label ? `${item.label}${item.caption ? ` · ${item.caption}` : ""}` : item.alt}
                 tabIndex={onSelect ? 0 : -1}
-                className="relative block h-full w-full cursor-pointer"
-                style={{ transformStyle: "preserve-3d" }}
-                transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
-                whileHover={{ rotateY: 180 }}
-                whileFocus={{ rotateY: 180 }}
+                className="relative block h-full w-full cursor-pointer rounded-md outline-none focus-visible:ring-2 focus-visible:ring-gold-light"
+                transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                whileHover={{ y: -8, scale: 1.08 }}
+                whileFocus={{ y: -8, scale: 1.08 }}
             >
-                {/* Front Face */}
-                <div
-                    className="absolute inset-0 h-full w-full overflow-hidden rounded-md shadow-lg shadow-black/40 bg-wine-deep ring-1 ring-gold/40"
-                    style={{ backfaceVisibility: "hidden" }}
-                >
+                <div className="absolute inset-0 h-full w-full overflow-hidden rounded-md bg-wine-deep shadow-lg shadow-black/40 ring-1 ring-gold/40 transition-shadow duration-300 group-hover:shadow-[0_14px_34px_-10px_rgba(198,160,82,.65)] group-hover:ring-gold-light">
                     <img
                         src={item.src}
                         alt={item.alt}
@@ -84,17 +78,11 @@ function FlipCard({
                         draggable={false}
                     />
                     <div className="absolute inset-0 bg-black/10 transition-colors group-hover:bg-transparent" />
-                </div>
-
-                {/* Back Face */}
-                <div
-                    className="absolute inset-0 h-full w-full overflow-hidden rounded-md shadow-lg bg-gradient-to-b from-wine to-wine-deep flex flex-col items-center justify-center p-1.5 border border-gold/50"
-                    style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-                >
-                    <div className="text-center">
-                        {item.caption && <p className="text-[5.5px] font-bold text-gold-light uppercase tracking-wider mb-1">{item.caption}</p>}
-                        <p className="font-display text-[10px] leading-tight text-ivory">{item.label ?? "Детальніше"}</p>
-                    </div>
+                    {item.label && (
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 translate-y-1 bg-gradient-to-t from-night/90 via-night/60 to-transparent px-1 pb-1.5 pt-5 text-center opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:opacity-100">
+                            <p className="font-display text-[9px] leading-tight text-ivory">{item.label}</p>
+                        </div>
+                    )}
                 </div>
             </motion.button>
         </motion.div>

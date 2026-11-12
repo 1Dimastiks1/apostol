@@ -1,8 +1,10 @@
 import { Play } from 'lucide-react'
+import { Embers } from '@/components/ui/embers'
 import type { Stream } from '@/lib/parish'
 import { RECTOR_PAGE, RECTOR_VIDEOS, embedUrl, formatDate, safeHttpUrl } from '@/lib/parish'
 import { ExternalLink, SectionHeading } from './section-heading'
 import { cn } from '@/lib/utils'
+import { EmbedGate } from './consent'
 
 const label = (s: Stream) => s.dateLabel || formatDate(s.date || s.createdAt)
 
@@ -11,7 +13,7 @@ function VideoFrame({ stream, className }: { stream: Stream; className?: string 
   return (
     <div className={cn('video-frame', className)}>
       {src
-        ? <iframe title={stream.title || 'Трансляція богослужіння'} loading="lazy" src={src} allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen />
+        ? <EmbedGate provider={src.includes('youtube') ? 'YouTube' : 'Facebook'}><iframe title={stream.title || 'Трансляція богослужіння'} loading="lazy" src={src} allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen /></EmbedGate>
         : <div className="grid size-full place-items-center text-ivory/50"><Play /></div>}
     </div>
   )
@@ -21,6 +23,7 @@ export function Worship({ current, archive, syncStatus }: { current: Stream | nu
   const live = Boolean(current?.isLive)
   return (
     <section id="online" className="grain relative isolate overflow-hidden bg-night py-28 text-ivory sm:py-36">
+      <Embers className="-z-[5]" />
       <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[600px] w-[1100px] -translate-x-1/2 bg-[radial-gradient(ellipse,rgba(90,20,24,.55),transparent_65%)]" aria-hidden="true" />
       <div className="shell">
         <SectionHeading

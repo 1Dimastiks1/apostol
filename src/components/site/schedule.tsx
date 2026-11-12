@@ -1,4 +1,5 @@
 import { Radio } from 'lucide-react'
+import { Embers } from '@/components/ui/embers'
 import { SUNDAY_SCHEDULE, photo } from '@/lib/parish'
 import { ExternalLink, SectionHeading } from './section-heading'
 import { PARISH_PAGE } from '@/lib/parish'
@@ -43,6 +44,7 @@ export function Schedule() {
 export function ScriptureBanner() {
   return (
     <section className="grain relative isolate overflow-hidden bg-night py-32 text-center text-ivory sm:py-44" aria-label="Слово Святого Письма">
+      <Embers className="-z-[5]" />
       <img src={photo('parish/iconostasis-gold.jpg')} alt="" className="absolute inset-0 -z-10 size-full object-cover opacity-45" loading="lazy" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-night via-night/40 to-night" />
       <div className="shell reveal max-w-4xl">

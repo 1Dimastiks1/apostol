@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Embers } from '@/components/ui/embers'
 import { ArrowUp, CalendarDays, HandCoins, ListOrdered, PenLine, Radio } from 'lucide-react'
 import { ADDRESS, PARISH_PAGE, PHONE, PHONE_LABEL, RECTOR_PAGE, RECTOR_PHONE, RECTOR_PHONE_LABEL } from '@/lib/parish'
 import { cn } from '@/lib/utils'
@@ -14,6 +15,7 @@ const COLUMNS = [
 export function SiteFooter() {
   return (
     <footer className="grain relative isolate overflow-hidden bg-night pb-[calc(7rem+env(safe-area-inset-bottom))] pt-24 text-ivory xl:pb-12">
+      <Embers className="-z-[5]" />
       <div className="shell">
         <div className="text-center">
           <Ornament />
@@ -43,7 +45,7 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-16 flex flex-col justify-between gap-3 border-t border-white/10 pt-8 text-xs text-ivory/40 sm:flex-row">
-          <span className="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center"><span>© {new Date().getFullYear()} Петропавлівська парафія ПЦУ · Кам’янець-Подільський</span><InstallApp /></span>
+          <span className="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center"><span>© {new Date().getFullYear()} Петропавлівська парафія ПЦУ · Кам’янець-Подільський · <a href={`${import.meta.env.BASE_URL}privacy`} className="underline-offset-4 hover:text-ivory/70 hover:underline">Конфіденційність</a> · <a href={`${import.meta.env.BASE_URL}terms`} className="underline-offset-4 hover:text-ivory/70 hover:underline">Умови використання</a></span><InstallApp /></span>
           <span>Ікони свят — Wikimedia Commons (дві ікони Скваряви Нової: Mykola Swarnyk, CC BY-SA 3.0).</span>
         </div>
       </div>

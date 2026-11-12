@@ -168,7 +168,7 @@ export function ServicesForm() {
                   <input id="req-consent" type="checkbox" checked={form.consent} onChange={(e) => update('consent', e.target.checked)} className="peer size-5 cursor-pointer appearance-none rounded-md border-2 border-gold-deep/60 bg-white transition checked:border-emerald-600 checked:bg-emerald-600" aria-invalid={Boolean(errors.consent)} aria-describedby={describedBy('consent')} />
                   <Check className="pointer-events-none absolute size-3.5 text-white opacity-0 peer-checked:opacity-100" strokeWidth={3} />
                 </span>
-                <span>Я перевірив(ла) ім’я та номер телефону. Погоджуюся, щоб парафія зв’язалася зі мною щодо цієї заявки. *</span>
+                <span>Я перевірив(ла) ім’я та номер телефону. Погоджуюся, щоб парафія зв’язалася зі мною щодо цієї заявки, і з <a href={`${import.meta.env.BASE_URL}privacy`} target="_blank" rel="noopener" className="font-semibold text-primary underline underline-offset-2">політикою конфіденційності</a>. *</span>
               </label>
               <FieldError id="req-consent-error" message={errors.consent} />
             </div>

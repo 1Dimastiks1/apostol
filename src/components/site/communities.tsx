@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { Embers } from '@/components/ui/embers'
 import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import { SectionHeading } from './section-heading'
 
@@ -35,6 +36,7 @@ export function Communities() {
 
   return (
     <section id="liturgy" className="grain relative isolate overflow-hidden bg-wine-deep py-28 text-ivory sm:py-36">
+      <Embers className="-z-[5]" />
       <div className="pointer-events-none absolute -left-40 bottom-0 -z-10 size-[600px] rounded-full bg-[radial-gradient(circle,rgba(198,160,82,.14),transparent_65%)]" aria-hidden="true" />
       <div className="shell grid gap-14 lg:grid-cols-[.85fr_1.15fr] lg:gap-24">
         <div className="lg:sticky lg:top-32 lg:self-start">

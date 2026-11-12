@@ -19,7 +19,10 @@ export async function api<T = unknown>(path: string, init: RequestInit & { json?
   const token = session.get()
   if (token) headers.set('Authorization', `Bearer ${token}`)
   if (init.json !== undefined) headers.set('Content-Type', 'application/json')
-  const res = await fetch(new URL(`api/${path}`, document.baseURI), {
+  const url = new URL(`api/${path}`, document.baseURI)
+  // Свіжі дані для адмінки: окрема адреса для кожного читання, щоб не отримати копію з кешу CDN
+  if (!init.method || init.method === 'GET') url.searchParams.set('_', String(Date.now()))
+  const res = await fetch(url, {
     ...init,
     headers,
     cache: 'no-store',

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Embers } from '@/components/ui/embers'
 import { ShieldCheck } from 'lucide-react'
 import { MetalButton } from '@/components/ui/liquid-glass-button'
 import { PAYMENT_URL, photo } from '@/lib/parish'
@@ -38,6 +39,7 @@ export function Donate() {
 
   return (
     <section id="donate" className="grain relative isolate overflow-hidden bg-night py-28 text-ivory sm:py-36">
+      <Embers className="-z-[5]" />
       <img src={photo('rector-liturgy-with-clergy.jpg')} alt="" className="absolute inset-y-0 right-0 -z-10 h-full w-full object-cover opacity-30 lg:w-1/2 lg:opacity-60" loading="lazy" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-night via-night/95 to-night/40" />
       <div className="shell grid gap-16 lg:grid-cols-[1.05fr_.95fr] lg:gap-20">

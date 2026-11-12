@@ -19,6 +19,7 @@ import { Donate } from '@/components/site/donate'
 import { Contacts } from '@/components/site/contacts'
 import { PageChrome, SiteFooter } from '@/components/site/site-footer'
 import { Ambient } from '@/components/site/ambient'
+import { ConsentBanner } from '@/components/site/consent'
 import { OutboxSync } from '@/components/site/outbox-sync'
 
 export default function App() {
@@ -52,6 +53,7 @@ export default function App() {
       <SiteFooter />
       <PageChrome />
       <OutboxSync />
+      <ConsentBanner />
     </>
   )
 }

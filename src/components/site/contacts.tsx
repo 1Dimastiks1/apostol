@@ -3,6 +3,7 @@ import { Bus, Car, Copy, Footprints, MapPin, Phone } from 'lucide-react'
 import { LiquidButton } from '@/components/ui/liquid-glass-button'
 import { ADDRESS, MAPS_EMBED, MAPS_URL, PARISH_PAGE, PHONE, PHONE_LABEL, RECTOR_PAGE, RECTOR_PHONE, RECTOR_PHONE_LABEL, copyText } from '@/lib/parish'
 import { ExternalLink, SectionHeading } from './section-heading'
+import { EmbedGate } from './consent'
 
 const ROUTES = [
   { icon: Footprints, title: 'Пішки від Ратуші', text: 'Лише 300 метрів (3–4 хвилини). Від Ратуші прямуйте вулицею Зарванською або П’ятницькою до перетину з Татарською.' },
@@ -50,7 +51,7 @@ export function Contacts() {
             </div>
           </div>
           <div className="reveal overflow-hidden rounded-[2rem] border border-gold/30 shadow-[0_40px_100px_-60px_rgba(74,15,18,.6)]">
-            <iframe title="Карта до храму на вулиці Татарській, 9 у Кам’янці-Подільському" loading="lazy" src={MAPS_EMBED} className="h-full min-h-[460px] w-full grayscale-[35%] sepia-[15%]" referrerPolicy="no-referrer-when-downgrade" />
+            <EmbedGate provider="Google Maps" dark={false} className="min-h-[460px]"><iframe title="Карта до храму на вулиці Татарській, 9 у Кам’янці-Подільському" loading="lazy" src={MAPS_EMBED} className="h-full min-h-[460px] w-full grayscale-[35%] sepia-[15%]" referrerPolicy="no-referrer-when-downgrade" /></EmbedGate>
           </div>
         </div>
       </div>

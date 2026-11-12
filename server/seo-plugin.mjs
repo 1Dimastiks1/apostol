@@ -24,9 +24,13 @@ export function seoPlugin() {
         console.warn('\n[seo] SITE_URL не задано: canonical, og:url і sitemap.xml не створюються. Додайте SITE_URL=https://ваш-домен у налаштуваннях хостингу.\n');
       }
     },
-    transformIndexHtml(html) {
+    transformIndexHtml(html, ctx) {
+      // Підтвердження власності в Google Search Console (значення з налаштувань хостингу)
+      const verify = String(process.env.GOOGLE_SITE_VERIFICATION || '').trim().replace(/[^\w-]/g, '');
+      if (verify && ctx?.filename?.endsWith('index.html')) html = html.replace('</head>', `  <meta name="google-site-verification" content="${verify}">\n</head>`);
       const root = siteUrl ? `${siteUrl}${base === '/' ? '' : base.replace(/\/$/, '')}` : '';
-      if (!root) return html.replace(/^.*__SITE_URL__.*\n/gm, '');
+      // Без адреси сайту прибираємо теги з абсолютними посиланнями, а в розмітці JSON-LD лишаємо відносні адреси
+      if (!root) return html.replace(/^[ \t]*<(?:meta|link)[^\n]*__SITE_URL__[^\n]*\n/gm, '').replaceAll('__SITE_URL__', '');
       return html.replaceAll('__SITE_URL__', root);
     },
     generateBundle() {
@@ -50,7 +54,7 @@ export function seoPlugin() {
         this.emitFile({
           type: 'asset',
           fileName: 'sitemap.xml',
-          source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${origin}${path}/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n</urlset>\n`,
+          source: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[['/', 'weekly', '1.0'], ['/privacy', 'yearly', '0.3'], ['/terms', 'yearly', '0.3']].map(([u, f, p]) => `  <url>\n    <loc>${origin}${path}${u}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${f}</changefreq>\n    <priority>${p}</priority>\n  </url>`).join('\n')}\n</urlset>\n`,
         });
       }
     },

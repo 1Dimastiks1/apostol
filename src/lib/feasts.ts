@@ -90,3 +90,84 @@ export const FEASTS: Feast[] = [
     text: 'Свято упокоєння Матері Божої, яку Христос приймає до Себе. Церковний рік завершується цим святом.',
   },
 ]
+
+/* ── Найближча дата свята (новоюліанський календар ПЦУ, рухомі свята від православної Пасхи) ── */
+const FIXED: Record<string, [number, number]> = {
+  'nativity-of-mary': [9, 8], exaltation: [9, 14], 'presentation-of-mary': [11, 21], nativity: [12, 25],
+  theophany: [1, 6], candlemas: [2, 2], annunciation: [3, 25], transfiguration: [8, 6], dormition: [8, 15],
+}
+const FROM_PASCHA: Record<string, number> = { entry: -7, ascension: 39, pentecost: 49 }
+
+/** Православна Пасха (юліанська пасхалія) у григоріанському календарі */
+export function orthodoxPascha(year: number) {
+  const a = year % 4, b = year % 7, c = year % 19
+  const d = (19 * c + 15) % 30, e = (2 * a + 4 * b - d + 34) % 7
+  const month = Math.floor((d + e + 114) / 31), day = ((d + e + 114) % 31) + 1
+  const date = new Date(year, month - 1, day, 12)
+  date.setDate(date.getDate() + Math.floor(year / 100) - Math.floor(year / 400) - 2)
+  return date
+}
+
+const dateIn = (id: string, year: number) => {
+  if (FIXED[id]) return new Date(year, FIXED[id][0] - 1, FIXED[id][1], 12)
+  const p = orthodoxPascha(year)
+  p.setDate(p.getDate() + (FROM_PASCHA[id] ?? 0))
+  return p
+}
+
+/** Сьогоднішня або найближча майбутня дата свята */
+export function nextFeastDate(id: string, from = new Date()) {
+  const today = new Date(from.getFullYear(), from.getMonth(), from.getDate(), 12)
+  const date = dateIn(id, today.getFullYear())
+  return date < today ? dateIn(id, today.getFullYear() + 1) : date
+}
+
+export const isoDay = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+const TEMPLE = { name: 'Храм святих апостолів Петра і Павла ПЦУ', address: 'вул. Татарська, 9, Кам’янець-Подільський' }
+
+/** Посилання «Додати в Google Календар» на весь день свята */
+export function googleCalendarUrl(title: string, date: Date, details: string) {
+  const next = new Date(date); next.setDate(next.getDate() + 1)
+  const url = new URL('https://calendar.google.com/calendar/render')
+  url.searchParams.set('action', 'TEMPLATE')
+  url.searchParams.set('text', `${title} · Петропавлівський храм`)
+  url.searchParams.set('dates', `${isoDay(date).replace(/-/g, '')}/${isoDay(next).replace(/-/g, '')}`)
+  url.searchParams.set('details', `${details}\n\n${TEMPLE.name}\n${TEMPLE.address}`)
+  url.searchParams.set('location', TEMPLE.address)
+  return url.href
+}
+
+/** Файл .ics для календаря на iPhone, Android чи комп’ютері */
+export function downloadIcs(title: string, date: Date, details: string) {
+  const esc = (v: string) => v.replace(/\\/g, '\\\\').replace(/[,;]/g, (m) => `\\${m}`).replace(/\n/g, '\\n')
+  const next = new Date(date); next.setDate(next.getDate() + 1)
+  const day = isoDay(date).replace(/-/g, '')
+  const ics = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Petropavlivsky Khram//Feasts//UK', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    `UID:feast-${day}@petropavlivsky-khram`,
+    `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+    `DTSTART;VALUE=DATE:${day}`, `DTEND;VALUE=DATE:${isoDay(next).replace(/-/g, '')}`,
+    `SUMMARY:${esc(`${title} · Петропавлівський храм`)}`,
+    `DESCRIPTION:${esc(`${details}\n\n${TEMPLE.name}\n${TEMPLE.address}`)}`,
+    `LOCATION:${esc(TEMPLE.address)}`,
+    'BEGIN:VALARM', 'TRIGGER:-PT15H', 'ACTION:DISPLAY', `DESCRIPTION:${esc(`Завтра: ${title}`)}`, 'END:VALARM',
+    'END:VEVENT', 'END:VCALENDAR',
+  ].join('\r\n')
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }))
+  a.download = `svyato-${day}.ics`
+  document.body.appendChild(a); a.click(); a.remove()
+  window.setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+}
+
+declare global { interface Window { churchCalendarGoTo?: (iso: string) => void; __churchCalendarPendingDate?: string } }
+
+/** Показати дату в церковному календарі на сайті (якщо календар ще не завантажився, він відкриє її сам) */
+export function showInSiteCalendar(date: Date) {
+  const iso = isoDay(date)
+  if (window.churchCalendarGoTo) window.churchCalendarGoTo(iso)
+  else window.__churchCalendarPendingDate = iso
+  document.getElementById('calendar')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}

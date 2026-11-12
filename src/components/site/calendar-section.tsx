@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { Embers } from '@/components/ui/embers'
 
 export function CalendarSection() {
   useEffect(() => {
@@ -8,6 +9,7 @@ export function CalendarSection() {
 
   return (
     <section id="calendar" className="grain relative isolate overflow-hidden bg-night py-24 text-ivory sm:py-32" aria-label="Новоюліанський церковний календар ПЦУ">
+      <Embers className="-z-[5]" />
       <div className="pointer-events-none absolute -left-40 top-10 -z-10 size-[620px] rounded-full bg-[radial-gradient(circle,rgba(122,28,34,.45),transparent_65%)]" aria-hidden="true" />
       <div className="pointer-events-none absolute -right-48 bottom-0 -z-10 size-[560px] rounded-full bg-[radial-gradient(circle,rgba(198,160,82,.18),transparent_65%)]" aria-hidden="true" />
       <div className="shell max-w-6xl">
