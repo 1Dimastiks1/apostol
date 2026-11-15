@@ -3,10 +3,6 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/google25661dafef2894c5.html",
-      "destination": "/google-verify/google25661dafef2894c5.txt"
-    },
-    {
       "source": "/api/:path*",
       "destination": "/api/index?__path=:path*"
     },
